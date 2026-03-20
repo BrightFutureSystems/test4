@@ -1,0 +1,1564 @@
+from textwrap import dedent
+
+html = dedent(r'''
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>資産寿命シミュレータ</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root{
+    --maxw: 1180px;
+    --border:#d7d7d7;
+    --muted:#666;
+    --bg:#fff;
+    --panel:#fafafa;
+    --green:#0a8f3e;
+    --red:#d33;
+    --blue:#0b67d1;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#fff;
+    color:#111;
+  }
+  .page{
+    max-width:var(--maxw);
+    margin:0 auto;
+    padding:12px 14px 20px;
+  }
+  h1{
+    margin:0 0 8px;
+    text-align:center;
+    font-size:1.7rem;
+  }
+  #chartWrap{
+    position:sticky;
+    top:0;
+    z-index:30;
+    background:#fff;
+    padding:8px 0 10px;
+    border-bottom:1px solid var(--border);
+  }
+  #chartTopBar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:8px;
+  }
+  #leftTopControls, #rightTopControls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+  }
+  #chart{
+    display:block;
+    width:100% !important;
+    max-width:980px;
+    height:420px !important;
+    margin:0 auto;
+  }
+  #resultBar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    margin-top:8px;
+    font-weight:bold;
+    justify-content:center;
+  }
+  .mini-card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:8px 10px;
+  }
+  #tabsBar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin:10px 0;
+    align-items:center;
+  }
+  #tabButtons{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .tab-btn{
+    border:1px solid var(--border);
+    background:#fff;
+    padding:6px 10px;
+    border-radius:10px;
+    cursor:pointer;
+  }
+  .tab-btn.active{
+    background:#222;
+    color:#fff;
+    border-color:#222;
+  }
+  button, select, input[type=number], input[type=text]{
+    font-size:14px;
+  }
+  button{
+    cursor:pointer;
+    padding:7px 10px;
+    border:1px solid var(--border);
+    background:#fff;
+    border-radius:10px;
+  }
+  button:hover{background:#f4f4f4}
+  #inputs{
+    max-height:calc(100vh - 610px);
+    overflow-y:auto;
+    padding-bottom:20px;
+  }
+  .section{
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:12px;
+    margin-bottom:12px;
+    background:#fff;
+  }
+  .section h2{
+    font-size:1.1rem;
+    margin:0 0 10px;
+  }
+  .subhead{
+    margin:10px 0 6px;
+    font-weight:bold;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin-bottom:10px;
+  }
+  th, td{
+    border:1px solid var(--border);
+    padding:6px;
+    text-align:center;
+    vertical-align:top;
+  }
+  th{background:#fafafa}
+  .grid2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  .inline{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+  }
+  .field{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+  input[type=number], input[type=text], select{
+    width:100%;
+    padding:5px 6px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    background:#fff;
+  }
+  .narrow{width:88px !important}
+  .medium{width:120px !important}
+  .wide{width:160px !important}
+  .checkbox-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:16px;
+    align-items:center;
+  }
+  .checkbox-row label,
+  .inline-check{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+  .edu-wrap{
+    overflow-x:auto;
+  }
+  .edu-cell{
+    min-width:140px;
+  }
+  .muted{color:var(--muted)}
+  .right{text-align:right}
+  .spacer{height:6px}
+  .hidden{display:none}
+  @media (max-width:900px){
+    #chart{height:360px !important}
+    .grid2{grid-template-columns:1fr}
+    #inputs{max-height:calc(100vh - 570px)}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>資産寿命シミュレータ</h1>
+
+  <div id="chartWrap">
+    <div id="chartTopBar">
+      <div id="leftTopControls">
+        <div class="field">
+          <label for="graphType">グラフ</label>
+          <select id="graphType" class="wide">
+            <option value="asset">総資産推移</option>
+            <option value="cashflow">年間収支</option>
+            <option value="education">教育費</option>
+            <option value="incomeExpense">収入 / 支出</option>
+            <option value="assetBreakdown">預金 / 運用内訳</option>
+          </select>
+        </div>
+        <label class="inline-check"><input type="checkbox" id="overlayToggle"> 複数ケース重ね描画</label>
+        <label class="inline-check"><input type="checkbox" id="fixedScale"> 縦軸固定</label>
+        <div class="field">
+          <span>±</span>
+          <input id="fixedScaleRange" type="number" class="narrow" value="50000" min="1000" step="1000">
+          <span>万円</span>
+        </div>
+      </div>
+      <div id="rightTopControls">
+        <button id="runMonteBtn" type="button">確率計算（モンテカルロ）</button>
+        <button id="copyUrlBtn" type="button">このシミュレーションを共有</button>
+      </div>
+    </div>
+
+    <canvas id="chart"></canvas>
+
+    <div id="resultBar">
+      <div class="mini-card" id="fireResult">FIRE：-</div>
+      <div class="mini-card" id="retireAssetResult">退職時資産：-</div>
+      <div class="mini-card" id="neededAssetResult">必要資産目安：-</div>
+      <div class="mini-card" id="depletionResult">資産枯渇：-</div>
+      <div class="mini-card" id="incomeTotalResult">総収入：-</div>
+      <div class="mini-card" id="expenseTotalResult">総支出：-</div>
+    </div>
+  </div>
+
+  <div id="tabsBar">
+    <div id="tabButtons"></div>
+    <button id="addTabBtn" type="button">＋追加</button>
+    <button id="dupTabBtn" type="button">複製</button>
+    <button id="renameTabBtn" type="button">条件名変更</button>
+  </div>
+
+  <div id="inputs">
+    <div class="section">
+      <h2>基本情報</h2>
+      <div class="grid2">
+        <div>
+          <table>
+            <tr><th>項目</th><th>入力</th></tr>
+            <tr><td>本人年齢</td><td><input id="age" type="number" class="narrow" value="50"></td></tr>
+            <tr><td>配偶者年齢</td><td><input id="spouseAge" type="number" class="narrow" value="48"></td></tr>
+            <tr><td>想定寿命</td><td><input id="lifeExpect" type="number" class="narrow" value="90"></td></tr>
+            <tr><td>1ドル</td><td><input id="usdRate" type="number" class="narrow" value="150"> 円</td></tr>
+            <tr><td>インフレ率</td><td><input id="inflRate" type="number" class="narrow" step="0.1" value="2.0"> %</td></tr>
+          </table>
+        </div>
+        <div>
+          <table>
+            <tr><th>子</th><th>有無</th><th>年齢</th><th>学校</th></tr>
+            <tr>
+              <td>子1</td><td><input id="child1_enabled" type="checkbox" checked></td>
+              <td><input id="child1_age" type="number" class="narrow" value="10"></td>
+              <td><select id="child1_school"></select></td>
+            </tr>
+            <tr>
+              <td>子2</td><td><input id="child2_enabled" type="checkbox" checked></td>
+              <td><input id="child2_age" type="number" class="narrow" value="6"></td>
+              <td><select id="child2_school"></select></td>
+            </tr>
+            <tr>
+              <td>子3</td><td><input id="child3_enabled" type="checkbox" checked></td>
+              <td><input id="child3_age" type="number" class="narrow" value="3"></td>
+              <td><select id="child3_school"></select></td>
+            </tr>
+            <tr>
+              <td>子4</td><td><input id="child4_enabled" type="checkbox"></td>
+              <td><input id="child4_age" type="number" class="narrow" value="0"></td>
+              <td><select id="child4_school"></select></td>
+            </tr>
+            <tr>
+              <td>子5</td><td><input id="child5_enabled" type="checkbox"></td>
+              <td><input id="child5_age" type="number" class="narrow" value="0"></td>
+              <td><select id="child5_school"></select></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>資産</h2>
+      <div class="subhead">預金</div>
+      <table>
+        <tr><th></th><th>預金額</th><th>通貨</th><th>金利%</th></tr>
+        <tr><td>預金1</td><td><input id="dep1_amount" type="number" value="5000"></td><td><select id="dep1_cur"><option>万円</option><option>ドル</option></select></td><td><input id="dep1_rate" type="number" step="0.01" value="0.2"></td></tr>
+        <tr><td>預金2</td><td><input id="dep2_amount" type="number" value="0"></td><td><select id="dep2_cur"><option>万円</option><option>ドル</option></select></td><td><input id="dep2_rate" type="number" step="0.01" value="0.2"></td></tr>
+        <tr><td>預金3</td><td><input id="dep3_amount" type="number" value="0"></td><td><select id="dep3_cur"><option>万円</option><option>ドル</option></select></td><td><input id="dep3_rate" type="number" step="0.01" value="0.2"></td></tr>
+        <tr><td>預金4</td><td><input id="dep4_amount" type="number" value="0"></td><td><select id="dep4_cur"><option>万円</option><option>ドル</option></select></td><td><input id="dep4_rate" type="number" step="0.01" value="0.2"></td></tr>
+        <tr><td>預金5</td><td><input id="dep5_amount" type="number" value="0"></td><td><select id="dep5_cur"><option>万円</option><option>ドル</option></select></td><td><input id="dep5_rate" type="number" step="0.01" value="0.2"></td></tr>
+      </table>
+
+      <div class="subhead">運用資産</div>
+      <table>
+        <tr><th></th><th>元本</th><th>現在額</th><th>通貨</th><th>利回り%</th></tr>
+        <tr><td>運用1</td><td><input id="inv1_cost" type="number" value="4000"></td><td><input id="inv1_amount" type="number" value="6000"></td><td><select id="inv1_cur"><option>万円</option><option>ドル</option></select></td><td><input id="inv1_rate" type="number" step="0.1" value="5"></td></tr>
+        <tr><td>運用2</td><td><input id="inv2_cost" type="number" value="0"></td><td><input id="inv2_amount" type="number" value="0"></td><td><select id="inv2_cur"><option>万円</option><option>ドル</option></select></td><td><input id="inv2_rate" type="number" step="0.1" value="5"></td></tr>
+        <tr><td>運用3</td><td><input id="inv3_cost" type="number" value="0"></td><td><input id="inv3_amount" type="number" value="0"></td><td><select id="inv3_cur"><option>万円</option><option>ドル</option></select></td><td><input id="inv3_rate" type="number" step="0.1" value="5"></td></tr>
+        <tr><td>運用4</td><td><input id="inv4_cost" type="number" value="0"></td><td><input id="inv4_amount" type="number" value="0"></td><td><select id="inv4_cur"><option>万円</option><option>ドル</option></select></td><td><input id="inv4_rate" type="number" step="0.1" value="5"></td></tr>
+        <tr><td>運用5</td><td><input id="inv5_cost" type="number" value="0"></td><td><input id="inv5_amount" type="number" value="0"></td><td><select id="inv5_cur"><option>万円</option><option>ドル</option></select></td><td><input id="inv5_rate" type="number" step="0.1" value="5"></td></tr>
+      </table>
+
+      <div class="checkbox-row">
+        <label><input id="taxOn" type="checkbox" checked> 運用益課税（20.315%）</label>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>収入</h2>
+      <div class="grid2">
+        <div>
+          <div class="subhead">本人</div>
+          <table>
+            <tr><th>項目</th><th>入力</th></tr>
+            <tr><td>手取り（月）</td><td><input id="self_salary_month" type="number" value="40"></td></tr>
+            <tr><td>ボーナス（年）</td><td><input id="self_bonus_year" type="number" value="100"></td></tr>
+            <tr><td>リタイヤ年齢</td><td><input id="self_retire_age" type="number" value="65"></td></tr>
+            <tr><td>退職金</td><td><input id="self_retire_pay" type="number" value="1000"></td></tr>
+            <tr><td>年金（月）</td><td><input id="self_pension_month" type="number" value="15"></td></tr>
+            <tr><td>年金開始年齢</td><td><input id="self_pension_age" type="number" value="65"></td></tr>
+          </table>
+        </div>
+        <div>
+          <div class="subhead">配偶者</div>
+          <table>
+            <tr><th>項目</th><th>入力</th></tr>
+            <tr><td>手取り（月）</td><td><input id="sp_salary_month" type="number" value="20"></td></tr>
+            <tr><td>ボーナス（年）</td><td><input id="sp_bonus_year" type="number" value="50"></td></tr>
+            <tr><td>リタイヤ年齢</td><td><input id="sp_retire_age" type="number" value="60"></td></tr>
+            <tr><td>退職金</td><td><input id="sp_retire_pay" type="number" value="500"></td></tr>
+            <tr><td>年金（月）</td><td><input id="sp_pension_month" type="number" value="10"></td></tr>
+            <tr><td>年金開始年齢</td><td><input id="sp_pension_age" type="number" value="65"></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="subhead">臨時収入</div>
+      <table>
+        <tr><th></th><th>年齢</th><th>金額（万円）</th></tr>
+        <tr><td>臨時収入1</td><td><input id="inc1_age" type="number" value="70"></td><td><input id="inc1_val" type="number" value="300"></td></tr>
+        <tr><td>臨時収入2</td><td><input id="inc2_age" type="number" value="0"></td><td><input id="inc2_val" type="number" value="0"></td></tr>
+        <tr><td>臨時収入3</td><td><input id="inc3_age" type="number" value="0"></td><td><input id="inc3_val" type="number" value="0"></td></tr>
+        <tr><td>臨時収入4</td><td><input id="inc4_age" type="number" value="0"></td><td><input id="inc4_val" type="number" value="0"></td></tr>
+        <tr><td>臨時収入5</td><td><input id="inc5_age" type="number" value="0"></td><td><input id="inc5_val" type="number" value="0"></td></tr>
+      </table>
+
+      <div class="checkbox-row">
+        <label><input id="childAllowanceOn" type="checkbox" checked> 児童手当</label>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>支出</h2>
+
+      <div class="subhead">家賃</div>
+      <table>
+        <tr><th></th><th>〜年齢</th><th>万円 / 月</th></tr>
+        <tr><td>家賃1</td><td><input id="rent1_age" type="number" value="55"></td><td><input id="rent1_val" type="number" value="20"></td></tr>
+        <tr><td>家賃2</td><td><input id="rent2_age" type="number" value="80"></td><td><input id="rent2_val" type="number" value="15"></td></tr>
+        <tr><td>家賃3</td><td><input id="rent3_age" type="number" value="120"></td><td><input id="rent3_val" type="number" value="12"></td></tr>
+        <tr><td>家賃4</td><td><input id="rent4_age" type="number" value="0"></td><td><input id="rent4_val" type="number" value="0"></td></tr>
+        <tr><td>家賃5</td><td><input id="rent5_age" type="number" value="0"></td><td><input id="rent5_val" type="number" value="0"></td></tr>
+      </table>
+
+      <div class="subhead">住宅ローン</div>
+      <table>
+        <tr><th>購入年齢</th><th>頭金（万円）</th><th>返済額（月）</th><th>返済年数</th></tr>
+        <tr>
+          <td><input id="homeAge" type="number" value="40"></td>
+          <td><input id="homeDown" type="number" value="1000"></td>
+          <td><input id="homePayMonth" type="number" value="10"></td>
+          <td><input id="homeYears" type="number" value="30"></td>
+        </tr>
+      </table>
+
+      <div class="subhead">教育費</div>
+      <div class="edu-wrap">
+        <table>
+          <tr>
+            <th></th>
+            <th>幼稚園</th>
+            <th>小学校</th>
+            <th>中学校</th>
+            <th>高校</th>
+            <th>大学</th>
+          </tr>
+
+          <!-- child rows inserted by JS -->
+          <tbody id="eduBody"></tbody>
+        </table>
+      </div>
+
+      <div class="subhead">生活費</div>
+      <table>
+        <tr><th></th><th>〜年齢</th><th>万円 / 月</th></tr>
+        <tr><td>生活費1</td><td><input id="life1_age" type="number" value="55"></td><td><input id="life1_val" type="number" value="35"></td></tr>
+        <tr><td>生活費2</td><td><input id="life2_age" type="number" value="70"></td><td><input id="life2_val" type="number" value="30"></td></tr>
+        <tr><td>生活費3</td><td><input id="life3_age" type="number" value="85"></td><td><input id="life3_val" type="number" value="25"></td></tr>
+        <tr><td>生活費4</td><td><input id="life4_age" type="number" value="120"></td><td><input id="life4_val" type="number" value="22"></td></tr>
+        <tr><td>生活費5</td><td><input id="life5_age" type="number" value="0"></td><td><input id="life5_val" type="number" value="0"></td></tr>
+      </table>
+
+      <div class="subhead">定期支出</div>
+      <table>
+        <tr><th></th><th>〜年齢</th><th>万円 / 年</th></tr>
+        <tr><td>定期支出1</td><td><input id="period1_age" type="number" value="120"></td><td><input id="period1_val" type="number" value="30"></td></tr>
+        <tr><td>定期支出2</td><td><input id="period2_age" type="number" value="0"></td><td><input id="period2_val" type="number" value="0"></td></tr>
+        <tr><td>定期支出3</td><td><input id="period3_age" type="number" value="0"></td><td><input id="period3_val" type="number" value="0"></td></tr>
+        <tr><td>定期支出4</td><td><input id="period4_age" type="number" value="0"></td><td><input id="period4_val" type="number" value="0"></td></tr>
+        <tr><td>定期支出5</td><td><input id="period5_age" type="number" value="0"></td><td><input id="period5_val" type="number" value="0"></td></tr>
+      </table>
+
+      <div class="subhead">臨時支出</div>
+      <table>
+        <tr><th></th><th>年齢</th><th>万円</th></tr>
+        <tr><td>臨時支出1</td><td><input id="extra1_age" type="number" value="55"></td><td><input id="extra1_val" type="number" value="400"></td></tr>
+        <tr><td>臨時支出2</td><td><input id="extra2_age" type="number" value="80"></td><td><input id="extra2_val" type="number" value="500"></td></tr>
+        <tr><td>臨時支出3</td><td><input id="extra3_age" type="number" value="0"></td><td><input id="extra3_val" type="number" value="0"></td></tr>
+        <tr><td>臨時支出4</td><td><input id="extra4_age" type="number" value="0"></td><td><input id="extra4_val" type="number" value="0"></td></tr>
+        <tr><td>臨時支出5</td><td><input id="extra5_age" type="number" value="0"></td><td><input id="extra5_val" type="number" value="0"></td></tr>
+      </table>
+
+      <div class="checkbox-row">
+        <label><input id="inflRent" type="checkbox"> 家賃</label>
+        <label><input id="inflLoan" type="checkbox"> 住宅ローン</label>
+        <label><input id="inflEdu" type="checkbox"> 教育費</label>
+        <label><input id="inflLife" type="checkbox" checked> 生活費</label>
+        <label><input id="inflPeriod" type="checkbox"> 定期支出</label>
+        <label><input id="inflExtra" type="checkbox"> 臨時支出</label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- constants ---------- */
+const TAX_RATE = 0.20315;
+const TAB_COLORS = [
+  "#0b67d1", "#0a8f3e", "#b31b1b", "#7a3db8", "#d57d00",
+  "#008b8b", "#cc2e7e", "#5a5a00", "#444"
+];
+const GRADE_OPTIONS = [
+  "未就園児","年少","年中","年長",
+  "小1","小2","小3","小4","小5","小6",
+  "中1","中2","中3",
+  "高1","高2","高3",
+  "大1","大2","大3","大4","社会人"
+];
+const gradeMap = {
+  "未就園児": -3, "年少": -2, "年中": -1, "年長": 0,
+  "小1": 1, "小2": 2, "小3": 3, "小4": 4, "小5": 5, "小6": 6,
+  "中1": 7, "中2": 8, "中3": 9,
+  "高1": 10, "高2": 11, "高3": 12,
+  "大1": 13, "大2": 14, "大3": 15, "大4": 16,
+  "社会人": 20
+};
+
+let chart;
+let scenarios = [];
+let currentTab = 0;
+let monteMode = false;
+let lastNormalSim = null;
+
+/* ---------- UI bootstrap ---------- */
+function buildSchoolSelect(id){
+  const sel = document.getElementById(id);
+  sel.innerHTML = GRADE_OPTIONS.map(v => `<option value="${v}">${v}</option>`).join("");
+}
+for(let i=1;i<=5;i++) buildSchoolSelect(`child${i}_school`);
+document.getElementById("child1_school").value = "小4";
+document.getElementById("child2_school").value = "小1";
+document.getElementById("child3_school").value = "年長";
+
+function buildEducationGrid(){
+  const eduBody = document.getElementById("eduBody");
+  const normalOptions = `<option>公立</option><option>私立</option>`;
+  const uniOptions = `
+    <option>国公立（自宅）</option>
+    <option>国公立（下宿）</option>
+    <option>私立（自宅）</option>
+    <option>私立（下宿）</option>
+  `;
+  let html = "";
+  for(let i=1;i<=5;i++){
+    html += `<tr><td>子${i}</td>`;
+    const stages = ["kind","elem","junior","high","uni"];
+    stages.forEach(stage=>{
+      const options = stage==="uni" ? uniOptions : normalOptions;
+      html += `
+        <td class="edu-cell">
+          <select id="c${i}_${stage}_type">${options}</select>
+          <div class="spacer"></div>
+          <input id="c${i}_${stage}_extra" type="number" placeholder="習い事/月" value="0">
+        </td>
+      `;
+    });
+    html += `</tr>`;
+  }
+  eduBody.innerHTML = html;
+}
+buildEducationGrid();
+
+/* defaults */
+for(let i=1;i<=5;i++){
+  ["kind","elem","junior","high"].forEach(stage=>{
+    const el = document.getElementById(`c${i}_${stage}_type`);
+    if(el) el.value = "公立";
+  });
+  const u = document.getElementById(`c${i}_uni_type`);
+  if(u) u.value = "国公立（自宅）";
+}
+
+/* ---------- state helpers ---------- */
+function getAllInputs(){
+  const data = {};
+  document.querySelectorAll("input, select").forEach(el=>{
+    if(!el.id) return;
+    data[el.id] = el.type === "checkbox" ? el.checked : el.value;
+  });
+  return data;
+}
+
+function setAllInputs(data){
+  Object.entries(data || {}).forEach(([id, val])=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(el.type === "checkbox") el.checked = !!val;
+    else el.value = val;
+  });
+}
+
+function addTab(){
+  scenarios.push({
+    name:`条件${scenarios.length+1}`,
+    data:getAllInputs()
+  });
+  currentTab = scenarios.length - 1;
+  renderTabs();
+}
+
+function duplicateTab(){
+  ensureScenarioSaved();
+  const base = scenarios[currentTab];
+  scenarios.push({
+    name: base.name + " コピー",
+    data: JSON.parse(JSON.stringify(base.data))
+  });
+  currentTab = scenarios.length - 1;
+  renderTabs();
+  draw();
+}
+
+function renameTab(){
+  const current = scenarios[currentTab];
+  const nextName = prompt("条件名を入力してください", current.name);
+  if(nextName && nextName.trim()){
+    current.name = nextName.trim();
+    renderTabs();
+    saveToLocal();
+    saveToURL();
+  }
+}
+
+function switchTab(i){
+  ensureScenarioSaved();
+  currentTab = i;
+  setAllInputs(scenarios[i].data);
+  monteMode = false;
+  renderTabs();
+  draw();
+}
+
+function renderTabs(){
+  const el = document.getElementById("tabButtons");
+  el.innerHTML = scenarios.map((s, i)=>{
+    const cls = i===currentTab ? "tab-btn active" : "tab-btn";
+    return `<button type="button" class="${cls}" onclick="switchTab(${i})">${escapeHtml(s.name)}</button>`;
+  }).join("");
+}
+
+function ensureScenarioSaved(){
+  if(!scenarios.length) return;
+  scenarios[currentTab].data = getAllInputs();
+}
+
+function escapeHtml(s){
+  return String(s)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;");
+}
+
+/* ---------- data extraction ---------- */
+function toManYen(amount, cur, usdRate){
+  const n = +amount || 0;
+  return cur === "ドル" ? (n * usdRate / 10000) : n;
+}
+
+function getScenarioFromDOM(){
+  const usdRate = +document.getElementById("usdRate").value || 150;
+  const age = +document.getElementById("age").value || 50;
+
+  const children = [];
+  for(let i=1;i<=5;i++){
+    const enabled = document.getElementById(`child${i}_enabled`).checked;
+    if(!enabled) continue;
+    children.push({
+      idx: i,
+      age: +document.getElementById(`child${i}_age`).value || 0,
+      school: document.getElementById(`child${i}_school`).value
+    });
+  }
+
+  const deposits = [];
+  for(let i=1;i<=5;i++){
+    deposits.push({
+      name:`預金${i}`,
+      amount: toManYen(document.getElementById(`dep${i}_amount`).value, document.getElementById(`dep${i}_cur`).value, usdRate),
+      rate: (+document.getElementById(`dep${i}_rate`).value || 0)/100
+    });
+  }
+
+  const investments = [];
+  for(let i=1;i<=5;i++){
+    investments.push({
+      name:`運用${i}`,
+      amount: toManYen(document.getElementById(`inv${i}_amount`).value, document.getElementById(`inv${i}_cur`).value, usdRate),
+      cost: toManYen(document.getElementById(`inv${i}_cost`).value, document.getElementById(`inv${i}_cur`).value, usdRate),
+      rate: (+document.getElementById(`inv${i}_rate`).value || 0)/100
+    });
+  }
+
+  const incomeSelf = {
+    salaryMonth: +document.getElementById("self_salary_month").value || 0,
+    bonusYear: +document.getElementById("self_bonus_year").value || 0,
+    retireAge: +document.getElementById("self_retire_age").value || 200,
+    retirePay: +document.getElementById("self_retire_pay").value || 0,
+    pensionMonth: +document.getElementById("self_pension_month").value || 0,
+    pensionAge: +document.getElementById("self_pension_age").value || 200
+  };
+  const incomeSp = {
+    salaryMonth: +document.getElementById("sp_salary_month").value || 0,
+    bonusYear: +document.getElementById("sp_bonus_year").value || 0,
+    retireAge: +document.getElementById("sp_retire_age").value || 200,
+    retirePay: +document.getElementById("sp_retire_pay").value || 0,
+    pensionMonth: +document.getElementById("sp_pension_month").value || 0,
+    pensionAge: +document.getElementById("sp_pension_age").value || 200
+  };
+
+  const extraIncome = [];
+  for(let i=1;i<=5;i++){
+    extraIncome.push({
+      age: +document.getElementById(`inc${i}_age`).value || 0,
+      val: +document.getElementById(`inc${i}_val`).value || 0
+    });
+  }
+
+  function rangeRows(prefix){
+    const arr = [];
+    for(let i=1;i<=5;i++){
+      arr.push({
+        toAge: +document.getElementById(`${prefix}${i}_age`).value || 0,
+        val: +document.getElementById(`${prefix}${i}_val`).value || 0
+      });
+    }
+    return arr.filter(r=>r.toAge>0 || r.val>0).sort((a,b)=>a.toAge-b.toAge);
+  }
+  function pointRows(prefix){
+    const arr = [];
+    for(let i=1;i<=5;i++){
+      arr.push({
+        age: +document.getElementById(`${prefix}${i}_age`).value || 0,
+        val: +document.getElementById(`${prefix}${i}_val`).value || 0
+      });
+    }
+    return arr.filter(r=>r.age>0 || r.val>0);
+  }
+
+  const educationMatrix = {};
+  for(let i=1;i<=5;i++){
+    educationMatrix[i] = {
+      kind:{ type: document.getElementById(`c${i}_kind_type`).value, extraMonth:+document.getElementById(`c${i}_kind_extra`).value||0 },
+      elem:{ type: document.getElementById(`c${i}_elem_type`).value, extraMonth:+document.getElementById(`c${i}_elem_extra`).value||0 },
+      junior:{ type: document.getElementById(`c${i}_junior_type`).value, extraMonth:+document.getElementById(`c${i}_junior_extra`).value||0 },
+      high:{ type: document.getElementById(`c${i}_high_type`).value, extraMonth:+document.getElementById(`c${i}_high_extra`).value||0 },
+      uni:{ type: document.getElementById(`c${i}_uni_type`).value, extraMonth:+document.getElementById(`c${i}_uni_extra`).value||0 }
+    };
+  }
+
+  return {
+    age,
+    spouseAge: +document.getElementById("spouseAge").value || age,
+    lifeExpect: +document.getElementById("lifeExpect").value || 90,
+    usdRate,
+    inflRate: (+document.getElementById("inflRate").value || 0)/100,
+    fixedScale: document.getElementById("fixedScale").checked,
+    fixedScaleRange: +document.getElementById("fixedScaleRange").value || 50000,
+    taxOn: document.getElementById("taxOn").checked,
+    childAllowanceOn: document.getElementById("childAllowanceOn").checked,
+    infl: {
+      rent: document.getElementById("inflRent").checked,
+      loan: document.getElementById("inflLoan").checked,
+      edu: document.getElementById("inflEdu").checked,
+      life: document.getElementById("inflLife").checked,
+      period: document.getElementById("inflPeriod").checked,
+      extra: document.getElementById("inflExtra").checked
+    },
+    children,
+    educationMatrix,
+    deposits,
+    investments,
+    incomeSelf,
+    incomeSp,
+    extraIncome,
+    rentRows: rangeRows("rent"),
+    lifeRows: rangeRows("life"),
+    periodRows: rangeRows("period"),
+    extraRows: pointRows("extra"),
+    home: {
+      age: +document.getElementById("homeAge").value || 0,
+      down: +document.getElementById("homeDown").value || 0,
+      payMonth: +document.getElementById("homePayMonth").value || 0,
+      years: +document.getElementById("homeYears").value || 0
+    }
+  };
+}
+
+/* ---------- simulation ---------- */
+function getBaseEduCost(grade, type){
+  if(grade >= -2 && grade <= 0){
+    return type === "私立" ? 70 : 25;
+  }
+  if(grade >= 1 && grade <= 6){
+    return type === "私立" ? 160 : 35;
+  }
+  if(grade >= 7 && grade <= 9){
+    return type === "私立" ? 140 : 50;
+  }
+  if(grade >= 10 && grade <= 12){
+    return type === "私立" ? 100 : 45;
+  }
+  if(grade >= 13 && grade <= 16){
+    switch(type){
+      case "国公立（自宅）": return 80;
+      case "国公立（下宿）": return 250;
+      case "私立（自宅）": return 150;
+      case "私立（下宿）": return 320;
+      default: return 0;
+    }
+  }
+  return 0;
+}
+
+function getStageFromGrade(grade){
+  if(grade >= -2 && grade <= 0) return "kind";
+  if(grade >= 1 && grade <= 6) return "elem";
+  if(grade >= 7 && grade <= 9) return "junior";
+  if(grade >= 10 && grade <= 12) return "high";
+  if(grade >= 13 && grade <= 16) return "uni";
+  return null;
+}
+
+function getEducationCostForYear(cfg, yearIndex){
+  let total = 0;
+  const byChild = {};
+  cfg.children.forEach(child=>{
+    const startGrade = gradeMap[child.school] ?? -3;
+    const grade = startGrade + yearIndex;
+    const stage = getStageFromGrade(grade);
+    if(!stage){ byChild[child.idx] = 0; return; }
+    const cell = cfg.educationMatrix[child.idx][stage];
+    const base = getBaseEduCost(grade, cell.type);
+    const extra = (cell.extraMonth || 0) * 12;
+    const val = base + extra;
+    byChild[child.idx] = val;
+    total += val;
+  });
+  return { total, byChild };
+}
+
+function getRangeValue(rows, age){
+  if(!rows.length) return 0;
+  for(const row of rows){
+    if(age <= row.toAge) return row.val;
+  }
+  return 0;
+}
+
+function getPointValue(rows, age){
+  return rows.filter(r=>r.age===age).reduce((s,r)=>s+r.val, 0);
+}
+
+function getChildAllowanceForYear(cfg, yearIndex){
+  if(!cfg.childAllowanceOn) return 0;
+  let total = 0;
+  cfg.children.forEach(child=>{
+    const childAge = child.age + yearIndex;
+    if(childAge >= 0 && childAge < 3) total += 18;
+    else if(childAge >= 3 && childAge < 15) total += 12;
+  });
+  return total;
+}
+
+function getIncomeForYear(cfg, age){
+  let total = 0;
+  const parts = { self:0, spouse:0, pension:0, extra:0, childAllowance:0, retirePay:0 };
+
+  if(age < cfg.incomeSelf.retireAge){
+    parts.self += cfg.incomeSelf.salaryMonth * 12 + cfg.incomeSelf.bonusYear;
+  }
+  if(age === cfg.incomeSelf.retireAge){
+    parts.retirePay += cfg.incomeSelf.retirePay;
+  }
+  if(age >= cfg.incomeSelf.pensionAge){
+    parts.pension += cfg.incomeSelf.pensionMonth * 12;
+  }
+
+  if(age < cfg.incomeSp.retireAge){
+    parts.spouse += cfg.incomeSp.salaryMonth * 12 + cfg.incomeSp.bonusYear;
+  }
+  if(age === cfg.incomeSp.retireAge){
+    parts.retirePay += cfg.incomeSp.retirePay;
+  }
+  if(age >= cfg.incomeSp.pensionAge){
+    parts.pension += cfg.incomeSp.pensionMonth * 12;
+  }
+
+  cfg.extraIncome.forEach(x=>{
+    if(x.age === age) parts.extra += x.val;
+  });
+
+  total += getChildAllowanceForYear(cfg, age - cfg.age);
+  parts.childAllowance = getChildAllowanceForYear(cfg, age - cfg.age);
+
+  total += parts.self + parts.spouse + parts.pension + parts.extra + parts.retirePay;
+  return { total, parts };
+}
+
+function applyInflation(v, enabled, infl, years){
+  if(!enabled) return v;
+  return v * Math.pow(1 + infl, Math.max(0, years));
+}
+
+function getExpenseForYear(cfg, age, yearIndex){
+  const life = applyInflation(getRangeValue(cfg.lifeRows, age) * 12, cfg.infl.life, cfg.inflRate, yearIndex);
+  const rent = applyInflation(getRangeValue(cfg.rentRows, age) * 12, cfg.infl.rent, cfg.inflRate, yearIndex);
+  const periodic = applyInflation(getRangeValue(cfg.periodRows, age), cfg.infl.period, cfg.inflRate, yearIndex);
+  const extra = applyInflation(getPointValue(cfg.extraRows, age), cfg.infl.extra, cfg.inflRate, yearIndex);
+  const eduObj = getEducationCostForYear(cfg, yearIndex);
+  const education = applyInflation(eduObj.total, cfg.infl.edu, cfg.inflRate, yearIndex);
+
+  let loan = 0;
+  let down = 0;
+  const h = cfg.home;
+  if(h.age > 0 && h.years > 0){
+    if(cfg.age <= h.age && age === h.age){
+      down = h.down;
+    }
+    if(cfg.age <= h.age){
+      if(age >= h.age && age < h.age + h.years){
+        loan = applyInflation(h.payMonth * 12, cfg.infl.loan, cfg.inflRate, age - h.age);
+      }
+    }else{
+      const elapsed = cfg.age - h.age;
+      const remain = Math.max(0, h.years - elapsed);
+      const endAge = cfg.age + remain;
+      if(age >= cfg.age && age < endAge){
+        loan = applyInflation(h.payMonth * 12, cfg.infl.loan, cfg.inflRate, age - cfg.age);
+      }
+    }
+  }
+
+  return {
+    total: life + rent + periodic + extra + education + loan + down,
+    parts: { life, rent, periodic, extra, education, loan, down, educationByChild: eduObj.byChild }
+  };
+}
+
+function deepClone(o){
+  return JSON.parse(JSON.stringify(o));
+}
+
+function randomizeReturn(base){
+  return base + (Math.random() - 0.5) * 0.30;
+}
+
+function simulate(cfg, random=false){
+  const deposits = deepClone(cfg.deposits).map(d=>({...d}));
+  const investments = deepClone(cfg.investments).map(i=>({...i}));
+
+  const labels = [];
+  const totalAssets = [];
+  const totalDeposits = [];
+  const totalInvestments = [];
+  const annualIncome = [];
+  const annualExpense = [];
+  const annualCashflow = [];
+  const annualEducation = [];
+  const educationByChildSeries = {1:[],2:[],3:[],4:[],5:[]};
+
+  let depletionAge = null;
+  let retireAsset = null;
+  let totalIncomeSum = 0;
+  let totalExpenseSum = 0;
+
+  for(let age = cfg.age; age <= 120; age++){
+    const yearIndex = age - cfg.age;
+
+    // asset growth at year start
+    deposits.forEach(d=>{
+      d.amount *= (1 + d.rate);
+    });
+    investments.forEach(inv=>{
+      let r = inv.rate;
+      if(random) r = randomizeReturn(r);
+      inv.amount *= (1 + r);
+    });
+
+    const incomeObj = getIncomeForYear(cfg, age);
+    const expenseObj = getExpenseForYear(cfg, age, yearIndex);
+
+    let income = incomeObj.total;
+    let expense = expenseObj.total;
+
+    totalIncomeSum += income;
+    totalExpenseSum += expense;
+
+    // add positive cashflow to deposits evenly
+    let net = income - expense;
+
+    const depositCount = Math.max(1, deposits.length);
+    if(net >= 0){
+      const per = net / depositCount;
+      deposits.forEach(d=> d.amount += per);
+    }else{
+      let need = -net;
+
+      // use deposits first
+      for(const d of deposits){
+        if(need <= 0) break;
+        const use = Math.min(d.amount, need);
+        d.amount -= use;
+        need -= use;
+      }
+
+      const currentLifeNeed = (expenseObj.parts.life || 0);
+      const depositLeft = deposits.reduce((s,d)=>s+d.amount, 0);
+      const triggerSell = depositLeft <= currentLifeNeed * 2;
+
+      // if remaining shortfall or 2-year buffer trigger, sell investments to restore buffer
+      let sellNeed = 0;
+      if(need > 0) sellNeed += need;
+      if(triggerSell){
+        sellNeed += Math.max(0, currentLifeNeed * 2 - depositLeft);
+      }
+
+      if(sellNeed > 0){
+        const active = investments.filter(i=>i.amount > 0.000001);
+        if(active.length){
+          let remainingSellNeed = sellNeed;
+
+          // iteratively sell equally among active funds accounting for tax drag
+          let safeLoop = 0;
+          while(remainingSellNeed > 0.0001 && safeLoop < 20){
+            safeLoop++;
+            const activeNow = active.filter(i=>i.amount > 0.000001);
+            if(!activeNow.length) break;
+
+            const targetNetPerInv = remainingSellNeed / activeNow.length;
+            let netCollectedThisRound = 0;
+
+            for(const inv of activeNow){
+              if(inv.amount <= 0) continue;
+              const gainRatio = inv.amount > 0 ? Math.max(0, (inv.amount - inv.cost) / inv.amount) : 0;
+
+              // to net target after tax, gross sell approx:
+              const effectiveKeep = 1 - (cfg.taxOn ? gainRatio * TAX_RATE : 0);
+              if(effectiveKeep <= 0) continue;
+
+              let grossSell = targetNetPerInv / effectiveKeep;
+              grossSell = Math.min(grossSell, inv.amount);
+
+              const taxable = grossSell * gainRatio;
+              const tax = cfg.taxOn ? taxable * TAX_RATE : 0;
+              const netToDeposit = grossSell - tax;
+
+              const costPortion = inv.amount > 0 ? inv.cost * (grossSell / inv.amount) : 0;
+
+              inv.amount -= grossSell;
+              inv.cost = Math.max(0, inv.cost - costPortion);
+              deposits[0].amount += netToDeposit;
+              netCollectedThisRound += netToDeposit;
+            }
+
+            // use collected deposit immediately toward remaining need / buffer
+            const afterDeposit = deposits.reduce((s,d)=>s+d.amount,0);
+            const desired = currentLifeNeed * 2;
+            const actualNeedNow = Math.max(0, (need > 0 ? need : 0)) + Math.max(0, triggerSell ? desired - afterDeposit : 0);
+
+            if(netCollectedThisRound <= 0.0001) break;
+            remainingSellNeed = actualNeedNow;
+
+            // if original shortfall still exists, consume deposits
+            if(need > 0){
+              for(const d of deposits){
+                if(need <= 0) break;
+                const use = Math.min(d.amount, need);
+                d.amount -= use;
+                need -= use;
+              }
+            }
+          }
+        }
+
+        // if still need after selling, consume again
+        if(need > 0){
+          for(const d of deposits){
+            if(need <= 0) break;
+            const use = Math.min(d.amount, need);
+            d.amount -= use;
+            need -= use;
+          }
+        }
+      }
+    }
+
+    const depTotal = deposits.reduce((s,d)=>s+d.amount,0);
+    const invTotal = investments.reduce((s,i)=>s+i.amount,0);
+    const total = depTotal + invTotal;
+
+    if(retireAsset === null && age === cfg.incomeSelf.retireAge){
+      retireAsset = total;
+    }
+
+    if(total <= 0 && depletionAge === null){
+      depletionAge = age;
+    }
+
+    labels.push(age);
+    totalAssets.push(total);
+    totalDeposits.push(depTotal);
+    totalInvestments.push(invTotal);
+    annualIncome.push(income);
+    annualExpense.push(expense);
+    annualCashflow.push(income - expense);
+    annualEducation.push(expenseObj.parts.education);
+    for(let c=1;c<=5;c++){
+      educationByChildSeries[c].push(expenseObj.parts.educationByChild[c] || 0);
+    }
+  }
+
+  if(retireAsset === null) retireAsset = totalAssets[0] ?? 0;
+
+  return {
+    labels,
+    totalAssets,
+    totalDeposits,
+    totalInvestments,
+    annualIncome,
+    annualExpense,
+    annualCashflow,
+    annualEducation,
+    educationByChildSeries,
+    depletionAge,
+    retireAsset,
+    totalIncomeSum,
+    totalExpenseSum
+  };
+}
+
+function neededAssetEstimate(cfg){
+  const annualSpend = getRangeValue(cfg.lifeRows, cfg.incomeSelf.retireAge) * 12;
+  const annualPension = (cfg.incomeSelf.pensionMonth + cfg.incomeSp.pensionMonth) * 12;
+  const net = Math.max(0, annualSpend - annualPension);
+  const r = 0.03;
+  return r > 0 ? Math.round(net / r) : net * 30;
+}
+
+/* ---------- chart ---------- */
+function yScaleForData(arr, cfg){
+  if(cfg.fixedScale){
+    return { min: -cfg.fixedScaleRange, max: cfg.fixedScaleRange };
+  }
+  const allPositive = arr.every(v=>v>=0);
+  const allNegative = arr.every(v=>v<=0);
+  if(allPositive) return { min: 0 };
+  if(allNegative) return { max: 0 };
+  return {};
+}
+
+function pluginLines(cfg, sim, monteInfo=null){
+  return {
+    id:"customLines",
+    afterDraw(chart){
+      const {ctx,scales:{x,y}} = chart;
+      ctx.save();
+
+      // 0 line
+      const y0 = y.getPixelForValue(0);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "black";
+      ctx.beginPath();
+      ctx.moveTo(x.left, y0);
+      ctx.lineTo(x.right, y0);
+      ctx.stroke();
+
+      // life line
+      const pxLife = x.getPixelForValue(cfg.lifeExpect);
+      ctx.strokeStyle = "#0b67d1";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(pxLife, y.top);
+      ctx.lineTo(pxLife, y.bottom);
+      ctx.stroke();
+      ctx.fillStyle = "#0b67d1";
+      ctx.font = "12px Arial";
+      ctx.fillText(`想定寿命：${cfg.lifeExpect}歳`, Math.min(pxLife + 6, x.right - 90), y.top + 16);
+
+      // depletion line
+      if(sim.depletionAge){
+        const pxD = x.getPixelForValue(sim.depletionAge);
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(pxD, y.top);
+        ctx.lineTo(pxD, y.bottom);
+        ctx.stroke();
+        ctx.fillStyle = "black";
+        ctx.fillText(`枯渇：${sim.depletionAge}歳`, Math.min(pxD + 6, x.right - 70), y.bottom - 8);
+      }
+
+      if(monteInfo){
+        const {prob, legendItems} = monteInfo;
+        const tx = x.left + 12;
+        const ty = y.top + 16;
+        ctx.font = "bold 18px Arial";
+        const text = `破綻確率: ${prob}%`;
+        const w = ctx.measureText(text).width + 14;
+        ctx.fillStyle = "black";
+        ctx.fillRect(tx - 6, ty - 14, w, 26);
+        ctx.fillStyle = "white";
+        ctx.fillText(text, tx, ty + 4);
+
+        ctx.font = "13px Arial";
+        legendItems.forEach((item, idx)=>{
+          ctx.fillStyle = item.color;
+          ctx.fillText(item.text, tx, ty + 28 + idx * 16);
+        });
+      }
+
+      ctx.restore();
+    }
+  };
+}
+
+function buildNormalDatasetsForScenario(sim, color, overlay){
+  const points = sim.labels.map((a,i)=>({x:a,y:sim.totalAssets[i]}));
+  if(overlay){
+    return [{
+      label:"総資産",
+      data: points,
+      borderColor: color,
+      backgroundColor: color + "22",
+      fill:false,
+      borderWidth:2,
+      pointRadius:0,
+      parsing:false,
+      spanGaps:true
+    }];
+  }
+  return [{
+    label:"総資産",
+    data: points,
+    borderWidth:2,
+    pointRadius:0,
+    parsing:false,
+    spanGaps:true,
+    fill:{target:"origin"},
+    segment:{
+      borderColor: ctx => ctx.p0.parsed.y >= 0 ? "green" : "red",
+      backgroundColor: ctx => ctx.p0.parsed.y >= 0 ? "rgba(0,150,0,0.20)" : "rgba(255,0,0,0.20)"
+    }
+  }];
+}
+
+function buildDatasetsByGraphType(sim, graphType, color, overlay){
+  if(graphType === "asset"){
+    return buildNormalDatasetsForScenario(sim, color, overlay);
+  }
+  if(graphType === "cashflow"){
+    return [{
+      label:"年間収支",
+      data: sim.labels.map((a,i)=>({x:a,y:sim.annualCashflow[i]})),
+      borderColor: overlay ? color : "black",
+      pointRadius:0,
+      borderWidth:2,
+      parsing:false
+    }];
+  }
+  if(graphType === "education"){
+    if(overlay){
+      return [{
+        label:"教育費",
+        data: sim.labels.map((a,i)=>({x:a,y:sim.annualEducation[i]})),
+        borderColor: color,
+        pointRadius:0,
+        borderWidth:2,
+        parsing:false
+      }];
+    }
+    return [1,2,3,4,5].map((idx)=>({
+      label:`子${idx}`,
+      data: sim.labels.map((a,i)=>({x:a,y:sim.educationByChildSeries[idx][i]})),
+      pointRadius:0,
+      borderWidth:2,
+      parsing:false
+    }));
+  }
+  if(graphType === "incomeExpense"){
+    return [
+      {
+        label:"収入",
+        data: sim.labels.map((a,i)=>({x:a,y:sim.annualIncome[i]})),
+        borderColor: overlay ? color : "#0a8f3e",
+        pointRadius:0, borderWidth:2, parsing:false
+      },
+      {
+        label:"支出",
+        data: sim.labels.map((a,i)=>({x:a,y:sim.annualExpense[i]})),
+        borderColor: overlay ? color : "#d33",
+        pointRadius:0, borderWidth:2, borderDash: overlay ? [6,4] : [], parsing:false
+      }
+    ];
+  }
+  if(graphType === "assetBreakdown"){
+    return [
+      {
+        label:"預金",
+        data: sim.labels.map((a,i)=>({x:a,y:sim.totalDeposits[i]})),
+        borderColor: overlay ? color : "#0b67d1",
+        pointRadius:0, borderWidth:2, parsing:false
+      },
+      {
+        label:"運用",
+        data: sim.labels.map((a,i)=>({x:a,y:sim.totalInvestments[i]})),
+        borderColor: overlay ? color : "#d57d00",
+        pointRadius:0, borderWidth:2, borderDash: overlay ? [6,4] : [], parsing:false
+      }
+    ];
+  }
+  return [];
+}
+
+function draw(){
+  monteMode = false;
+  ensureScenarioSaved();
+
+  const cfg = getScenarioFromDOM();
+  const graphType = document.getElementById("graphType").value;
+  const overlay = document.getElementById("overlayToggle").checked;
+
+  let datasets = [];
+  let yData = [];
+  let labels = null;
+  let baseSim = null;
+
+  const targets = overlay ? scenarios : [scenarios[currentTab]];
+  targets.forEach((s, idx)=>{
+    setAllInputs(s.data);
+    const c = getScenarioFromDOM();
+    const sim = simulate(c, false);
+    if(idx===0){ labels = sim.labels; baseSim = sim; lastNormalSim = sim; }
+    const ds = buildDatasetsByGraphType(sim, graphType, TAB_COLORS[idx % TAB_COLORS.length], overlay);
+    datasets.push(...ds);
+    if(graphType === "asset") yData.push(...sim.totalAssets);
+    else if(graphType === "cashflow") yData.push(...sim.annualCashflow);
+    else if(graphType === "education") yData.push(...sim.annualEducation);
+    else if(graphType === "incomeExpense") yData.push(...sim.annualIncome, ...sim.annualExpense);
+    else if(graphType === "assetBreakdown") yData.push(...sim.totalDeposits, ...sim.totalInvestments);
+  });
+  setAllInputs(scenarios[currentTab].data);
+
+  updateResultCards(cfg, baseSim);
+
+  if(chart) chart.destroy();
+  chart = new Chart(document.getElementById("chart").getContext("2d"),{
+    type:"line",
+    data:{ datasets },
+    options:{
+      plugins:{
+        legend:{ display: overlay || graphType!=="asset" || graphType==="education" },
+        tooltip:{ mode:"nearest", intersect:false }
+      },
+      scales:{
+        x:{ type:"linear", min:cfg.age, max:120, ticks:{ stepSize:5 }, title:{display:true,text:"年齢"} },
+        y:{ title:{display:true,text:"金額（万円）"}, ...yScaleForData(yData.length?yData:[0], cfg) }
+      }
+    },
+    plugins:[pluginLines(cfg, baseSim)]
+  });
+}
+
+function runMonte(){
+  monteMode = true;
+  ensureScenarioSaved();
+
+  const overlay = document.getElementById("overlayToggle").checked;
+  const trials = 60;
+  const cfg = getScenarioFromDOM();
+  let labels = null;
+  let datasets = [];
+  let baseSim = null;
+  let monteInfo = null;
+
+  const targets = overlay ? scenarios : [scenarios[currentTab]];
+  let yData = [];
+
+  targets.forEach((s, idx)=>{
+    setAllInputs(s.data);
+    const c = getScenarioFromDOM();
+    const base = simulate(c, false);
+    if(!labels) labels = base.labels;
+    if(idx===0) baseSim = base;
+
+    let results = [];
+    for(let i=0;i<trials;i++) results.push(simulate(c, true).totalAssets);
+
+    const lifeIndex = Math.max(0, c.lifeExpect - c.age);
+    const fail = results.filter(r => (r[lifeIndex] ?? r[r.length-1]) <= 0).length;
+    const prob = Math.round(fail / trials * 100);
+
+    const finals = results.map(r=>r.at(-1));
+    const best = results[finals.indexOf(Math.max(...finals))];
+    const worst = results[finals.indexOf(Math.min(...finals))];
+    const color = TAB_COLORS[idx % TAB_COLORS.length];
+
+    if(overlay){
+      results.forEach(r=>{
+        datasets.push({
+          data: labels.map((a,i)=>({x:a,y:r[i]})),
+          borderColor: color + "33",
+          pointRadius:0,
+          borderWidth:1,
+          parsing:false
+        });
+      });
+      datasets.push({
+        data: labels.map((a,i)=>({x:a,y:best[i]})),
+        borderColor: color,
+        pointRadius:0,
+        borderWidth:2,
+        parsing:false
+      });
+      datasets.push({
+        data: labels.map((a,i)=>({x:a,y:worst[i]})),
+        borderColor: color,
+        pointRadius:0,
+        borderWidth:2,
+        borderDash:[5,4],
+        parsing:false
+      });
+      datasets.push({
+        data: labels.map((a,i)=>({x:a,y:base.totalAssets[i]})),
+        borderColor: color,
+        pointRadius:0,
+        borderWidth:3,
+        parsing:false
+      });
+    }else{
+      results.forEach(r=>{
+        datasets.push({
+          data: labels.map((a,i)=>({x:a,y:r[i]})),
+          borderColor:"rgba(150,150,150,0.20)",
+          pointRadius:0,
+          borderWidth:1,
+          parsing:false
+        });
+      });
+      datasets.push({
+        data: labels.map((a,i)=>({x:a,y:best[i]})),
+        borderColor:"green",
+        pointRadius:0,
+        borderWidth:2,
+        parsing:false
+      });
+      datasets.push({
+        data: labels.map((a,i)=>({x:a,y:worst[i]})),
+        borderColor:"red",
+        pointRadius:0,
+        borderWidth:2,
+        parsing:false
+      });
+      datasets.push({
+        data: labels.map((a,i)=>({x:a,y:base.totalAssets[i]})),
+        borderColor:"black",
+        pointRadius:0,
+        borderWidth:2,
+        parsing:false
+      });
+    }
+
+    yData.push(...results.flat(), ...base.totalAssets);
+    if(idx===0){
+      monteInfo = overlay
+        ? { prob, legendItems:[{text:"各ケースの試行 / ベスト / ワースト / 固定", color:TAB_COLORS[0]}] }
+        : { prob, legendItems:[{text:"ベスト",color:"green"},{text:"固定",color:"black"},{text:"ワースト",color:"red"}] };
+    }
+  });
+
+  setAllInputs(scenarios[currentTab].data);
+
+  updateResultCards(cfg, baseSim);
+
+  if(chart) chart.destroy();
+  chart = new Chart(document.getElementById("chart").getContext("2d"),{
+    type:"line",
+    data:{ datasets },
+    options:{
+      plugins:{ legend:{ display:false } },
+      scales:{
+        x:{ type:"linear", min:cfg.age, max:120, ticks:{ stepSize:5 }, title:{display:true,text:"年齢"} },
+        y:{ title:{display:true,text:"金額（万円）"}, ...yScaleForData(yData, cfg) }
+      }
+    },
+    plugins:[pluginLines(cfg, baseSim, monteInfo)]
+  });
+}
+
+function updateResultCards(cfg, sim){
+  const lifeIdx = Math.max(0, cfg.lifeExpect - cfg.age);
+  const lifeAsset = sim.totalAssets[lifeIdx] ?? sim.totalAssets.at(-1) ?? 0;
+  const fire = lifeAsset > 0;
+  const needed = neededAssetEstimate(cfg);
+  document.getElementById("fireResult").textContent = `FIRE：${fire ? "成立 ✅" : "不成立 ❌"}`;
+  document.getElementById("retireAssetResult").textContent = `退職時資産：約${Math.round(sim.retireAsset)}万円`;
+  document.getElementById("neededAssetResult").textContent = `必要資産目安：約${needed}万円`;
+  document.getElementById("depletionResult").textContent = `資産枯渇：${sim.depletionAge ? sim.depletionAge+"歳" : "なし"}`;
+  document.getElementById("incomeTotalResult").textContent = `総収入：約${Math.round(sim.totalIncomeSum)}万円`;
+  document.getElementById("expenseTotalResult").textContent = `総支出：約${Math.round(sim.totalExpenseSum)}万円`;
+}
+
+/* ---------- save/load ---------- */
+function encodeData(obj){
+  return btoa(unescape(encodeURIComponent(JSON.stringify(obj))));
+}
+function decodeData(str){
+  return JSON.parse(decodeURIComponent(escape(atob(str))));
+}
+function getSaveData(){
+  ensureScenarioSaved();
+  return { scenarios, currentTab };
+}
+function saveToURL(){
+  const encoded = encodeData(getSaveData());
+  history.replaceState(null,"", location.pathname + "?d=" + encoded);
+}
+function saveToLocal(){
+  localStorage.setItem("fire_simulator_state", JSON.stringify(getSaveData()));
+}
+function loadFromURL(){
+  const p = new URLSearchParams(location.search);
+  const d = p.get("d");
+  if(!d) return false;
+  try{
+    const data = decodeData(d);
+    scenarios = data.scenarios || [];
+    currentTab = data.currentTab || 0;
+    renderTabs();
+    if(scenarios.length) setAllInputs(scenarios[currentTab].data);
+    return true;
+  }catch(e){
+    console.error(e);
+    return false;
+  }
+}
+function loadFromLocal(){
+  const raw = localStorage.getItem("fire_simulator_state");
+  if(!raw) return false;
+  try{
+    const data = JSON.parse(raw);
+    scenarios = data.scenarios || [];
+    currentTab = data.currentTab || 0;
+    renderTabs();
+    if(scenarios.length) setAllInputs(scenarios[currentTab].data);
+    return true;
+  }catch(e){
+    console.error(e);
+    return false;
+  }
+}
+function copyURL(){
+  saveToURL();
+  navigator.clipboard.writeText(location.href);
+  alert("URLをコピーしました！");
+}
+
+/* ---------- event wiring ---------- */
+document.getElementById("addTabBtn").addEventListener("click", ()=>{ addTab(); draw(); saveToLocal(); saveToURL(); });
+document.getElementById("dupTabBtn").addEventListener("click", ()=>{ duplicateTab(); saveToLocal(); saveToURL(); });
+document.getElementById("renameTabBtn").addEventListener("click", renameTab);
+document.getElementById("runMonteBtn").addEventListener("click", ()=>{ runMonte(); saveToLocal(); saveToURL(); });
+document.getElementById("copyUrlBtn").addEventListener("click", copyURL);
+document.getElementById("graphType").addEventListener("change", ()=>{ draw(); });
+document.getElementById("overlayToggle").addEventListener("change", ()=>{ if(monteMode) runMonte(); else draw(); });
+document.getElementById("fixedScale").addEventListener("change", ()=>{ if(monteMode) runMonte(); else draw(); });
+document.getElementById("fixedScaleRange").addEventListener("input", ()=>{ if(monteMode) runMonte(); else draw(); });
+
+document.querySelectorAll("input, select").forEach(el=>{
+  if(["graphType","overlayToggle","fixedScale","fixedScaleRange"].includes(el.id)) return;
+  el.addEventListener("input", ()=>{
+    monteMode = false;
+    if(scenarios.length){
+      scenarios[currentTab].data = getAllInputs();
+    }
+    draw();
+    saveToLocal();
+    saveToURL();
+  });
+  el.addEventListener("change", ()=>{
+    monteMode = false;
+    if(scenarios.length){
+      scenarios[currentTab].data = getAllInputs();
+    }
+    draw();
+    saveToLocal();
+    saveToURL();
+  });
+});
+
+/* ---------- init ---------- */
+window.addEventListener("load", ()=>{
+  if(!loadFromURL() && !loadFromLocal()){
+    addTab();
+  }else{
+    if(!scenarios.length) addTab();
+  }
+  renderTabs();
+  draw();
+});
+</script>
+</body>
+</html>
