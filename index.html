@@ -68,6 +68,13 @@
     height:430px !important;
     margin:0 auto;
   }
+  .table-scroll{
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  .table-scroll > table{
+    min-width:520px;
+  }
   #resultBar{
     display:flex;
     flex-wrap:wrap;
@@ -321,11 +328,18 @@
   }
   .danger-btn:hover{background:#b91c1c;}
   @media (max-width:900px){
+    #chartWrap{
+      position:static;
+      padding-bottom:8px;
+    }
     #chartTopBar,#leftTopControls,#rightTopControls{flex-wrap:wrap;}
-
-    #chart{height:360px !important}
+    #chart{
+      height:250px !important;
+      max-width:100%;
+    }
+    .graph-select{width:110px;}
     .grid2{grid-template-columns:1fr}
-    #inputs{max-height:calc(100vh - 575px)}
+    #inputs{max-height:calc(100vh - 360px)}
   }
 </style>
 </head>
@@ -437,6 +451,7 @@
       </table>
 
       <div class="subhead">運用資産</div>
+      <div class="table-scroll">
       <table class="center-table">
         <tr><th></th><th>元本</th><th>現在額</th><th>通貨</th><th>利回り</th></tr>
         <tr><td>運用1</td><td><input id="inv1_cost" type="number" class="moneybox" value="4000"></td><td><input id="inv1_amount" type="number" class="moneybox" value="6000"></td><td><select id="inv1_cur"><option>万円</option><option>ドル</option></select></td><td><div class="input-unit center"><input id="inv1_rate" type="number" class="ratebox" step="0.1" value="5"><span class="suffix">%</span></div></td></tr>
@@ -445,6 +460,7 @@
         <tr><td>運用4</td><td><input id="inv4_cost" type="number" class="moneybox" value="0"></td><td><input id="inv4_amount" type="number" class="moneybox" value="0"></td><td><select id="inv4_cur"><option>万円</option><option>ドル</option></select></td><td><div class="input-unit center"><input id="inv4_rate" type="number" class="ratebox" step="0.1" value="5"><span class="suffix">%</span></div></td></tr>
         <tr><td>運用5</td><td><input id="inv5_cost" type="number" class="moneybox" value="0"></td><td><input id="inv5_amount" type="number" class="moneybox" value="0"></td><td><select id="inv5_cur"><option>万円</option><option>ドル</option></select></td><td><div class="input-unit center"><input id="inv5_rate" type="number" class="ratebox" step="0.1" value="5"><span class="suffix">%</span></div></td></tr>
       </table>
+      </div>
 
       <div class="checkbox-row">
         <label><input id="taxOn" type="checkbox" checked> 運用益課税を考慮する（税率20.315% / 売却時のみ課税）</label>
@@ -482,6 +498,7 @@
       </div>
 
       <div class="subhead">定期収入</div>
+      <div class="table-scroll">
       <table class="center-table">
         <tr><th></th><th>期間</th><th>金額</th></tr>
         <tr><td>定期収入1</td><td><div class="period-line"><span id="reginc1_from" class="period-prefix">現在〜</span><input id="reginc1_age" type="number" class="agebox" value="120"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="reginc1_val" type="number" class="moneybox" value="0" step="1"><span class="suffix">万円 / 年</span></div></td></tr>
@@ -490,6 +507,7 @@
         <tr><td>定期収入4</td><td><div class="period-line"><span id="reginc4_from" class="period-prefix">0〜</span><input id="reginc4_age" type="number" class="agebox" value="0"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="reginc4_val" type="number" class="moneybox" value="0" step="1"><span class="suffix">万円 / 年</span></div></td></tr>
         <tr><td>定期収入5</td><td><div class="period-line"><span id="reginc5_from" class="period-prefix">0〜</span><input id="reginc5_age" type="number" class="agebox" value="0"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="reginc5_val" type="number" class="moneybox" value="0" step="1"><span class="suffix">万円 / 年</span></div></td></tr>
       </table>
+      </div>
 
       <div class="subhead">臨時収入</div>
       <table class="center-table">
@@ -510,6 +528,7 @@
       <h2>支出</h2>
 
       <div class="subhead">家賃</div>
+      <div class="table-scroll">
       <table class="center-table">
         <tr><th></th><th>期間</th><th>金額</th></tr>
         <tr><td>家賃1</td><td><div class="period-line"><span id="rent1_from" class="period-prefix">現在〜</span><input id="rent1_age" type="number" class="agebox" value="55"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="rent1_val" type="number" class="moneybox" value="20" step="0.1"><span class="suffix">万円 / 月</span></div></td></tr>
@@ -518,6 +537,7 @@
         <tr><td>家賃4</td><td><div class="period-line"><span id="rent4_from" class="period-prefix">120〜</span><input id="rent4_age" type="number" class="agebox" value="0"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="rent4_val" type="number" class="moneybox" value="0" step="0.1"><span class="suffix">万円 / 月</span></div></td></tr>
         <tr><td>家賃5</td><td><div class="period-line"><span id="rent5_from" class="period-prefix">0〜</span><input id="rent5_age" type="number" class="agebox" value="0"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="rent5_val" type="number" class="moneybox" value="0" step="0.1"><span class="suffix">万円 / 月</span></div></td></tr>
       </table>
+      </div>
 
       <div class="subhead">住宅ローン</div>
       <div class="loan-wrap">
@@ -549,6 +569,7 @@
       </div>
 
       <div class="subhead">生活費</div>
+      <div class="table-scroll">
       <table class="center-table">
         <tr><th></th><th>期間</th><th>金額</th></tr>
         <tr><td>生活費1</td><td><div class="period-line"><span id="life1_from" class="period-prefix">現在〜</span><input id="life1_age" type="number" class="agebox" value="55"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="life1_val" type="number" class="moneybox" value="35" step="0.1"><span class="suffix">万円 / 月</span></div></td></tr>
@@ -557,8 +578,10 @@
         <tr><td>生活費4</td><td><div class="period-line"><span id="life4_from" class="period-prefix">85〜</span><input id="life4_age" type="number" class="agebox" value="120"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="life4_val" type="number" class="moneybox" value="22" step="0.1"><span class="suffix">万円 / 月</span></div></td></tr>
         <tr><td>生活費5</td><td><div class="period-line"><span id="life5_from" class="period-prefix">120〜</span><input id="life5_age" type="number" class="agebox" value="0"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="life5_val" type="number" class="moneybox" value="0" step="0.1"><span class="suffix">万円 / 月</span></div></td></tr>
       </table>
+      </div>
 
       <div class="subhead">定期支出</div>
+      <div class="table-scroll">
       <table class="center-table">
         <tr><th></th><th>期間</th><th>金額</th></tr>
         <tr><td>定期支出1</td><td><div class="period-line"><span id="period1_from" class="period-prefix">現在〜</span><input id="period1_age" type="number" class="agebox" value="120"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="period1_val" type="number" class="moneybox" value="30" step="1"><span class="suffix">万円 / 年</span></div></td></tr>
@@ -567,6 +590,7 @@
         <tr><td>定期支出4</td><td><div class="period-line"><span id="period4_from" class="period-prefix">0〜</span><input id="period4_age" type="number" class="agebox" value="0"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="period4_val" type="number" class="moneybox" value="0" step="1"><span class="suffix">万円 / 年</span></div></td></tr>
         <tr><td>定期支出5</td><td><div class="period-line"><span id="period5_from" class="period-prefix">0〜</span><input id="period5_age" type="number" class="agebox" value="0"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="period5_val" type="number" class="moneybox" value="0" step="1"><span class="suffix">万円 / 年</span></div></td></tr>
       </table>
+      </div>
 
       <div class="subhead">臨時支出</div>
       <table class="center-table">
@@ -1227,7 +1251,7 @@ function getAxisBounds(arr, cfg, symmetric=false){
 
   if(symmetric){
     const absMax = Math.max(Math.abs(minVal), Math.abs(maxVal), 1);
-    const raw = absMax / 0.9;
+    const raw = absMax / 0.8;
     const step = niceNumber(raw / 5);
     const limit = Math.ceil(raw / step) * step;
     return {min:-limit, max:limit};
@@ -1236,7 +1260,7 @@ function getAxisBounds(arr, cfg, symmetric=false){
   if(minVal === maxVal){
     if(minVal === 0) return {min:0, max:1};
     const mag = Math.abs(minVal);
-    const raw = mag / 0.9;
+    const raw = mag / 0.8;
     const step = niceNumber(raw / 5);
     if(minVal > 0){
       return {min:0, max:Math.ceil(raw / step) * step};
@@ -1244,8 +1268,8 @@ function getAxisBounds(arr, cfg, symmetric=false){
     return {min:-Math.ceil(raw / step) * step, max:0};
   }
 
-  const rawMin = minVal >= 0 ? 0 : minVal / 0.9;
-  const rawMax = maxVal <= 0 ? 0 : maxVal / 0.9;
+  const rawMin = minVal >= 0 ? 0 : minVal / 0.8;
+  const rawMax = maxVal <= 0 ? 0 : maxVal / 0.8;
   const span = Math.max(rawMax - rawMin, 1);
   const step = niceNumber(span / 6);
   const min = rawMin >= 0 ? 0 : Math.floor(rawMin / step) * step;
@@ -1254,6 +1278,9 @@ function getAxisBounds(arr, cfg, symmetric=false){
 }
 function getVisibleSeriesValues(labels, data, xMax){
   return labels.map((age, idx)=> age <= xMax ? data[idx] : null).filter(v=>v!==null && Number.isFinite(v));
+}
+function hasAnyVisibleValue(data){
+  return (data || []).some(v=>Number.isFinite(v) && Math.abs(v) > 1e-9);
 }
 function buildLinePoints(labels, data){
   return labels.map((x,i)=>({x, y:data[i]}));
@@ -1334,15 +1361,20 @@ function buildEducationDatasets(sim, color, overlay, labelPrefix=""){
       borderColor:color, borderWidth:2, backgroundColor:color+"22"
     })];
   }
-  const bars = [1,2,3,4,5].map((idx)=>makeBarDataset(`子${idx}`, sim.labels, sim.educationByChildSeries[idx], {
-    backgroundColor:TAB_COLORS[(idx-1)%TAB_COLORS.length],
-    stack:"edu",
-    order:1
-  }));
-  const cumLine = makeLineDataset("教育費累計", sim.labels, sim.annualEducationCum, {
-    borderColor:"#111827", borderWidth:2, yAxisID:"y1", order:20
-  });
-  return [...bars, cumLine];
+  const bars = [1,2,3,4,5]
+    .filter((idx)=>hasAnyVisibleValue(sim.educationByChildSeries[idx]))
+    .map((idx)=>makeBarDataset(`子${idx}`, sim.labels, sim.educationByChildSeries[idx], {
+      backgroundColor:TAB_COLORS[(idx-1)%TAB_COLORS.length],
+      stack:"edu",
+      order:1
+    }));
+  const datasets = [...bars];
+  if(hasAnyVisibleValue(sim.annualEducationCum)){
+    datasets.push(makeLineDataset("教育費累計", sim.labels, sim.annualEducationCum, {
+      borderColor:"#111827", borderWidth:2, yAxisID:"y1", order:20
+    }));
+  }
+  return datasets;
 }
 function buildIncomeExpenseDatasets(sim, color, overlay, labelPrefix=""){
   if(overlay){
@@ -1353,6 +1385,7 @@ function buildIncomeExpenseDatasets(sim, color, overlay, labelPrefix=""){
   }
   const d = [];
   Object.entries(INCOME_COLORS).forEach(([k,c])=>{
+    if(!hasAnyVisibleValue(sim.incomePartsSeries[k])) return;
     d.push(makeBarDataset(
       {self:"本人給与",spouse:"配偶者給与",pension:"年金",regular:"定期収入",extra:"臨時収入",childAllowance:"児童手当",retirePay:"退職金"}[k],
       sim.labels,
@@ -1361,10 +1394,12 @@ function buildIncomeExpenseDatasets(sim, color, overlay, labelPrefix=""){
     ));
   });
   Object.entries(EXPENSE_COLORS).forEach(([k,c])=>{
+    const expenseSeries = sim.expensePartsSeries[k].map(v=>-v);
+    if(!hasAnyVisibleValue(expenseSeries)) return;
     d.push(makeBarDataset(
       {life:"生活費",rent:"家賃",education:"教育費",loan:"住宅ローン",periodic:"定期支出",extra:"臨時支出"}[k],
       sim.labels,
-      sim.expensePartsSeries[k].map(v=>-v),
+      expenseSeries,
       {backgroundColor:c, stack:"expense"}
     ));
   });
@@ -1392,10 +1427,18 @@ function buildInvestmentDatasets(sim, color, overlay, labelPrefix=""){
   }
   const ds = [];
   let cumulative = sim.labels.map(()=>0);
+  let visibleCount = 0;
   for(let i=1;i<=5;i++){
-    cumulative = cumulative.map((v,idx)=>v + (sim.invSeries[i][idx] || 0));
+    const currentSeries = sim.invSeries[i] || sim.labels.map(()=>0);
+    cumulative = cumulative.map((v,idx)=>v + (currentSeries[idx] || 0));
+    if(!hasAnyVisibleValue(currentSeries)) continue;
+    visibleCount += 1;
     ds.push(makeLineDataset(`運用${i}`, sim.labels, cumulative, {
-      borderColor:INVESTMENT_COLORS[i-1], backgroundColor:INVESTMENT_COLORS[i-1]+"33", borderWidth:2, fill:i===1?{target:"origin"}:{target:"-1"}, order:5+i
+      borderColor:INVESTMENT_COLORS[i-1],
+      backgroundColor:INVESTMENT_COLORS[i-1]+"33",
+      borderWidth:2,
+      fill:visibleCount===1?{target:"origin"}:{target:"-1"},
+      order:5+i
     }));
   }
   const principalTotal = sim.labels.map((_,idx)=>{
@@ -1403,7 +1446,9 @@ function buildInvestmentDatasets(sim, color, overlay, labelPrefix=""){
     for(let i=1;i<=5;i++) s += sim.principalSeries[i][idx] || 0;
     return s;
   });
-  ds.push(makeLineDataset("元本合計", sim.labels, principalTotal, {borderColor:"#111827", borderWidth:2.5, order:20}));
+  if(hasAnyVisibleValue(principalTotal)){
+    ds.push(makeLineDataset("元本合計", sim.labels, principalTotal, {borderColor:"#111827", borderWidth:2.5, order:20}));
+  }
   return ds;
 }
 function buildDatasetsByGraphType(sim, graphType, color, overlay, labelPrefix=""){
@@ -1505,7 +1550,10 @@ function buildChartOptions(graphType, cfg, yData, overlay=false, extra={}){
     maintainAspectRatio:false,
     interaction:{mode:"nearest", intersect:false},
     plugins:{
-      legend:{display:showLegend, labels:{filter:(item)=>!!item.text}},
+      legend:{display:showLegend, labels:{filter:(item, data)=>{
+        const ds = data?.datasets?.[item.datasetIndex];
+        return !!item.text && (!!ds ? ds.data.some(p=>Number.isFinite(p?.y) && Math.abs(p.y) > 1e-9) : true);
+      }}},
       tooltip:{
         callbacks:{
           label(ctx){
@@ -1641,7 +1689,10 @@ function runMonte(){
       animation:false,
       responsive:true,
       maintainAspectRatio:false,
-      plugins:{legend:{display:overlay, labels:{filter:(item)=>!!item.text}}},
+      plugins:{legend:{display:overlay, labels:{filter:(item, data)=>{
+        const ds = data?.datasets?.[item.datasetIndex];
+        return !!item.text && (!!ds ? ds.data.some(p=>Number.isFinite(p?.y) && Math.abs(p.y) > 1e-9) : true);
+      }}}},
       scales:{
         x:{type:"linear", min:Math.min(firstCfg.xAxisMin ?? firstCfg.age, firstCfg.xAxisMax), max:firstCfg.xAxisMax, offset:false, bounds:"ticks", ticks:{stepSize:5}, title:{display:true,text:"年齢（歳）"}},
         y:{title:{display:true,text:"総資産（万円）"}, ...getAxisBounds(yData, firstCfg, false)}
