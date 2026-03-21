@@ -327,6 +327,29 @@
     border-color:#dc2626;
   }
   .danger-btn:hover{background:#b91c1c;}
+
+  .tab-context-menu{
+    position:fixed;
+    display:none;
+    min-width:160px;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:12px;
+    box-shadow:0 10px 24px rgba(0,0,0,.16);
+    padding:6px;
+    z-index:1100;
+  }
+  .tab-context-menu.show{display:block;}
+  .tab-context-menu button{
+    display:block;
+    width:100%;
+    text-align:left;
+    border:none;
+    background:transparent;
+    border-radius:8px;
+    padding:9px 10px;
+  }
+  .tab-context-menu button:hover{background:#f4f4f4;}
   @media (max-width:900px){
     #chartWrap{
       position:static;
@@ -388,9 +411,11 @@
   <div id="tabsBar">
     <div id="tabButtons"></div>
     <button id="addTabBtn" type="button">＋追加</button>
-    <button id="dupTabBtn" type="button">複製</button>
-    <button id="deleteTabBtn" type="button">削除</button>
-    <button id="renameTabBtn" type="button">条件名変更</button>
+  </div>
+
+  <div id="tabContextMenu" class="tab-context-menu" aria-hidden="true">
+    <button id="tabMenuRenameBtn" type="button">条件名変更</button>
+    <button id="tabMenuDeleteBtn" type="button">削除</button>
   </div>
 
   <div id="deleteTabModal" class="modal-backdrop" aria-hidden="true">
@@ -720,24 +745,15 @@ function updateInputsVisibility(){
   document.getElementById("inputs").style.display = scenarios.length ? "block" : "none";
 }
 function addTab(){
-  const baseData = getAllInputs();
+  const baseData = (scenarios.length && currentTab >= 0 && scenarios[currentTab]) ? deepClone(getAllInputs()) : getAllInputs();
   scenarios.push({name:`条件${scenarios.length+1}`, data:baseData});
   currentTab = scenarios.length - 1;
   updateInputsVisibility();
   renderTabs();
 }
-function duplicateTab(){
-  if(!scenarios.length || currentTab < 0 || !scenarios[currentTab]) return;
-  ensureScenarioSaved();
-  const base = scenarios[currentTab];
-  scenarios.push({name:`${base.name} コピー`, data:deepClone(base.data)});
-  currentTab = scenarios.length - 1;
-  updateInputsVisibility();
-  renderTabs();
-}
-function renameTab(){
-  if(!scenarios.length || currentTab < 0 || !scenarios[currentTab]) return;
-  const current = scenarios[currentTab];
+function renameTab(tabIndex = currentTab){
+  if(!scenarios.length || tabIndex < 0 || !scenarios[tabIndex]) return;
+  const current = scenarios[tabIndex];
   const nextName = prompt("条件名を入力してください", current.name);
   if(nextName && nextName.trim()){
     current.name = nextName.trim();
@@ -745,10 +761,10 @@ function renameTab(){
     persistState();
   }
 }
-function openDeleteTabModal(){
-  if(!scenarios.length || currentTab < 0 || !scenarios[currentTab]) return;
-  pendingDeleteTabIndex = currentTab;
-  document.getElementById("deleteTabMessage").textContent = `「${scenarios[currentTab].name}」を削除します。元に戻せませんが実行しますか？`;
+function openDeleteTabModal(tabIndex = currentTab){
+  if(!scenarios.length || tabIndex < 0 || !scenarios[tabIndex]) return;
+  pendingDeleteTabIndex = tabIndex;
+  document.getElementById("deleteTabMessage").textContent = `「${scenarios[tabIndex].name}」を削除します。元に戻せませんが実行しますか？`;
   document.getElementById("deleteTabModal").classList.add("show");
 }
 function closeDeleteTabModal(){
@@ -793,12 +809,63 @@ function switchTab(i){
   renderTabs();
   draw();
 }
+function openTabContextMenu(tabIndex, x, y){
+  const menu = document.getElementById("tabContextMenu");
+  if(!menu || !scenarios[tabIndex]) return;
+  menu.dataset.tabIndex = String(tabIndex);
+  menu.classList.add("show");
+  menu.setAttribute("aria-hidden", "false");
+  menu.style.left = "0px";
+  menu.style.top = "0px";
+  const rect = menu.getBoundingClientRect();
+  const left = Math.min(x, window.innerWidth - rect.width - 8);
+  const top = Math.min(y, window.innerHeight - rect.height - 8);
+  menu.style.left = `${Math.max(8, left)}px`;
+  menu.style.top = `${Math.max(8, top)}px`;
+}
+function closeTabContextMenu(){
+  const menu = document.getElementById("tabContextMenu");
+  if(!menu) return;
+  menu.classList.remove("show");
+  menu.setAttribute("aria-hidden", "true");
+}
 function renderTabs(){
   const el = document.getElementById("tabButtons");
   el.innerHTML = scenarios.map((s,i)=>{
     const cls = i===currentTab ? "tab-btn active" : "tab-btn";
-    return `<button type="button" class="${cls}" onclick="switchTab(${i})">${escapeHtml(s.name)}</button>`;
+    return `<button type="button" class="${cls}" data-tab-index="${i}">${escapeHtml(s.name)}</button>`;
   }).join("");
+  el.querySelectorAll(".tab-btn").forEach(btn=>{
+    const idx = +btn.dataset.tabIndex;
+    let pressTimer = null;
+    let longPressed = false;
+    const clearPressTimer = ()=>{
+      if(pressTimer){ clearTimeout(pressTimer); pressTimer = null; }
+    };
+    btn.addEventListener("click", (e)=>{
+      if(longPressed){
+        longPressed = false;
+        e.preventDefault();
+        return;
+      }
+      closeTabContextMenu();
+      switchTab(idx);
+    });
+    btn.addEventListener("contextmenu", (e)=>{
+      e.preventDefault();
+      openTabContextMenu(idx, e.clientX, e.clientY);
+    });
+    btn.addEventListener("touchstart", (e)=>{
+      clearPressTimer();
+      longPressed = false;
+      const touch = e.touches[0];
+      pressTimer = setTimeout(()=>{
+        longPressed = true;
+        openTabContextMenu(idx, touch.clientX, touch.clientY);
+      }, 550);
+    }, {passive:true});
+    ["touchend","touchmove","touchcancel"].forEach(ev=>btn.addEventListener(ev, clearPressTimer, {passive:true}));
+  });
   updateInputsVisibility();
 }
 function rangeRows(prefix){
@@ -1776,14 +1843,15 @@ async function copyURL(){
 document.getElementById("addTabBtn").addEventListener("click", ()=>{
   addTab(); draw(); persistState();
 });
-document.getElementById("dupTabBtn").addEventListener("click", ()=>{
-  duplicateTab(); draw(); persistState();
+document.getElementById("tabMenuRenameBtn").addEventListener("click", ()=>{
+  const idx = +(document.getElementById("tabContextMenu").dataset.tabIndex || currentTab);
+  closeTabContextMenu();
+  renameTab(idx); draw();
 });
-document.getElementById("renameTabBtn").addEventListener("click", ()=>{
-  renameTab(); draw();
-});
-document.getElementById("deleteTabBtn").addEventListener("click", ()=>{
-  openDeleteTabModal();
+document.getElementById("tabMenuDeleteBtn").addEventListener("click", ()=>{
+  const idx = +(document.getElementById("tabContextMenu").dataset.tabIndex || currentTab);
+  closeTabContextMenu();
+  openDeleteTabModal(idx);
 });
 document.getElementById("cancelDeleteTabBtn").addEventListener("click", ()=>{
   closeDeleteTabModal();
@@ -1793,6 +1861,16 @@ document.getElementById("confirmDeleteTabBtn").addEventListener("click", ()=>{
 });
 document.getElementById("deleteTabModal").addEventListener("click", (e)=>{
   if(e.target.id === "deleteTabModal") closeDeleteTabModal();
+});
+document.addEventListener("click", (e)=>{
+  const menu = document.getElementById("tabContextMenu");
+  if(menu && menu.classList.contains("show") && !menu.contains(e.target) && !e.target.closest(".tab-btn")){
+    closeTabContextMenu();
+  }
+});
+document.addEventListener("scroll", ()=> closeTabContextMenu(), true);
+document.addEventListener("keydown", (e)=>{
+  if(e.key === "Escape") closeTabContextMenu();
 });
 document.getElementById("runMonteBtn").addEventListener("click", ()=>{
   document.getElementById("graphType").value = "asset";
