@@ -708,10 +708,20 @@ function createDefaultScenarioData(){
   return migrateLegacyData(getAllInputs());
 }
 
-function buildSchoolSelect(id){
+function buildSchoolSelect(id, value){
   const sel = document.getElementById(id);
   if(!sel) return;
-  sel.innerHTML = GRADE_OPTIONS.map(v => `<option value="${v}">${v}</option>`).join("");
+  sel.innerHTML = GRADE_OPTIONS.map(v => `<option value="${escapeAttr(v)}" ${String(value || "") === String(v) ? "selected" : ""}>${escapeHtml(v)}</option>`).join("");
+}
+function escapeAttr(s){
+  return escapeHtml(String(s ?? "")).replaceAll("'", "&#39;");
+}
+function attrValue(v, fallback=""){
+  return escapeAttr(v == null || v === "" ? fallback : v);
+}
+function isCheckedAttr(v, fallback=false){
+  const val = v == null || v === "" ? fallback : v;
+  return val === true || String(val) === "true" || String(val) === "on" ? "checked" : "";
 }
 
 const DYNAMIC_SECTIONS = ["child","dep","inv","reginc","inc","rent","life","period","extra"];
@@ -894,30 +904,45 @@ function renderChildRows(data = {}){
   if(!body) return;
   let html = "";
   for(let i=1;i<=dynamicCounts.child;i++){
-    html += `<tr>${buildRowLabelCell("child", i, data)}<td><input id="child${i}_enabled" type="checkbox" ${i===1?'checked':''}></td><td><div class="input-unit center"><input id="child${i}_age" type="number" class="agebox" value="${i===1?10:0}"><span class="suffix">歳</span></div></td><td><select id="child${i}_school"></select></td></tr>`;
+    const enabled = isCheckedAttr(data[`child${i}_enabled`], i===1);
+    const ageVal = attrValue(data[`child${i}_age`], i===1 ? 10 : 0);
+    html += `<tr>${buildRowLabelCell("child", i, data)}<td><input id="child${i}_enabled" type="checkbox" ${enabled}></td><td><div class="input-unit center"><input id="child${i}_age" type="number" class="agebox" value="${ageVal}"><span class="suffix">歳</span></div></td><td><select id="child${i}_school"></select></td></tr>`;
   }
   body.innerHTML = html;
-  for(let i=1;i<=dynamicCounts.child;i++) buildSchoolSelect(`child${i}_school`);
-  const s1 = document.getElementById("child1_school"); if(s1) s1.value = "小4";
+  for(let i=1;i<=dynamicCounts.child;i++) buildSchoolSelect(`child${i}_school`, data[`child${i}_school`] ?? (i===1 ? "小4" : "未就園児"));
 }
 function renderDepositRows(data = {}){
   const body = document.getElementById("depRows"); if(!body) return;
   let html="";
-  for(let i=1;i<=dynamicCounts.dep;i++) html += `<tr>${buildRowLabelCell("dep", i, data)}<td><div class="input-unit center"><input id="dep${i}_amount" type="number" class="moneybox" value="${i===1?5000:0}"></div></td><td><select id="dep${i}_cur"><option>万円</option><option>ドル</option></select></td><td><div class="input-unit center"><input id="dep${i}_rate" type="number" class="ratebox" step="0.01" value="0.2"><span class="suffix">%</span></div></td></tr>`;
+  for(let i=1;i<=dynamicCounts.dep;i++){
+    const amountVal = attrValue(data[`dep${i}_amount`], i===1 ? 5000 : 0);
+    const curVal = escapeAttr(data[`dep${i}_cur`] ?? "万円");
+    const rateVal = attrValue(data[`dep${i}_rate`], 0.2);
+    html += `<tr>${buildRowLabelCell("dep", i, data)}<td><div class="input-unit center"><input id="dep${i}_amount" type="number" class="moneybox" value="${amountVal}"></div></td><td><select id="dep${i}_cur"><option ${curVal === "万円" ? "selected" : ""}>万円</option><option ${curVal === "ドル" ? "selected" : ""}>ドル</option></select></td><td><div class="input-unit center"><input id="dep${i}_rate" type="number" class="ratebox" step="0.01" value="${rateVal}"><span class="suffix">%</span></div></td></tr>`;
+  }
   body.innerHTML = html;
 }
 function renderInvestmentRows(data = {}){
   const body = document.getElementById("invRows"); if(!body) return;
   let html="";
-  for(let i=1;i<=dynamicCounts.inv;i++) html += `<tr>${buildRowLabelCell("inv", i, data)}<td><input id="inv${i}_cost" type="number" class="moneybox" value="${i===1?4000:0}"></td><td><input id="inv${i}_amount" type="number" class="moneybox" value="${i===1?6000:0}"></td><td><select id="inv${i}_cur"><option>万円</option><option>ドル</option></select></td><td><div class="input-unit center"><input id="inv${i}_rate" type="number" class="ratebox" step="0.1" value="5"><span class="suffix">%</span></div></td></tr>`;
+  for(let i=1;i<=dynamicCounts.inv;i++){
+    const costVal = attrValue(data[`inv${i}_cost`], i===1 ? 4000 : 0);
+    const amountVal = attrValue(data[`inv${i}_amount`], i===1 ? 6000 : 0);
+    const curVal = escapeAttr(data[`inv${i}_cur`] ?? "万円");
+    const rateVal = attrValue(data[`inv${i}_rate`], 5);
+    html += `<tr>${buildRowLabelCell("inv", i, data)}<td><input id="inv${i}_cost" type="number" class="moneybox" value="${costVal}"></td><td><input id="inv${i}_amount" type="number" class="moneybox" value="${amountVal}"></td><td><select id="inv${i}_cur"><option ${curVal === "万円" ? "selected" : ""}>万円</option><option ${curVal === "ドル" ? "selected" : ""}>ドル</option></select></td><td><div class="input-unit center"><input id="inv${i}_rate" type="number" class="ratebox" step="0.1" value="${rateVal}"><span class="suffix">%</span></div></td></tr>`;
+  }
   body.innerHTML = html;
 }
 function renderRangeRows(prefix, bodyId, label, suffix, step, defaultVal, data = {}){
   const body = document.getElementById(bodyId); if(!body) return;
-  const currentAge = currentAgeValue();
+  const currentAge = currentAgeValue(data);
   let html="";
   for(let i=1;i<=dynamicCounts[prefix];i++){
-    html += `<tr>${buildRowLabelCell(prefix, i, data)}<td><div class="period-range"><input id="${prefix}${i}_fromAge" type="number" class="agebox" value="${currentAge}"><span class="suffix">〜</span><input id="${prefix}${i}_toAge" type="number" class="agebox" value="120"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="${prefix}${i}_val" type="number" class="moneybox" value="${defaultVal}" step="${step}"><span class="suffix">${suffix}</span></div></td></tr>`;
+    const fromVal = attrValue(data[`${prefix}${i}_fromAge`], currentAge);
+    const toVal = attrValue(data[`${prefix}${i}_toAge`], 120);
+    const val = attrValue(data[`${prefix}${i}_val`], defaultVal);
+    html += `<tr>${buildRowLabelCell(prefix, i, data)}<td><div class="period-range"><input id="${prefix}${i}_fromAge" type="number" class="agebox" value="${fromVal}"><span class="suffix">〜</span><input id="${prefix}${i}_toAge" type="number" class="agebox" value="${toVal}"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="${prefix}${i}_val" type="number" class="moneybox" value="${val}" step="${step}"><span class="suffix">${suffix}</span></div></td></tr>`;
     defaultVal = 0;
   }
   body.innerHTML = html;
@@ -925,27 +950,29 @@ function renderRangeRows(prefix, bodyId, label, suffix, step, defaultVal, data =
 function renderPointRows(prefix, bodyId, label, suffix, defaultAge, defaultVal, data = {}){
   const body = document.getElementById(bodyId); if(!body) return;
   let html="";
-  for(let i=1;i<=dynamicCounts[prefix];i++) html += `<tr>${buildRowLabelCell(prefix, i, data)}<td><div class="input-unit center"><input id="${prefix}${i}_age" type="number" class="agebox" value="${i===1?defaultAge:0}"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="${prefix}${i}_val" type="number" class="moneybox" value="${i===1?defaultVal:0}"><span class="suffix">${suffix}</span></div></td></tr>`;
+  for(let i=1;i<=dynamicCounts[prefix];i++){
+    const ageVal = attrValue(data[`${prefix}${i}_age`], i===1 ? defaultAge : 0);
+    const val = attrValue(data[`${prefix}${i}_val`], i===1 ? defaultVal : 0);
+    html += `<tr>${buildRowLabelCell(prefix, i, data)}<td><div class="input-unit center"><input id="${prefix}${i}_age" type="number" class="agebox" value="${ageVal}"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="${prefix}${i}_val" type="number" class="moneybox" value="${val}"><span class="suffix">${suffix}</span></div></td></tr>`;
+  }
   body.innerHTML = html;
 }
 function buildEducationGrid(data = {}){
   const body = document.getElementById("eduBody");
-  const normalOptions = `<option>公立</option><option>私立</option>`;
-  const uniOptions = `<option>なし</option><option>国公立（自宅）</option><option>国公立（自宅外）</option><option>私立（自宅）</option><option>私立（自宅外）</option>`;
+  const normalOptions = ["公立","私立"];
+  const uniOptions = ["なし","国公立（自宅）","国公立（自宅外）","私立（自宅）","私立（自宅外）"];
   let html = "";
   for(let i=1;i<=dynamicCounts.child;i++){
     html += `<tr>${buildRowLabelCell("child", i, data)}`;
     STAGE_ORDER.forEach(stage=>{
-      const opts = stage==="uni" ? uniOptions : normalOptions;
-      html += `<td class="edu-cell"><div class="edu-cell-inner"><select id="c${i}_${stage}_type">${opts}</select><div style="height:6px"></div><div class="input-unit"><input id="c${i}_${stage}_extra" type="number" class="moneybox" value="0" step="0.1"><span class="suffix">万円 / 月</span></div></div></td>`;
+      const options = stage === "uni" ? uniOptions : normalOptions;
+      const currentType = data[`c${i}_${stage}_type`] ?? (stage === "uni" ? "国公立（自宅）" : "公立");
+      const currentExtra = attrValue(data[`c${i}_${stage}_extra`], 0);
+      html += `<td class="edu-cell"><div class="edu-cell-inner"><select id="c${i}_${stage}_type">${options.map(opt => `<option value="${escapeAttr(opt)}" ${String(currentType) === String(opt) ? "selected" : ""}>${escapeHtml(opt)}</option>`).join("")}</select><div style="height:6px"></div><div class="input-unit"><input id="c${i}_${stage}_extra" type="number" class="moneybox" value="${currentExtra}" step="0.1"><span class="suffix">万円 / 月</span></div></div></td>`;
     });
     html += `</tr>`;
   }
   body.innerHTML = html;
-  for(let i=1;i<=dynamicCounts.child;i++){
-    ["kind","elem","junior","high"].forEach(stage=>{ const el = document.getElementById(`c${i}_${stage}_type`); if(el) el.value = "公立"; });
-    const uni = document.getElementById(`c${i}_uni_type`); if(uni) uni.value = "国公立（自宅）";
-  }
 }
 function renderDynamicSections(data = {}){
   renderChildRows(data);
@@ -963,14 +990,11 @@ function renderDynamicSections(data = {}){
 function rerenderDynamicSection(type, nextCount){
   const data = migrateLegacyData(getAllInputs());
   dynamicCounts[type] = Math.max(1, nextCount);
-  renderDynamicSections();
+  renderDynamicSections(data);
   setAllInputs(data);
   updatePeriodDisplays();
 }
 renderDynamicSections();
-
-
-
 let activeNumericInput = null;
 let numericAssistEl = null;
 
@@ -1056,6 +1080,7 @@ function updatePeriodDisplays(){
   if(xMaxEl && (!xMaxEl.value || +xMaxEl.value < currentAge)) xMaxEl.value = Math.min(120, Math.max(100, currentAge));
 }
 
+let inputPersistTimer = null;
 function getAllInputs(){
   const data = {};
   document.querySelectorAll("input, select").forEach(el=>{
@@ -1063,6 +1088,14 @@ function getAllInputs(){
     data[el.id] = el.type === "checkbox" ? el.checked : el.value;
   });
   return data;
+}
+function syncCurrentScenarioFromDOM(persistLocal = false){
+  if(!scenarios.length || currentTab < 0 || !scenarios[currentTab]) return;
+  scenarios[currentTab].data = migrateLegacyData(getAllInputs());
+  if(persistLocal){
+    clearTimeout(inputPersistTimer);
+    inputPersistTimer = setTimeout(()=>{ saveToLocal(); }, 150);
+  }
 }
 function refreshRowLabelTexts(){
   document.querySelectorAll(".row-label-btn[data-type][data-index]").forEach(btn=>{
@@ -1085,7 +1118,7 @@ function setAllInputs(data){
   enhanceNumericInputs(document);
 }
 function ensureScenarioSaved(){
-  if(scenarios.length && currentTab >= 0 && scenarios[currentTab]) scenarios[currentTab].data = getAllInputs();
+  if(scenarios.length && currentTab >= 0 && scenarios[currentTab]) scenarios[currentTab].data = migrateLegacyData(getAllInputs());
 }
 function updateInputsVisibility(){
   document.getElementById("inputs").style.display = scenarios.length ? "block" : "none";
@@ -2339,9 +2372,10 @@ document.addEventListener("input", (e)=>{
   const el = e.target;
   if(!(el.matches("input") || el.matches("select"))) return;
   if(["graphType","overlayToggle","fixedScale","fixedScaleMin","fixedScaleMax","xAxisMin","xAxisMax"].includes(el.id)) return;
-  // スマホで number 入力中に再描画するとフォーカスが外れやすいため、
-  // input 中は表示更新のみ行い、保存・再計算は change / focusout 側で行う。
+  // 入力中は再描画せず、現在値だけは常にシナリオへ退避しておく。
+  // これにより後段の再描画で動的行がデフォルトへ戻る事故を防ぐ。
   updatePeriodDisplays();
+  syncCurrentScenarioFromDOM(true);
 });
 function commitMainInputChange(e){
   const el = e.target;
@@ -2349,7 +2383,7 @@ function commitMainInputChange(e){
   if(["graphType","overlayToggle","fixedScale","fixedScaleMin","fixedScaleMax","xAxisMin","xAxisMax"].includes(el.id)) return;
   monteMode = false;
   updatePeriodDisplays();
-  if(scenarios.length && currentTab >= 0) scenarios[currentTab].data = getAllInputs();
+  syncCurrentScenarioFromDOM(false);
   draw();
   persistState();
 }
