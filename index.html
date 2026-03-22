@@ -171,6 +171,7 @@
     grid-template-columns:1fr 1fr;
     gap:12px;
   }
+  .grid2 > div{min-width:0;}
   .field{
     display:inline-flex;
     align-items:center;
@@ -373,6 +374,13 @@
     .graph-select{width:110px;}
     .grid2{grid-template-columns:1fr}
     #inputs{max-height:calc(100vh - 360px)}
+    .basic-table{table-layout:fixed;}
+    .basic-table th,.basic-table td{padding:4px;}
+    .basic-table td:nth-child(2) .input-unit{width:auto;max-width:100%;justify-content:center;gap:4px;}
+    .basic-table .agebox,.basic-table .ratebox,.basic-table .moneybox{width:68px !important;}
+    .basic-table select{max-width:100%;width:100%;}
+    #childRows td:last-child select{width:100%;min-width:0;}
+    .basic-table .suffix{font-size:12px;}
   }
 
   .numeric-assist{display:none !important;
@@ -906,7 +914,7 @@ function renderChildRows(data = {}){
   for(let i=1;i<=dynamicCounts.child;i++){
     const enabled = isCheckedAttr(data[`child${i}_enabled`], i===1);
     const ageVal = attrValue(data[`child${i}_age`], i===1 ? 10 : 0);
-    html += `<tr>${buildRowLabelCell("child", i, data)}<td><input id="child${i}_enabled" type="checkbox" ${enabled}></td><td><div class="input-unit center"><input id="child${i}_age" type="number" class="agebox" value="${ageVal}"><span class="suffix">歳</span></div></td><td><select id="child${i}_school"></select></td></tr>`;
+    html += `<tr>${buildRowLabelCell("child", i, data)}<td><input id="child${i}_enabled" type="checkbox" ${enabled}></td><td><div class="input-unit center"><input id="child${i}_age" type="number" class="agebox" value="${ageVal}"><span class="suffix">歳</span></div></td><td><select id="child${i}_school" class="wide-child-school"></select></td></tr>`;
   }
   body.innerHTML = html;
   for(let i=1;i<=dynamicCounts.child;i++) buildSchoolSelect(`child${i}_school`, data[`child${i}_school`] ?? (i===1 ? "小4" : "未就園児"));
@@ -1260,13 +1268,13 @@ function renderTabs(){
     btn.addEventListener("touchstart", (e)=>{
       clearPressTimer();
       longPressed = false;
-      e.preventDefault();
       const touch = e.touches[0];
+      if(!touch) return;
       pressTimer = setTimeout(()=>{
         longPressed = true;
         openTabContextMenu(idx, touch.clientX, touch.clientY);
       }, 550);
-    }, {passive:false});
+    }, {passive:true});
     ["touchend","touchmove","touchcancel"].forEach(ev=>btn.addEventListener(ev, clearPressTimer, {passive:true}));
   });
   updateInputsVisibility();
