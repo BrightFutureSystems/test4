@@ -2231,13 +2231,11 @@ document.addEventListener("input", (e)=>{
   const el = e.target;
   if(!(el.matches("input") || el.matches("select"))) return;
   if(["graphType","overlayToggle","fixedScale","fixedScaleMin","fixedScaleMax","xAxisMin","xAxisMax"].includes(el.id)) return;
-  monteMode = false;
+  // スマホで number 入力中に再描画するとフォーカスが外れやすいため、
+  // input 中は表示更新のみ行い、保存・再計算は change / focusout 側で行う。
   updatePeriodDisplays();
-  if(scenarios.length && currentTab >= 0) scenarios[currentTab].data = getAllInputs();
-  draw();
-  persistState();
 });
-document.addEventListener("change", (e)=>{
+function commitMainInputChange(e){
   const el = e.target;
   if(!(el.matches("input") || el.matches("select"))) return;
   if(["graphType","overlayToggle","fixedScale","fixedScaleMin","fixedScaleMax","xAxisMin","xAxisMax"].includes(el.id)) return;
@@ -2246,7 +2244,9 @@ document.addEventListener("change", (e)=>{
   if(scenarios.length && currentTab >= 0) scenarios[currentTab].data = getAllInputs();
   draw();
   persistState();
-});
+}
+document.addEventListener("change", commitMainInputChange);
+document.addEventListener("focusout", commitMainInputChange, true);
 
 window.addEventListener("load", ()=>{
   if(!loadFromURL() && !loadFromLocal()) addTab();
