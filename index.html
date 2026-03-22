@@ -374,6 +374,37 @@
     .grid2{grid-template-columns:1fr}
     #inputs{max-height:calc(100vh - 360px)}
   }
+
+  .numeric-assist{
+    position:fixed;
+    z-index:9999;
+    display:none;
+    gap:6px;
+    align-items:center;
+    background:rgba(17,24,39,0.92);
+    color:#fff;
+    border-radius:999px;
+    padding:6px 8px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.22);
+    user-select:none;
+    -webkit-user-select:none;
+    -webkit-touch-callout:none;
+  }
+  .numeric-assist.show{ display:flex; }
+  .numeric-assist button{
+    border:none;
+    background:#fff;
+    color:#111827;
+    border-radius:999px;
+    min-width:32px;
+    height:32px;
+    font-size:20px;
+    line-height:1;
+    font-weight:700;
+    cursor:pointer;
+    padding:0 10px;
+  }
+
 </style>
 </head>
 <body>
@@ -927,6 +958,7 @@ function renderDynamicSections(data = {}){
   renderRangeRows("period","periodRows","定期支出","万円 / 年",1,30,data);
   renderPointRows("extra","extraRows","臨時支出","万円",55,400,data);
   buildEducationGrid(data);
+  enhanceNumericInputs(document);
 }
 function rerenderDynamicSection(type, nextCount){
   const data = migrateLegacyData(getAllInputs());
@@ -937,6 +969,111 @@ function rerenderDynamicSection(type, nextCount){
 }
 renderDynamicSections();
 
+
+
+let activeNumericInput = null;
+let numericAssistEl = null;
+
+function sanitizeNumericText(value, finalize = false){
+  let v = String(value ?? "")
+    .replace(/[−ー―‐]/g, "-")
+    .replace(/[．。]/g, ".")
+    .replace(/[０-９]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 65248));
+  let sign = "";
+  if(v.trim().startsWith("-")) sign = "-";
+  v = v.replace(/-/g, "");
+  const firstDot = v.indexOf(".");
+  if(firstDot >= 0){
+    v = v.slice(0, firstDot + 1) + v.slice(firstDot + 1).replace(/\./g, "");
+  }
+  v = v.replace(/[^0-9.]/g, "");
+  v = sign + v;
+  if(finalize){
+    if(v === "-" || v === "." || v === "-.") return "";
+    if(v.startsWith(".")) v = "0" + v;
+    if(v.startsWith("-.")) v = "-0" + v.slice(1);
+    if(v.endsWith(".")) v = v.slice(0, -1);
+  }
+  return v;
+}
+
+function isNumericLikeInput(el){
+  return !!(el && el.matches && (
+    el.matches('input[type="number"]') ||
+    el.id === "fixedScaleMin" ||
+    el.id === "fixedScaleMax" ||
+    el.dataset.numericReady === "1"
+  ));
+}
+
+function ensureNumericAssist(){
+  if(numericAssistEl) return numericAssistEl;
+  numericAssistEl = document.createElement("div");
+  numericAssistEl.className = "numeric-assist";
+  numericAssistEl.innerHTML = '<button type="button" data-sign-toggle>−</button>';
+  document.body.appendChild(numericAssistEl);
+  numericAssistEl.addEventListener("pointerdown", (e)=>{
+    const btn = e.target.closest("[data-sign-toggle]");
+    if(!btn || !activeNumericInput) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const el = activeNumericInput;
+    const next = String(el.value || "").trim().startsWith("-")
+      ? String(el.value || "").replace(/^\s*-\s*/, "")
+      : "-" + String(el.value || "");
+    el.value = sanitizeNumericText(next, false);
+    el.dispatchEvent(new Event("input", {bubbles:true}));
+    el.focus({preventScroll:true});
+    requestAnimationFrame(()=>positionNumericAssist(el));
+  });
+  return numericAssistEl;
+}
+
+function positionNumericAssist(el){
+  const assist = ensureNumericAssist();
+  if(!el || !document.body.contains(el)){
+    assist.classList.remove("show");
+    return;
+  }
+  const rect = el.getBoundingClientRect();
+  const top = Math.max(8, rect.top - 42);
+  const left = Math.min(window.innerWidth - assist.offsetWidth - 8, Math.max(8, rect.right - assist.offsetWidth));
+  assist.style.top = `${top}px`;
+  assist.style.left = `${left}px`;
+  assist.classList.add("show");
+}
+
+function hideNumericAssist(){
+  if(numericAssistEl) numericAssistEl.classList.remove("show");
+  activeNumericInput = null;
+}
+
+function enhanceNumericInputs(root = document){
+  root.querySelectorAll('input[type="number"], #fixedScaleMin, #fixedScaleMax').forEach(el=>{
+    if(el.dataset.numericReady === "1") return;
+    el.dataset.numericReady = "1";
+    try{ el.type = "text"; }catch(_e){}
+    el.setAttribute("inputmode", "decimal");
+    el.setAttribute("autocomplete", "off");
+    el.setAttribute("spellcheck", "false");
+    el.setAttribute("enterkeyhint", "done");
+    el.addEventListener("focus", ()=>{
+      activeNumericInput = el;
+      ensureNumericAssist();
+      requestAnimationFrame(()=>positionNumericAssist(el));
+    });
+    el.addEventListener("input", ()=>{
+      activeNumericInput = el;
+      requestAnimationFrame(()=>positionNumericAssist(el));
+    });
+    el.addEventListener("blur", ()=>{
+      el.value = sanitizeNumericText(el.value, true);
+      setTimeout(()=>{
+        if(document.activeElement !== el && (!numericAssistEl || !numericAssistEl.contains(document.activeElement))) hideNumericAssist();
+      }, 120);
+    });
+  });
+}
 
 function escapeHtml(s){
   return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
@@ -982,6 +1119,7 @@ function setAllInputs(data){
     else el.value = val;
   });
   refreshRowLabelTexts();
+  enhanceNumericInputs(document);
 }
 function ensureScenarioSaved(){
   if(scenarios.length && currentTab >= 0 && scenarios[currentTab]) scenarios[currentTab].data = getAllInputs();
@@ -2227,6 +2365,13 @@ document.addEventListener("click", (e)=>{
   }
 });
 
+
+window.addEventListener("resize", ()=>{ if(activeNumericInput) positionNumericAssist(activeNumericInput); });
+window.addEventListener("scroll", ()=>{ if(activeNumericInput) positionNumericAssist(activeNumericInput); }, true);
+document.addEventListener("click", (e)=>{
+  if(numericAssistEl && !numericAssistEl.contains(e.target) && !isNumericLikeInput(e.target)) hideNumericAssist();
+});
+
 document.addEventListener("input", (e)=>{
   const el = e.target;
   if(!(el.matches("input") || el.matches("select"))) return;
@@ -2254,6 +2399,7 @@ window.addEventListener("load", ()=>{
   if(!scenarios.length) addTab();
   renderTabs();
   updatePeriodDisplays();
+  enhanceNumericInputs(document);
   draw();
 });
 </script>
