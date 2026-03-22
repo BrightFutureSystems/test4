@@ -375,7 +375,7 @@
     #inputs{max-height:calc(100vh - 360px)}
   }
 
-  .numeric-assist{
+  .numeric-assist{display:none !important;
     position:fixed;
     z-index:9999;
     display:none;
@@ -428,7 +428,7 @@
         <label class="inline-check"><input type="checkbox" id="overlayToggle"> 全条件重ね描き</label>
         <label class="inline-check"><input type="checkbox" id="fixedScale"> 縦軸</label>
         <div class="axis-group">
-          <input id="fixedScaleMin" type="text" inputmode="decimal" class="moneybox" value="-50000" spellcheck="false" autocomplete="off">
+          <input id="fixedScaleMin" type="text" class="moneybox" value="-50000" spellcheck="false" autocomplete="off">
           <span>〜</span>
           <input id="fixedScaleMax" type="text" inputmode="decimal" class="moneybox" value="50000" spellcheck="false" autocomplete="off">
         </div>
@@ -551,7 +551,7 @@
             <tr><th>項目</th><th>入力</th></tr>
             <tr><td>手取り（月）</td><td><div class="input-unit center"><input id="self_salary_month" type="number" class="moneybox" value="40" step="0.1"><span class="suffix">万円 / 月</span></div></td></tr>
             <tr><td>ボーナス（年）</td><td><div class="input-unit center"><input id="self_bonus_year" type="number" class="moneybox" value="100"><span class="suffix">万円 / 年</span></div></td></tr>
-            <tr><td>リタイヤ年齢</td><td><div class="input-unit center"><input id="self_retire_age" type="number" class="agebox" value="65"><span class="suffix">歳</span></div></td></tr>
+            <tr><td>リタイア年齢</td><td><div class="input-unit center"><input id="self_retire_age" type="number" class="agebox" value="65"><span class="suffix">歳</span></div></td></tr>
             <tr><td>退職金</td><td><div class="input-unit center"><input id="self_retire_pay" type="number" class="moneybox" value="1000"><span class="suffix">万円</span></div></td></tr>
             <tr><td>年金（月）</td><td><div class="input-unit center"><input id="self_pension_month" type="number" class="moneybox" value="15" step="0.1"><span class="suffix">万円 / 月</span></div></td></tr>
             <tr><td>年金開始年齢</td><td><div class="input-unit center"><input id="self_pension_age" type="number" class="agebox" value="65"><span class="suffix">歳</span></div></td></tr>
@@ -563,7 +563,7 @@
             <tr><th>項目</th><th>入力</th></tr>
             <tr><td>手取り（月）</td><td><div class="input-unit center"><input id="sp_salary_month" type="number" class="moneybox" value="20" step="0.1"><span class="suffix">万円 / 月</span></div></td></tr>
             <tr><td>ボーナス（年）</td><td><div class="input-unit center"><input id="sp_bonus_year" type="number" class="moneybox" value="50"><span class="suffix">万円 / 年</span></div></td></tr>
-            <tr><td>リタイヤ年齢</td><td><div class="input-unit center"><input id="sp_retire_age" type="number" class="agebox" value="60"><span class="suffix">歳</span></div></td></tr>
+            <tr><td>リタイア年齢</td><td><div class="input-unit center"><input id="sp_retire_age" type="number" class="agebox" value="60"><span class="suffix">歳</span></div></td></tr>
             <tr><td>退職金</td><td><div class="input-unit center"><input id="sp_retire_pay" type="number" class="moneybox" value="500"><span class="suffix">万円</span></div></td></tr>
             <tr><td>年金（月）</td><td><div class="input-unit center"><input id="sp_pension_month" type="number" class="moneybox" value="10" step="0.1"><span class="suffix">万円 / 月</span></div></td></tr>
             <tr><td>年金開始年齢</td><td><div class="input-unit center"><input id="sp_pension_age" type="number" class="agebox" value="65"><span class="suffix">歳</span></div></td></tr>
@@ -1006,70 +1006,33 @@ function isNumericLikeInput(el){
   ));
 }
 
-function ensureNumericAssist(){
-  if(numericAssistEl) return numericAssistEl;
-  numericAssistEl = document.createElement("div");
-  numericAssistEl.className = "numeric-assist";
-  numericAssistEl.innerHTML = '<button type="button" data-sign-toggle>−</button>';
-  document.body.appendChild(numericAssistEl);
-  numericAssistEl.addEventListener("pointerdown", (e)=>{
-    const btn = e.target.closest("[data-sign-toggle]");
-    if(!btn || !activeNumericInput) return;
-    e.preventDefault();
-    e.stopPropagation();
-    const el = activeNumericInput;
-    const next = String(el.value || "").trim().startsWith("-")
-      ? String(el.value || "").replace(/^\s*-\s*/, "")
-      : "-" + String(el.value || "");
-    el.value = sanitizeNumericText(next, false);
-    el.dispatchEvent(new Event("input", {bubbles:true}));
-    el.focus({preventScroll:true});
-    requestAnimationFrame(()=>positionNumericAssist(el));
-  });
-  return numericAssistEl;
-}
-
-function positionNumericAssist(el){
-  const assist = ensureNumericAssist();
-  if(!el || !document.body.contains(el)){
-    assist.classList.remove("show");
-    return;
-  }
-  const rect = el.getBoundingClientRect();
-  const top = Math.max(8, rect.top - 42);
-  const left = Math.min(window.innerWidth - assist.offsetWidth - 8, Math.max(8, rect.right - assist.offsetWidth));
-  assist.style.top = `${top}px`;
-  assist.style.left = `${left}px`;
-  assist.classList.add("show");
-}
-
-function hideNumericAssist(){
-  if(numericAssistEl) numericAssistEl.classList.remove("show");
-  activeNumericInput = null;
-}
+function ensureNumericAssist(){ return null; }
+function positionNumericAssist(_el){}
+function hideNumericAssist(){ activeNumericInput = null; }
 
 function enhanceNumericInputs(root = document){
   root.querySelectorAll('input[type="number"], #fixedScaleMin, #fixedScaleMax').forEach(el=>{
     if(el.dataset.numericReady === "1") return;
     el.dataset.numericReady = "1";
     try{ el.type = "text"; }catch(_e){}
-    el.setAttribute("inputmode", "decimal");
+    if(el.id === "fixedScaleMin"){
+      el.removeAttribute("inputmode");
+    }else{
+      el.setAttribute("inputmode", "decimal");
+    }
     el.setAttribute("autocomplete", "off");
     el.setAttribute("spellcheck", "false");
     el.setAttribute("enterkeyhint", "done");
     el.addEventListener("focus", ()=>{
       activeNumericInput = el;
-      ensureNumericAssist();
-      requestAnimationFrame(()=>positionNumericAssist(el));
     });
     el.addEventListener("input", ()=>{
       activeNumericInput = el;
-      requestAnimationFrame(()=>positionNumericAssist(el));
     });
     el.addEventListener("blur", ()=>{
       el.value = sanitizeNumericText(el.value, true);
       setTimeout(()=>{
-        if(document.activeElement !== el && (!numericAssistEl || !numericAssistEl.contains(document.activeElement))) hideNumericAssist();
+        if(document.activeElement !== el) hideNumericAssist();
       }, 120);
     });
   });
@@ -2369,7 +2332,7 @@ document.addEventListener("click", (e)=>{
 window.addEventListener("resize", ()=>{ if(activeNumericInput) positionNumericAssist(activeNumericInput); });
 window.addEventListener("scroll", ()=>{ if(activeNumericInput) positionNumericAssist(activeNumericInput); }, true);
 document.addEventListener("click", (e)=>{
-  if(numericAssistEl && !numericAssistEl.contains(e.target) && !isNumericLikeInput(e.target)) hideNumericAssist();
+  if(!isNumericLikeInput(e.target)) hideNumericAssist();
 });
 
 document.addEventListener("input", (e)=>{
