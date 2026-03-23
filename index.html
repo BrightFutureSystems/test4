@@ -1028,6 +1028,7 @@ let numericAssistEl = null;
 
 function sanitizeNumericText(value, finalize = false){
   let v = String(value ?? "")
+    .replace(/,/g, "")
     .replace(/[−ー―‐]/g, "-")
     .replace(/[．。]/g, ".")
     .replace(/[０-９]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 65248));
@@ -1047,6 +1048,59 @@ function sanitizeNumericText(value, finalize = false){
     if(v.endsWith(".")) v = v.slice(0, -1);
   }
   return v;
+}
+function formatNumericText(value, finalize = false){
+  const v = sanitizeNumericText(value, finalize);
+  if(v === "" || v === "-" || v === "." || v === "-.") return v;
+  let sign = "";
+  let body = v;
+  if(body.startsWith("-")){
+    sign = "-";
+    body = body.slice(1);
+  }
+  const hasDot = body.includes(".");
+  let intPart = hasDot ? body.split(".")[0] : body;
+  const decPart = hasDot ? body.slice(body.indexOf(".") + 1) : "";
+  if(intPart === "") intPart = "0";
+  intPart = intPart.replace(/^0+(?=\d)/, "");
+  const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return sign + formattedInt + (hasDot ? "." + decPart : "");
+}
+function getNumericRawIndex(value, caret){
+  return sanitizeNumericText(String(value ?? "").slice(0, caret ?? 0), false).length;
+}
+function getFormattedCaretPos(formattedValue, rawIndex){
+  if(rawIndex <= 0) return 0;
+  for(let i=0;i<=formattedValue.length;i++){
+    if(sanitizeNumericText(formattedValue.slice(0, i), false).length >= rawIndex) return i;
+  }
+  return formattedValue.length;
+}
+function formatNumericInputDisplay(el, finalize = false){
+  if(!el) return;
+  const wasActive = document.activeElement === el;
+  const start = typeof el.selectionStart === "number" ? el.selectionStart : String(el.value ?? "").length;
+  const rawIndex = getNumericRawIndex(el.value, start);
+  const formatted = formatNumericText(el.value, finalize);
+  el.value = formatted;
+  if(wasActive && typeof el.setSelectionRange === "function"){
+    const pos = getFormattedCaretPos(formatted, rawIndex);
+    try{ el.setSelectionRange(pos, pos); }catch(_e){}
+  }
+}
+function formatAllNumericInputs(root = document, finalize = true){
+  root.querySelectorAll('input[data-numeric-ready="1"]').forEach(el=>{
+    if(document.activeElement === el && !finalize) return;
+    formatNumericInputDisplay(el, finalize);
+  });
+}
+function numValue(value, fallback = 0){
+  const n = parseFloat(sanitizeNumericText(value, true));
+  return Number.isFinite(n) ? n : fallback;
+}
+function numInput(id, fallback = 0){
+  const el = document.getElementById(id);
+  return numValue(el ? el.value : "", fallback);
 }
 
 function isNumericLikeInput(el){
@@ -1077,12 +1131,14 @@ function enhanceNumericInputs(root = document){
     el.setAttribute("enterkeyhint", "done");
     el.addEventListener("focus", ()=>{
       activeNumericInput = el;
+      formatNumericInputDisplay(el, false);
     });
     el.addEventListener("input", ()=>{
       activeNumericInput = el;
+      formatNumericInputDisplay(el, false);
     });
     el.addEventListener("blur", ()=>{
-      el.value = sanitizeNumericText(el.value, true);
+      formatNumericInputDisplay(el, true);
       setTimeout(()=>{
         if(document.activeElement !== el) hideNumericAssist();
       }, 120);
@@ -1095,17 +1151,23 @@ function escapeHtml(s){
 }
 function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
 function toManYen(amount, cur, usdRate){
-  const n = +amount || 0;
+  const n = numValue(amount, 0);
   return cur === "ドル" ? (n * usdRate / 10000) : n;
 }
 function fmtMoney(v){ return `${Math.round(v).toLocaleString()}万円`; }
 
 function updatePeriodDisplays(){
-  const currentAge = +document.getElementById("age").value || 0;
+  const currentAge = numInput("age", 0);
   const xMinEl = document.getElementById("xAxisMin");
   const xMaxEl = document.getElementById("xAxisMax");
-  if(xMinEl && (!xMinEl.value || +xMinEl.value < currentAge)) xMinEl.value = currentAge;
-  if(xMaxEl && (!xMaxEl.value || +xMaxEl.value < currentAge)) xMaxEl.value = Math.min(120, Math.max(100, currentAge));
+  if(xMinEl && (!sanitizeNumericText(xMinEl.value, true) || numValue(xMinEl.value, 0) < currentAge)){
+    xMinEl.value = String(currentAge);
+    formatNumericInputDisplay(xMinEl, true);
+  }
+  if(xMaxEl && (!sanitizeNumericText(xMaxEl.value, true) || numValue(xMaxEl.value, 0) < currentAge)){
+    xMaxEl.value = String(Math.min(120, Math.max(100, currentAge)));
+    formatNumericInputDisplay(xMaxEl, true);
+  }
 }
 
 let inputPersistTimer = null;
@@ -1113,7 +1175,9 @@ function getAllInputs(){
   const data = {};
   document.querySelectorAll("input, select").forEach(el=>{
     if(!el.id) return;
-    data[el.id] = el.type === "checkbox" ? el.checked : el.value;
+    if(el.type === "checkbox") data[el.id] = el.checked;
+    else if(el.dataset.numericReady === "1") data[el.id] = sanitizeNumericText(el.value, true);
+    else data[el.id] = el.value;
   });
   return data;
 }
@@ -1144,6 +1208,7 @@ function setAllInputs(data){
   });
   refreshRowLabelTexts();
   enhanceNumericInputs(document);
+  formatAllNumericInputs(document, true);
 }
 function ensureScenarioSaved(){
   if(scenarios.length && currentTab >= 0 && scenarios[currentTab]) scenarios[currentTab].data = migrateLegacyData(getAllInputs());
@@ -1302,20 +1367,24 @@ function renderTabs(){
 function rangeRows(prefix){
   const arr = [];
   for(let i=1;i<=dynamicCounts[prefix];i++){
-    arr.push({fromAge:+document.getElementById(`${prefix}${i}_fromAge`).value||0,toAge:+document.getElementById(`${prefix}${i}_toAge`).value||0,val:+document.getElementById(`${prefix}${i}_val`).value||0});
+    arr.push({
+      fromAge:numInput(`${prefix}${i}_fromAge`, 0),
+      toAge:numInput(`${prefix}${i}_toAge`, 0),
+      val:numInput(`${prefix}${i}_val`, 0)
+    });
   }
   return arr.filter(r=>r.toAge>0 || r.fromAge>0 || r.val>0).sort((a,b)=> (a.fromAge-b.fromAge) || (a.toAge-b.toAge));
 }
 function pointRows(prefix){
   const arr = [];
   for(let i=1;i<=dynamicCounts[prefix];i++){
-    arr.push({age:+document.getElementById(`${prefix}${i}_age`).value||0,val:+document.getElementById(`${prefix}${i}_val`).value||0});
+    arr.push({age:numInput(`${prefix}${i}_age`, 0),val:numInput(`${prefix}${i}_val`, 0)});
   }
   return arr.filter(r=>r.age>0 || r.val>0);
 }
 function getScenarioFromDOM(){
-  const usdRate = +document.getElementById("usdRate").value || 150;
-  const age = +document.getElementById("age").value || 50;
+  const usdRate = numInput("usdRate", 150) || 150;
+  const age = numInput("age", 50) || 50;
 
   const children = [];
   for(let i=1;i<=dynamicCounts.child;i++){
@@ -1323,7 +1392,7 @@ function getScenarioFromDOM(){
     children.push({
       idx:i,
       name:document.getElementById(`child${i}_name`)?.value || `子${i}`,
-      age:+document.getElementById(`child${i}_age`).value||0,
+      age:numInput(`child${i}_age`, 0),
       school:document.getElementById(`child${i}_school`).value
     });
   }
@@ -1333,7 +1402,7 @@ function getScenarioFromDOM(){
     deposits.push({
       name:document.getElementById(`dep${i}_name`)?.value || `預金${i}`,
       amount:toManYen(document.getElementById(`dep${i}_amount`).value, document.getElementById(`dep${i}_cur`).value, usdRate),
-      rate:(+document.getElementById(`dep${i}_rate`).value||0)/100
+      rate:(numInput(`dep${i}_rate`, 0)||0)/100
     });
   }
 
@@ -1343,35 +1412,35 @@ function getScenarioFromDOM(){
       name:document.getElementById(`inv${i}_name`)?.value || `運用${i}`,
       amount:toManYen(document.getElementById(`inv${i}_amount`).value, document.getElementById(`inv${i}_cur`).value, usdRate),
       cost:toManYen(document.getElementById(`inv${i}_cost`).value, document.getElementById(`inv${i}_cur`).value, usdRate),
-      rate:(+document.getElementById(`inv${i}_rate`).value||0)/100
+      rate:(numInput(`inv${i}_rate`, 0)||0)/100
     });
   }
 
   const educationMatrix = {};
   for(let i=1;i<=dynamicCounts.child;i++){
     educationMatrix[i] = {
-      kind:{type:document.getElementById(`c${i}_kind_type`).value, extraMonth:+document.getElementById(`c${i}_kind_extra`).value||0},
-      elem:{type:document.getElementById(`c${i}_elem_type`).value, extraMonth:+document.getElementById(`c${i}_elem_extra`).value||0},
-      junior:{type:document.getElementById(`c${i}_junior_type`).value, extraMonth:+document.getElementById(`c${i}_junior_extra`).value||0},
-      high:{type:document.getElementById(`c${i}_high_type`).value, extraMonth:+document.getElementById(`c${i}_high_extra`).value||0},
-      uni:{type:document.getElementById(`c${i}_uni_type`).value, extraMonth:+document.getElementById(`c${i}_uni_extra`).value||0}
+      kind:{type:document.getElementById(`c${i}_kind_type`).value, extraMonth:numInput(`c${i}_kind_extra`, 0)},
+      elem:{type:document.getElementById(`c${i}_elem_type`).value, extraMonth:numInput(`c${i}_elem_extra`, 0)},
+      junior:{type:document.getElementById(`c${i}_junior_type`).value, extraMonth:numInput(`c${i}_junior_extra`, 0)},
+      high:{type:document.getElementById(`c${i}_high_type`).value, extraMonth:numInput(`c${i}_high_extra`, 0)},
+      uni:{type:document.getElementById(`c${i}_uni_type`).value, extraMonth:numInput(`c${i}_uni_extra`, 0)}
     };
   }
 
-  const xAxisMinRaw = Math.min(120, Math.max(0, +document.getElementById("xAxisMin").value||age));
-  const xAxisMaxRaw = Math.min(120, Math.max(age, +document.getElementById("xAxisMax").value||100));
+  const xAxisMinRaw = Math.min(120, Math.max(0, numInput("xAxisMin", age)||age));
+  const xAxisMaxRaw = Math.min(120, Math.max(age, numInput("xAxisMax", 100)||100));
   const xAxisMin = Math.min(xAxisMinRaw, xAxisMaxRaw);
   const xAxisMax = Math.max(xAxisMin, xAxisMaxRaw);
 
   return {
     age,
-    spouseAge:+document.getElementById("spouseAge").value||age,
-    lifeExpect:+document.getElementById("lifeExpect").value||90,
+    spouseAge:numInput("spouseAge", age)||age,
+    lifeExpect:numInput("lifeExpect", 90)||90,
     usdRate,
-    inflRate:(+document.getElementById("inflRate").value||0)/100,
+    inflRate:(numInput("inflRate", 0)||0)/100,
     fixedScale:document.getElementById("fixedScale").checked,
-    fixedScaleMin:+document.getElementById("fixedScaleMin").value||-50000,
-    fixedScaleMax:+document.getElementById("fixedScaleMax").value||50000,
+    fixedScaleMin:numInput("fixedScaleMin", -50000),
+    fixedScaleMax:numInput("fixedScaleMax", 50000),
     xAxisMin,
     xAxisMax,
     taxOn:document.getElementById("taxOn").checked,
@@ -1389,20 +1458,20 @@ function getScenarioFromDOM(){
     deposits,
     investments,
     incomeSelf:{
-      salaryMonth:+document.getElementById("self_salary_month").value||0,
-      bonusYear:+document.getElementById("self_bonus_year").value||0,
-      retireAge:+document.getElementById("self_retire_age").value||200,
-      retirePay:+document.getElementById("self_retire_pay").value||0,
-      pensionMonth:+document.getElementById("self_pension_month").value||0,
-      pensionAge:+document.getElementById("self_pension_age").value||200
+      salaryMonth:numInput("self_salary_month", 0),
+      bonusYear:numInput("self_bonus_year", 0),
+      retireAge:numInput("self_retire_age", 200)||200,
+      retirePay:numInput("self_retire_pay", 0),
+      pensionMonth:numInput("self_pension_month", 0),
+      pensionAge:numInput("self_pension_age", 200)||200
     },
     incomeSp:{
-      salaryMonth:+document.getElementById("sp_salary_month").value||0,
-      bonusYear:+document.getElementById("sp_bonus_year").value||0,
-      retireAge:+document.getElementById("sp_retire_age").value||200,
-      retirePay:+document.getElementById("sp_retire_pay").value||0,
-      pensionMonth:+document.getElementById("sp_pension_month").value||0,
-      pensionAge:+document.getElementById("sp_pension_age").value||200
+      salaryMonth:numInput("sp_salary_month", 0),
+      bonusYear:numInput("sp_bonus_year", 0),
+      retireAge:numInput("sp_retire_age", 200)||200,
+      retirePay:numInput("sp_retire_pay", 0),
+      pensionMonth:numInput("sp_pension_month", 0),
+      pensionAge:numInput("sp_pension_age", 200)||200
     },
     regularIncomeRows:rangeRows("reginc"),
     extraIncome:pointRows("inc"),
@@ -1411,10 +1480,10 @@ function getScenarioFromDOM(){
     periodRows:rangeRows("period"),
     extraRows:pointRows("extra"),
     home:{
-      age:+document.getElementById("homeAge").value||0,
-      down:+document.getElementById("homeDown").value||0,
-      payMonth:+document.getElementById("homePayMonth").value||0,
-      years:+document.getElementById("homeYears").value||0
+      age:numInput("homeAge", 0),
+      down:numInput("homeDown", 0),
+      payMonth:numInput("homePayMonth", 0),
+      years:numInput("homeYears", 0)
     }
   };
 }
@@ -2425,6 +2494,7 @@ window.addEventListener("load", ()=>{
   renderTabs();
   updatePeriodDisplays();
   enhanceNumericInputs(document);
+  formatAllNumericInputs(document, true);
   draw();
 });
 </script>
