@@ -378,9 +378,22 @@
     .basic-table th,.basic-table td{padding:4px;}
     .basic-table td:nth-child(2) .input-unit{width:170px;max-width:100%;justify-content:flex-start;gap:4px;margin:0 auto;}
     .basic-table .agebox,.basic-table .ratebox,.basic-table .moneybox{width:68px !important;}
-    #childRows .agebox{width:84px !important;}
     .basic-table select{max-width:100%;width:100%;}
-    #childRows td:last-child select{width:100%;min-width:0;}
+    .grid2 > div:last-child .basic-table th:nth-child(1), #childRows td:nth-child(1){width:26%;}
+    .grid2 > div:last-child .basic-table th:nth-child(2), #childRows td:nth-child(2){width:16%;}
+    .grid2 > div:last-child .basic-table th:nth-child(3), #childRows td:nth-child(3){width:29%;}
+    .grid2 > div:last-child .basic-table th:nth-child(4), #childRows td:nth-child(4){width:29%;}
+    #childRows td:nth-child(2){text-align:center;}
+    #childRows td:nth-child(3) .input-unit{width:auto;justify-content:center;gap:4px;padding-left:0;}
+    #childRows td:nth-child(3) input.agebox{width:56px !important;min-width:56px;}
+    #childRows td:nth-child(3) .suffix{min-width:auto;font-size:12px;}
+    #childRows td:last-child select{
+      width:100% !important;
+      min-width:0 !important;
+      max-width:100% !important;
+      font-size:12px;
+      box-sizing:border-box;
+    }
     .basic-table .suffix{font-size:12px;display:inline-block;min-width:54px;text-align:left;}
   }
 
@@ -530,10 +543,12 @@
     <div class="section">
       <h2>資産</h2>
       <div class="subhead">預金</div>
+      <div class="table-scroll">
       <table class="center-table">
         <tr><th></th><th>預金額</th><th>通貨</th><th>金利</th></tr>
         <tbody id="depRows"></tbody>
       </table>
+      </div>
       <div class="add-row-wrap"><button type="button" class="add-row-btn" data-add-row="dep">＋</button></div>
 
       <div class="subhead">運用資産</div>
@@ -590,10 +605,12 @@
       <div class="add-row-wrap"><button type="button" class="add-row-btn" data-add-row="reginc">＋</button></div>
 
       <div class="subhead">臨時収入</div>
+      <div class="table-scroll">
       <table class="center-table">
         <tr><th></th><th>年齢</th><th>金額</th></tr>
         <tbody id="incRows"></tbody>
       </table>
+      </div>
       <div class="add-row-wrap"><button type="button" class="add-row-btn" data-add-row="inc">＋</button></div>
 
       <div class="checkbox-row">
@@ -661,10 +678,12 @@
       <div class="add-row-wrap"><button type="button" class="add-row-btn" data-add-row="period">＋</button></div>
 
       <div class="subhead">臨時支出</div>
+      <div class="table-scroll">
       <table class="center-table">
         <tr><th></th><th>年齢</th><th>金額</th></tr>
         <tbody id="extraRows"></tbody>
       </table>
+      </div>
       <div class="add-row-wrap"><button type="button" class="add-row-btn" data-add-row="extra">＋</button></div>
 
       <div class="subhead">インフレ考慮</div>
