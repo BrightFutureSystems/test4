@@ -3228,6 +3228,8 @@ function ensureIncomeCurveSeed(owner){
   const hidden = document.getElementById(c.curveJsonId);
   if(!hidden) return;
   const current = parseIncomeCurveJson(hidden.value);
+  // カスタム値は定額値とは別管理。
+  // 初回だけ、その時点の定額入力値を初期値として作成し、以後は上書きしない。
   if(current && Array.isArray(current.points) && current.points.length >= 2) return;
   hidden.value = JSON.stringify(buildDefaultIncomeCurveForOwner(owner));
 }
@@ -3430,7 +3432,7 @@ function saveIncomeCurveModal(){
   const c = getIncomeOwnerConfig(activeIncomeCurveOwner);
   const hidden = document.getElementById(c.curveJsonId);
   if(hidden) hidden.value = JSON.stringify(incomeCurveDraft);
-  syncIncomeInputsFromCurve(activeIncomeCurveOwner, incomeCurveDraft);
+  // 定額入力欄は定額用の値として保持し、カスタム保存時に上書きしない。
   syncCurrentScenarioFromDOM(true);
   updateIncomeCurveControls();
   draw();
