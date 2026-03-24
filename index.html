@@ -308,6 +308,45 @@
   #eduBody .moneybox{width:78px !important;}
   .loan-wrap{overflow-x:auto;}
   .loan-table{min-width:520px;}
+  .loan-summary{
+    margin:8px 0 10px;
+    padding:10px 12px;
+    border:1px solid #d8dee9;
+    border-radius:10px;
+    background:#f8fafc;
+    color:#334155;
+    font-size:13px;
+    line-height:1.6;
+  }
+  .loan-summary .loan-summary-title{font-weight:700;color:#0f172a;margin-bottom:4px;}
+  .loan-summary ul{margin:0;padding-left:1.2em;}
+  .loan-summary li + li{margin-top:2px;}
+  .loan-control-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:flex-start;margin:0 0 8px;}
+  .loan-control-row label{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .loan-detail-btn[disabled]{opacity:.45;cursor:not-allowed;}
+  .loan-readonly{background:#f3f4f6 !important;color:#6b7280;}
+  .loan-detail-modal{width:min(920px, calc(100vw - 24px));max-height:min(92vh, 960px);overflow:auto;}
+  .loan-detail-grid{display:flex;flex-direction:column;gap:12px;}
+  .loan-detail-note{color:var(--muted);font-size:.92rem;line-height:1.55;}
+  .loan-detail-section{border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff;}
+  .loan-detail-section-title{font-weight:700;margin-bottom:8px;color:#0f172a;}
+  .loan-detail-fields{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px 12px;}
+  .loan-detail-field{display:flex;flex-direction:column;gap:4px;min-width:0;}
+  .loan-detail-field > label{font-size:.92rem;color:#374151;}
+  .loan-detail-field .input-unit{max-width:none;width:100%;justify-content:flex-start;}
+  .loan-detail-field select,.loan-detail-field input[type=number],.loan-detail-field input[type=text]{width:100%;max-width:100%;min-width:0;}
+  .loan-prepay-table-wrap{overflow-x:auto;}
+  .loan-prepay-table{width:100%;min-width:520px;border-collapse:collapse;table-layout:fixed;}
+  .loan-prepay-table th,.loan-prepay-table td{border:1px solid var(--border);padding:6px;text-align:center;vertical-align:middle;}
+  .loan-prepay-table th{background:#fafafa;line-height:1.25;}
+  .loan-prepay-table th:nth-child(1),.loan-prepay-table td:nth-child(1){width:24%;}
+  .loan-prepay-table th:nth-child(2),.loan-prepay-table td:nth-child(2){width:32%;}
+  .loan-prepay-table th:nth-child(3),.loan-prepay-table td:nth-child(3){width:28%;}
+  .loan-prepay-table th:nth-child(4),.loan-prepay-table td:nth-child(4){width:16%;}
+  .loan-prepay-table .input-unit{max-width:none;width:100%;justify-content:flex-start;}
+  .loan-prepay-table select,.loan-prepay-table input[type=number]{width:100%;min-width:0;max-width:100%;}
+  .loan-detail-result{background:#fafafa;border:1px solid var(--border);border-radius:12px;padding:10px;line-height:1.7;}
+  .loan-detail-result strong{color:#0f172a;}
   .period-stack{display:flex;flex-direction:column;gap:4px;align-items:center;}
   .period-start{display:inline-block;min-width:34px;text-align:right;color:#444;}
   .ratebox{width:80px !important}
@@ -512,6 +551,8 @@
     .income-mode-line-button .curve-btn{font-size:12px;align-self:flex-end;padding:6px 10px;}
     .curve-btn{padding:5px 8px;font-size:12px;}
     .income-curve-modal{width:min(100vw - 12px, 980px);padding:14px 10px 12px;}
+    .loan-detail-modal{width:min(100vw - 12px, 920px);padding:14px 10px 12px;}
+    .loan-detail-fields{grid-template-columns:1fr;}
     .income-curve-chart-wrap{height:260px;}
     .income-curve-table th,.income-curve-table td{padding:4px 3px;font-size:12px;}
     .income-curve-table th:nth-child(1), .income-curve-table td:nth-child(1){width:20%;}
@@ -632,6 +673,44 @@
       <div class="modal-actions" style="margin-top:14px;">
         <button type="button" id="cancelIncomeCurveBtn">キャンセル</button>
         <button type="button" id="saveIncomeCurveBtn">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="loanDetailModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal-card loan-detail-modal" role="dialog" aria-modal="true" aria-labelledby="loanDetailTitle">
+      <div id="loanDetailTitle" class="modal-text" style="font-weight:bold;margin-bottom:10px;">住宅ローン詳細設定</div>
+      <div class="loan-detail-grid">
+        <div class="loan-detail-note">※ 詳細モードでは、入力内容から返済額と返済期間見込みを計算し、住宅ローン表に反映します。詳細モードON中は、住宅ローン表の4項目は直接編集できません。</div>
+        <div class="loan-detail-section">
+          <div class="loan-detail-section-title">基本条件</div>
+          <div class="loan-detail-fields">
+            <div class="loan-detail-field"><label for="loanDetailAge">購入年齢</label><div class="input-unit"><input id="loanDetailAge" type="number" class="agebox" value="40"><span class="suffix">歳</span></div></div>
+            <div class="loan-detail-field"><label for="loanDetailDown">頭金</label><div class="input-unit"><input id="loanDetailDown" type="number" class="moneybox" value="1000" step="0.1"><span class="suffix">万円</span></div></div>
+            <div class="loan-detail-field"><label for="loanDetailLoanAmount">ローン額</label><div class="input-unit"><input id="loanDetailLoanAmountInput" type="number" class="moneybox" value="5000" step="0.1"><span class="suffix">万円</span></div></div>
+            <div class="loan-detail-field"><label for="loanDetailRate">金利</label><div class="input-unit"><input id="loanDetailRateInput" type="number" class="ratebox" value="1.2" step="0.01"><span class="suffix">%</span></div></div>
+            <div class="loan-detail-field"><label for="loanDetailYears">返済期間</label><div class="input-unit"><input id="loanDetailYears" type="number" class="agebox" value="30"><span class="suffix">年</span></div></div>
+            <div class="loan-detail-field"><label for="loanDetailMethod">返済方式</label><select id="loanDetailMethodSelect"><option value="元利均等返済">元利均等返済（一般的）</option><option value="元金均等返済">元金均等返済（初期負担大きめ）</option></select></div>
+          </div>
+        </div>
+        <div class="loan-detail-section">
+          <div class="loan-detail-section-title">繰上返済計画</div>
+          <div class="loan-prepay-table-wrap">
+            <table class="loan-prepay-table">
+              <thead><tr><th>実行年齢</th><th>金額</th><th>方式</th><th>操作</th></tr></thead>
+              <tbody id="loanDetailPrepayRows"></tbody>
+            </table>
+          </div>
+          <div class="add-row-wrap" style="margin-top:8px;"><button type="button" id="loanDetailAddPrepayBtn" class="add-row-btn">＋</button></div>
+        </div>
+        <div class="loan-detail-section">
+          <div class="loan-detail-section-title">試算結果</div>
+          <div id="loanDetailResult" class="loan-detail-result"></div>
+        </div>
+      </div>
+      <div class="modal-actions" style="margin-top:14px;">
+        <button type="button" id="cancelLoanDetailBtn">キャンセル</button>
+        <button type="button" id="saveLoanDetailBtn">この内容で反映</button>
       </div>
     </div>
   </div>
@@ -841,9 +920,19 @@
         </tr>
       </table>
       </div>
-      <div class="checkbox-row infl-box" style="margin:0 0 10px;">
-        <label><input id="inflLoan" type="checkbox"> 住宅ローンにインフレを反映</label>
+      <div class="loan-control-row">
+        <label><input id="homeDetailOn" type="checkbox"> 詳細モード</label>
+        <button type="button" id="homeDetailBtn" class="loan-detail-btn" disabled>住宅ローン詳細設定</button>
       </div>
+      <div class="checkbox-row infl-box" style="margin:0 0 8px;">
+        <label><input id="inflLoan" type="checkbox"> インフレ率に基づき返済額上昇を仮定</label>
+      </div>
+      <div id="loanSummary" class="loan-summary" aria-live="polite"></div>
+      <input id="homeDetailLoanAmount" type="hidden" value="5000">
+      <input id="homeDetailRate" type="hidden" value="1.2">
+      <input id="homeDetailBaseYears" type="hidden" value="30">
+      <input id="homeDetailMethod" type="hidden" value="元利均等返済">
+      <input id="homeDetailPrepayJson" type="hidden" value="[]">
 
       <div class="subhead">教育費</div>
       <div class="help">各セルの上段で学校種別、下段で習い事代（万円 / 月）を入力してください。</div>
@@ -1200,6 +1289,12 @@ function migrateLegacyData(data){
     if(!data[`${prefix}_bonus_mode_normal`] && !data[`${prefix}_bonus_mode_custom`]) data[`${prefix}_bonus_mode_normal`] = true;
     if(data[`${prefix}_income_curve_json`] == null) data[`${prefix}_income_curve_json`] = "";
   });
+  if(data.homeDetailOn == null) data.homeDetailOn = false;
+  if(data.homeDetailLoanAmount == null || data.homeDetailLoanAmount === "") data.homeDetailLoanAmount = 5000;
+  if(data.homeDetailRate == null || data.homeDetailRate === "") data.homeDetailRate = 1.2;
+  if(data.homeDetailBaseYears == null || data.homeDetailBaseYears === "") data.homeDetailBaseYears = data.homeYears || 30;
+  if(data.homeDetailMethod == null || data.homeDetailMethod === "") data.homeDetailMethod = "元利均等返済";
+  if(data.homeDetailPrepayJson == null || data.homeDetailPrepayJson === "") data.homeDetailPrepayJson = "[]";
   delete data.taxOn;
   return data;
 }
@@ -1612,6 +1707,7 @@ function getAllInputs(){
   const data = {};
   document.querySelectorAll("input, select").forEach(el=>{
     if(!el.id) return;
+    if(el.closest && (el.closest("#loanDetailModal") || el.closest("#incomeCurveModal"))) return;
     if(el.type === "checkbox") data[el.id] = el.checked;
     else if(el.dataset.numericReady === "1") data[el.id] = sanitizeNumericText(el.value, true);
     else data[el.id] = el.value;
@@ -1647,9 +1743,255 @@ function setAllInputs(data){
   enhanceNumericInputs(document);
   formatAllNumericInputs(document, true);
   updateIncomeCurveControls();
+  updateHomeDetailUIState();
+  updateLoanSummary();
 }
 function ensureScenarioSaved(){
   if(scenarios.length && currentTab >= 0 && scenarios[currentTab]) scenarios[currentTab].data = migrateLegacyData(getAllInputs());
+}
+function formatLoanSummaryAmount(val){
+  const n = Math.round((Number(val) || 0) * 10) / 10;
+  return `${n.toLocaleString("ja-JP", {maximumFractionDigits:1})}万円`;
+}
+function parseLoanPrepayJson(value){
+  try{
+    const arr = JSON.parse(value || "[]");
+    return Array.isArray(arr) ? arr : [];
+  }catch(_e){
+    return [];
+  }
+}
+function normalizeLoanPrepayPlans(plans){
+  return (Array.isArray(plans) ? plans : []).map((row, idx)=>({
+    id: row && row.id ? String(row.id) : `plan_${idx+1}`,
+    age: Math.max(0, Number(row?.age) || 0),
+    amount: Math.max(0, Number(row?.amount) || 0),
+    mode: row?.mode === "返済額軽減型" ? "返済額軽減型" : "期間短縮型"
+  })).filter(r=>r.age > 0 && r.amount > 0).sort((a,b)=>a.age - b.age);
+}
+function calcLevelPayment(principal, monthlyRate, months){
+  const p = Math.max(0, Number(principal) || 0);
+  const n = Math.max(0, Math.round(Number(months) || 0));
+  if(p <= 0 || n <= 0) return 0;
+  if(monthlyRate <= 0) return p / n;
+  const f = Math.pow(1 + monthlyRate, n);
+  return p * monthlyRate * f / (f - 1);
+}
+function calcMonthsForLevelPayment(principal, monthlyRate, payment){
+  const p = Math.max(0, Number(principal) || 0);
+  const pay = Math.max(0, Number(payment) || 0);
+  if(p <= 0 || pay <= 0) return 0;
+  if(monthlyRate <= 0) return Math.ceil(p / pay);
+  if(pay <= p * monthlyRate) return Number.POSITIVE_INFINITY;
+  return Math.ceil(Math.log(pay / (pay - p * monthlyRate)) / Math.log(1 + monthlyRate));
+}
+function buildLoanDetailFromDOM(){
+  return {
+    enabled: !!document.getElementById("homeDetailOn")?.checked,
+    buyAge: numInput("homeAge", 0),
+    down: numInput("homeDown", 0),
+    loanAmount: numInput("homeDetailLoanAmount", 0),
+    ratePct: numInput("homeDetailRate", 0),
+    baseYears: numInput("homeDetailBaseYears", 0),
+    method: document.getElementById("homeDetailMethod")?.value || "元利均等返済",
+    prepayPlans: normalizeLoanPrepayPlans(parseLoanPrepayJson(document.getElementById("homeDetailPrepayJson")?.value || "[]"))
+  };
+}
+function buildLoanDetailFromConfig(home){
+  return {
+    enabled: !!home?.detail?.enabled,
+    buyAge: Number(home?.age) || 0,
+    down: Number(home?.down) || 0,
+    loanAmount: Number(home?.detail?.loanAmount) || 0,
+    ratePct: Number(home?.detail?.ratePct) || 0,
+    baseYears: Number(home?.detail?.baseYears) || 0,
+    method: home?.detail?.method || "元利均等返済",
+    prepayPlans: normalizeLoanPrepayPlans(home?.detail?.prepayPlans || [])
+  };
+}
+function simulateLoanDetail(detail){
+  const buyAge = Math.max(0, Number(detail?.buyAge) || 0);
+  const loanAmount = Math.max(0, Number(detail?.loanAmount) || 0);
+  const ratePct = Math.max(0, Number(detail?.ratePct) || 0);
+  const baseYears = Math.max(0, Number(detail?.baseYears) || 0);
+  const method = detail?.method === "元金均等返済" ? "元金均等返済" : "元利均等返済";
+  const plans = normalizeLoanPrepayPlans(detail?.prepayPlans || []);
+  if(buyAge <= 0 || loanAmount <= 0 || baseYears <= 0){
+    return {valid:false, annualByAge:{}, monthsTotal:0, initialMonthly:0, currentMonthly:0, totalPaid:0, prepayTotal:0, endAge:buyAge, actualYears:0, monthlyAtAge:{}, remainYearsFromCurrent:0};
+  }
+  const monthlyRate = ratePct / 100 / 12;
+  let remainPrincipal = loanAmount;
+  let remainMonths = Math.max(1, Math.round(baseYears * 12));
+  let monthlyPayment = method === "元利均等返済" ? calcLevelPayment(remainPrincipal, monthlyRate, remainMonths) : 0;
+  let monthlyPrincipal = method === "元金均等返済" ? (remainMonths > 0 ? remainPrincipal / remainMonths : 0) : 0;
+  const annualByAge = {};
+  const monthlyAtAge = {};
+  let totalPaid = 0;
+  let prepayTotal = 0;
+  let monthIndex = 0;
+  let age = buyAge;
+  let initialMonthly = 0;
+  while(remainPrincipal > 1e-8 && remainMonths > 0 && monthIndex < 1200){
+    const plansThisAge = plans.filter(p=>p.age === age);
+    plansThisAge.forEach(plan=>{
+      if(remainPrincipal <= 1e-8) return;
+      const applied = Math.min(remainPrincipal, plan.amount);
+      remainPrincipal -= applied;
+      prepayTotal += applied;
+      annualByAge[age] = (annualByAge[age] || 0) + applied;
+      totalPaid += applied;
+      if(remainPrincipal <= 1e-8){
+        remainMonths = 0;
+        monthlyPayment = 0;
+        monthlyPrincipal = 0;
+        return;
+      }
+      if(plan.mode === "返済額軽減型"){
+        if(method === "元利均等返済") monthlyPayment = calcLevelPayment(remainPrincipal, monthlyRate, remainMonths);
+        else monthlyPrincipal = remainMonths > 0 ? remainPrincipal / remainMonths : 0;
+      }else{
+        if(method === "元利均等返済") remainMonths = Math.max(1, calcMonthsForLevelPayment(remainPrincipal, monthlyRate, monthlyPayment));
+        else remainMonths = Math.max(1, Math.ceil(remainPrincipal / Math.max(monthlyPrincipal, 1e-8)));
+      }
+    });
+    if(remainPrincipal <= 1e-8 || remainMonths <= 0) break;
+    let yearPayment = annualByAge[age] || 0;
+    let yearMonthlyRepresentative = 0;
+    let monthsThisAge = 0;
+    for(let m=0; m<12 && remainPrincipal > 1e-8 && remainMonths > 0; m++){
+      const interest = remainPrincipal * monthlyRate;
+      let payment = 0;
+      let principalPart = 0;
+      if(method === "元利均等返済"){
+        payment = monthlyPayment;
+        principalPart = payment - interest;
+        if(principalPart <= 0){ principalPart = remainPrincipal; payment = remainPrincipal + interest; }
+        if(principalPart > remainPrincipal){ principalPart = remainPrincipal; payment = principalPart + interest; }
+      }else{
+        principalPart = Math.min(remainPrincipal, monthlyPrincipal);
+        payment = principalPart + interest;
+      }
+      remainPrincipal = Math.max(0, remainPrincipal - principalPart);
+      remainMonths = Math.max(0, remainMonths - 1);
+      yearPayment += payment;
+      totalPaid += payment;
+      yearMonthlyRepresentative += payment;
+      monthsThisAge += 1;
+      monthIndex += 1;
+      if(!initialMonthly) initialMonthly = payment;
+      if(remainPrincipal <= 1e-8) break;
+    }
+    annualByAge[age] = yearPayment;
+    monthlyAtAge[age] = monthsThisAge > 0 ? yearMonthlyRepresentative / monthsThisAge : 0;
+    age += 1;
+    if(remainPrincipal <= 1e-8) break;
+    if(method === "元金均等返済" && remainMonths > 0) monthlyPrincipal = remainPrincipal / remainMonths;
+  }
+  const activeAges = Object.keys(annualByAge).map(v=>+v).filter(v=>annualByAge[v] > 0).sort((a,b)=>a-b);
+  const lastAge = activeAges.length ? activeAges[activeAges.length - 1] : buyAge;
+  const currentAge = numInput("age", 0);
+  const currentMonthly = currentAge > 0 && monthlyAtAge[currentAge] > 0
+    ? monthlyAtAge[currentAge]
+    : (activeAges.length ? (monthlyAtAge[activeAges[0]] || 0) : 0);
+  const endAge = activeAges.length ? lastAge + 1 : buyAge;
+  return {
+    valid:true,
+    annualByAge,
+    monthlyAtAge,
+    monthsTotal:monthIndex,
+    initialMonthly:initialMonthly || 0,
+    currentMonthly:currentMonthly || initialMonthly || 0,
+    totalPaid,
+    prepayTotal,
+    endAge,
+    actualYears:activeAges.length,
+    remainYearsFromCurrent: currentAge > 0 ? Math.max(0, endAge - Math.max(currentAge, buyAge)) : Math.max(0, endAge - buyAge)
+  };
+}
+function getLoanDisplayPayment(detailResult, currentAge, buyAge){
+  if(!detailResult?.valid) return 0;
+  if(currentAge > 0 && currentAge >= buyAge && detailResult.monthlyAtAge?.[currentAge] > 0) return detailResult.monthlyAtAge[currentAge];
+  const ages = Object.keys(detailResult.monthlyAtAge || {}).map(v=>+v).sort((a,b)=>a-b);
+  return ages.length ? (detailResult.monthlyAtAge[ages[0]] || 0) : (detailResult.initialMonthly || 0);
+}
+function updateHomeDetailUIState(){
+  const on = !!document.getElementById("homeDetailOn")?.checked;
+  const btn = document.getElementById("homeDetailBtn");
+  if(btn) btn.disabled = !on;
+  ["homeAge","homeDown","homePayMonth","homeYears"].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.disabled = on;
+    el.classList.toggle("loan-readonly", on);
+  });
+}
+function buildLoanSummaryHtml(items){
+  return `<div class="loan-summary-title">住宅ローンの見込み</div><ul>${items.map(v=>`<li>${v}</li>`).join("")}</ul>`;
+}
+function updateLoanSummary(){
+  updateHomeDetailUIState();
+  const box = document.getElementById("loanSummary");
+  if(!box) return;
+  const currentAge = numInput("age", 0);
+  const detail = buildLoanDetailFromDOM();
+  if(detail.enabled){
+    const result = simulateLoanDetail(detail);
+    if(!result.valid){
+      box.innerHTML = buildLoanSummaryHtml(["詳細モードでは、購入年齢・頭金・ローン額・金利・返済期間を入力すると住宅ローン見込みを表示します。"]);
+      return;
+    }
+    const endAge = result.endAge;
+    const items = [];
+    if(currentAge > detail.buyAge){
+      const elapsed = Math.max(0, currentAge - detail.buyAge);
+      const remain = Math.max(0, endAge - currentAge);
+      items.push(`現在返済中（${elapsed}年経過 / 残り${remain}年）`);
+      items.push(`完済予定：${endAge}歳`);
+      if(detail.down > 0) items.push(`頭金${formatLoanSummaryAmount(detail.down)}は過去支出のため、今後支出には含めません`);
+      const currentMonthly = getLoanDisplayPayment(result, currentAge, detail.buyAge);
+      if(remain > 0 && currentMonthly > 0) items.push(`現在の返済見込み：約${formatLoanSummaryAmount(currentMonthly)} / 月`);
+      if(remain > 0) items.push(`借入${formatLoanSummaryAmount(detail.loanAmount)}・金利${(detail.ratePct || 0).toLocaleString("ja-JP", {maximumFractionDigits:2})}%・${detail.method}で試算しています`);
+      if(result.prepayTotal > 0) items.push(`繰上返済合計：${formatLoanSummaryAmount(result.prepayTotal)}を反映済みです`);
+      if(remain <= 0) items.push(`すでに完済済みのため、今後の住宅ローン支出は発生しません`);
+    }else{
+      items.push(`${detail.buyAge}歳で購入予定`);
+      items.push(`完済予定：${endAge}歳`);
+      if(detail.down > 0) items.push(`${detail.buyAge}歳時に頭金${formatLoanSummaryAmount(detail.down)}を支出します`);
+      const firstMonthly = getLoanDisplayPayment(result, currentAge, detail.buyAge);
+      if(firstMonthly > 0) items.push(`初期返済見込み：約${formatLoanSummaryAmount(firstMonthly)} / 月`);
+      items.push(`借入${formatLoanSummaryAmount(detail.loanAmount)}・金利${(detail.ratePct || 0).toLocaleString("ja-JP", {maximumFractionDigits:2})}%・${detail.method}で試算しています`);
+      if(result.prepayTotal > 0) items.push(`繰上返済合計：${formatLoanSummaryAmount(result.prepayTotal)}を反映した完済見込みです`);
+      items.push(`${detail.buyAge}〜${Math.max(detail.buyAge, endAge - 1)}歳を中心に返済が発生します`);
+    }
+    box.innerHTML = buildLoanSummaryHtml(items);
+    return;
+  }
+  const buyAge = numInput("homeAge", 0);
+  const down = numInput("homeDown", 0);
+  const payMonth = numInput("homePayMonth", 0);
+  const years = numInput("homeYears", 0);
+  if(currentAge <= 0 || buyAge <= 0 || years <= 0 || (down <= 0 && payMonth <= 0)){
+    box.innerHTML = buildLoanSummaryHtml(["購入年齢・頭金・返済額・返済年数を入力すると、現在返済中か将来購入予定かをここに表示します。"]);
+    return;
+  }
+  const endAge = buyAge + years;
+  const annual = payMonth * 12;
+  const items = [];
+  if(currentAge > buyAge){
+    const elapsed = Math.min(years, Math.max(0, currentAge - buyAge));
+    const remain = Math.max(0, years - elapsed);
+    items.push(`現在返済中（${elapsed}年経過 / 残り${remain}年）`);
+    items.push(`完済予定：${endAge}歳`);
+    if(down > 0) items.push(`頭金${formatLoanSummaryAmount(down)}は過去支出のため、今後支出には含めません`);
+    if(remain > 0 && payMonth > 0) items.push(`今後は${currentAge}〜${endAge - 1}歳まで毎年${formatLoanSummaryAmount(annual)}返済します`);
+    if(remain <= 0) items.push(`すでに完済済みのため、今後の住宅ローン支出は発生しません`);
+  }else{
+    items.push(`${buyAge}歳で購入予定`);
+    items.push(`完済予定：${endAge}歳`);
+    if(down > 0) items.push(`${buyAge}歳時に頭金${formatLoanSummaryAmount(down)}を支出します`);
+    if(payMonth > 0) items.push(`${buyAge}〜${endAge - 1}歳まで毎年${formatLoanSummaryAmount(annual)}返済します`);
+  }
+  box.innerHTML = buildLoanSummaryHtml(items);
 }
 function updateInputsVisibility(){
   document.getElementById("inputs").style.display = scenarios.length ? "block" : "none";
@@ -1975,7 +2317,15 @@ function getScenarioFromDOM(){
       age:numInput("homeAge", 0),
       down:numInput("homeDown", 0),
       payMonth:numInput("homePayMonth", 0),
-      years:numInput("homeYears", 0)
+      years:numInput("homeYears", 0),
+      detail:{
+        enabled: !!document.getElementById("homeDetailOn")?.checked,
+        loanAmount:numInput("homeDetailLoanAmount", 0),
+        ratePct:numInput("homeDetailRate", 0),
+        baseYears:numInput("homeDetailBaseYears", 0),
+        method:document.getElementById("homeDetailMethod")?.value || "元利均等返済",
+        prepayPlans: normalizeLoanPrepayPlans(parseLoanPrepayJson(document.getElementById("homeDetailPrepayJson")?.value || "[]"))
+      }
     }
   };
 }
@@ -2262,7 +2612,16 @@ function getExpenseForYear(cfg, age, yearIndex){
   let loan = 0;
   let down = 0;
   const h = cfg.home;
-  if(h.age > 0 && h.years > 0){
+  if(h.detail?.enabled){
+    const detail = buildLoanDetailFromConfig(h);
+    const detailResult = simulateLoanDetail(detail);
+    if(cfg.age <= h.age && age === h.age) down = h.down;
+    if(detailResult.valid && detailResult.annualByAge?.[age] > 0){
+      const baseAnnual = detailResult.annualByAge[age] || 0;
+      const inflYears = cfg.age <= h.age ? (age - h.age) : (age - cfg.age);
+      loan = applyInflation(baseAnnual, cfg.infl.loan, cfg.inflRate, inflYears);
+    }
+  }else if(h.age > 0 && h.years > 0){
     if(cfg.age <= h.age && age === h.age) down = h.down;
     if(cfg.age <= h.age){
       if(age >= h.age && age < h.age + h.years){
@@ -3390,6 +3749,119 @@ function syncIncomeInputsFromCurve(owner, curve){
   formatNumericInputDisplay(salaryInput, true);
   formatNumericInputDisplay(bonusInput, true);
 }
+function getStoredLoanDetail(){
+  return buildLoanDetailFromDOM();
+}
+function fillLoanDetailModalFromStored(){
+  const stored = getStoredLoanDetail();
+  loanDetailDraft = {
+    buyAge: stored.buyAge || numInput("age", 0) || 50,
+    down: stored.down || 0,
+    loanAmount: stored.loanAmount || 0,
+    ratePct: stored.ratePct || 0,
+    baseYears: stored.baseYears || numInput("homeYears", 0) || 35,
+    method: stored.method || "元利均等返済",
+    prepayPlans: normalizeLoanPrepayPlans(stored.prepayPlans || [])
+  };
+}
+function renderLoanDetailPrepayRows(){
+  const body = document.getElementById("loanDetailPrepayRows");
+  if(!body) return;
+  const rows = Array.isArray(loanDetailDraft?.prepayPlans) ? loanDetailDraft.prepayPlans : [];
+  if(!rows.length){
+    body.innerHTML = `<tr><td colspan="4" style="color:#6b7280;">繰上返済計画がまだありません</td></tr>`;
+    return;
+  }
+  body.innerHTML = rows.map((row, idx)=>`<tr>
+    <td><div class="input-unit"><input type="number" class="agebox" data-loan-prepay-field="age" data-loan-prepay-index="${idx}" value="${attrValue(row.age, 0)}"><span class="suffix">歳</span></div></td>
+    <td><div class="input-unit"><input type="number" class="moneybox" data-loan-prepay-field="amount" data-loan-prepay-index="${idx}" value="${attrValue(row.amount, 0)}" step="0.1"><span class="suffix">万円</span></div></td>
+    <td><select data-loan-prepay-field="mode" data-loan-prepay-index="${idx}"><option value="期間短縮型" ${row.mode === "期間短縮型" ? "selected" : ""}>期間短縮型</option><option value="返済額軽減型" ${row.mode === "返済額軽減型" ? "selected" : ""}>返済額軽減型</option></select></td>
+    <td><button type="button" data-loan-prepay-delete="${idx}">削除</button></td>
+  </tr>`).join("");
+  enhanceNumericInputs(body);
+  formatAllNumericInputs(body, true);
+}
+function syncLoanDetailDraftFromModal(){
+  if(!loanDetailDraft) fillLoanDetailModalFromStored();
+  loanDetailDraft.buyAge = numInput("loanDetailAge", 0);
+  loanDetailDraft.down = numInput("loanDetailDown", 0);
+  loanDetailDraft.loanAmount = numInput("loanDetailLoanAmountInput", 0);
+  loanDetailDraft.ratePct = numInput("loanDetailRateInput", 0);
+  loanDetailDraft.baseYears = numInput("loanDetailYears", 0);
+  loanDetailDraft.method = document.getElementById("loanDetailMethodSelect")?.value || "元利均等返済";
+  loanDetailDraft.prepayPlans = (loanDetailDraft.prepayPlans || []).map((row, idx)=>({
+    id: row.id || `plan_${idx+1}`,
+    age: Number(document.querySelector(`[data-loan-prepay-field="age"][data-loan-prepay-index="${idx}"]`)?.value || row.age || 0),
+    amount: Number(document.querySelector(`[data-loan-prepay-field="amount"][data-loan-prepay-index="${idx}"]`)?.value || row.amount || 0),
+    mode: document.querySelector(`[data-loan-prepay-field="mode"][data-loan-prepay-index="${idx}"]`)?.value || row.mode || "期間短縮型"
+  }));
+}
+function renderLoanDetailResult(){
+  syncLoanDetailDraftFromModal();
+  const box = document.getElementById("loanDetailResult");
+  if(!box) return;
+  const sim = simulateLoanDetail(loanDetailDraft);
+  if(!sim.valid){
+    box.innerHTML = `購入年齢・ローン額・金利・返済期間を入力すると試算結果を表示します。`;
+    return;
+  }
+  const initialMonthly = sim.initialMonthly || 0;
+  const lines = [
+    `<div><strong>初期返済見込み：</strong>約${formatLoanSummaryAmount(initialMonthly)} / 月</div>`,
+    `<div><strong>完済予定：</strong>${sim.endAge}歳</div>`,
+    `<div><strong>総返済額目安：</strong>${formatLoanSummaryAmount(sim.totalPaid)}</div>`
+  ];
+  if(sim.prepayTotal > 0) lines.push(`<div><strong>繰上返済合計：</strong>${formatLoanSummaryAmount(sim.prepayTotal)}</div>`);
+  lines.push(`<div><strong>見込み返済期間：</strong>${sim.actualYears}年</div>`);
+  box.innerHTML = lines.join("");
+}
+function renderLoanDetailModal(){
+  if(!loanDetailDraft) fillLoanDetailModalFromStored();
+  document.getElementById("loanDetailAge").value = loanDetailDraft.buyAge || "";
+  document.getElementById("loanDetailDown").value = loanDetailDraft.down || loanDetailDraft.down === 0 ? loanDetailDraft.down : "";
+  document.getElementById("loanDetailLoanAmountInput").value = loanDetailDraft.loanAmount || loanDetailDraft.loanAmount === 0 ? loanDetailDraft.loanAmount : "";
+  document.getElementById("loanDetailRateInput").value = loanDetailDraft.ratePct || loanDetailDraft.ratePct === 0 ? loanDetailDraft.ratePct : "";
+  document.getElementById("loanDetailYears").value = loanDetailDraft.baseYears || "";
+  document.getElementById("loanDetailMethodSelect").value = loanDetailDraft.method || "元利均等返済";
+  renderLoanDetailPrepayRows();
+  enhanceNumericInputs(document.getElementById("loanDetailModal"));
+  formatAllNumericInputs(document.getElementById("loanDetailModal"), true);
+  renderLoanDetailResult();
+}
+function openLoanDetailModal(){
+  fillLoanDetailModalFromStored();
+  renderLoanDetailModal();
+  const modal = document.getElementById("loanDetailModal");
+  modal?.classList.add("show");
+  modal?.setAttribute("aria-hidden", "false");
+}
+function closeLoanDetailModal(){
+  loanDetailDraft = null;
+  const modal = document.getElementById("loanDetailModal");
+  modal?.classList.remove("show");
+  modal?.setAttribute("aria-hidden", "true");
+}
+function saveLoanDetailModal(){
+  syncLoanDetailDraftFromModal();
+  const sim = simulateLoanDetail(loanDetailDraft);
+  if(!sim.valid) return;
+  document.getElementById("homeAge").value = loanDetailDraft.buyAge || 0;
+  document.getElementById("homeDown").value = loanDetailDraft.down || 0;
+  document.getElementById("homePayMonth").value = Math.round((getLoanDisplayPayment(sim, numInput("age", 0), loanDetailDraft.buyAge) || 0) * 10) / 10;
+  document.getElementById("homeYears").value = sim.actualYears || loanDetailDraft.baseYears || 0;
+  document.getElementById("homeDetailLoanAmount").value = loanDetailDraft.loanAmount || 0;
+  document.getElementById("homeDetailRate").value = loanDetailDraft.ratePct || 0;
+  document.getElementById("homeDetailBaseYears").value = loanDetailDraft.baseYears || 0;
+  document.getElementById("homeDetailMethod").value = loanDetailDraft.method || "元利均等返済";
+  document.getElementById("homeDetailPrepayJson").value = JSON.stringify(normalizeLoanPrepayPlans(loanDetailDraft.prepayPlans || []));
+  formatAllNumericInputs(document, true);
+  updateLoanSummary();
+  syncCurrentScenarioFromDOM(false);
+  draw();
+  persistState();
+  closeLoanDetailModal();
+}
+
 function openIncomeCurveModal(owner){
   const c = getIncomeOwnerConfig(owner);
   const modes = getIncomeModes(owner);
@@ -3701,18 +4173,22 @@ document.addEventListener("input", (e)=>{
   const el = e.target;
   if(!(el.matches("input") || el.matches("select"))) return;
   if(["graphType","overlayToggle","fixedScale","fixedScaleMin","fixedScaleMax","xAxisMin","xAxisMax"].includes(el.id)) return;
+  if(el.closest && el.closest("#loanDetailModal")) return;
   // 入力中は再描画せず、現在値だけは常にシナリオへ退避しておく。
   // これにより後段の再描画で動的行がデフォルトへ戻る事故を防ぐ。
   updatePeriodDisplays();
   syncCurrentScenarioFromDOM(true);
+  updateLoanSummary();
 });
 function commitMainInputChange(e){
   const el = e.target;
   if(!(el.matches("input") || el.matches("select"))) return;
   if(["graphType","overlayToggle","fixedScale","fixedScaleMin","fixedScaleMax","xAxisMin","xAxisMax"].includes(el.id)) return;
+  if(el.closest && el.closest("#loanDetailModal")) return;
   monteMode = false;
   updatePeriodDisplays();
   syncCurrentScenarioFromDOM(false);
+  updateLoanSummary();
   draw();
   persistState();
 }
@@ -3745,6 +4221,46 @@ document.addEventListener("focusout", commitMainInputChange, true);
   });
   document.getElementById(c.buttonId)?.addEventListener("click", ()=>openIncomeCurveModal(owner));
 });
+document.getElementById("homeDetailOn")?.addEventListener("change", ()=>{
+  updateHomeDetailUIState();
+  updateLoanSummary();
+  syncCurrentScenarioFromDOM(false);
+  draw();
+  persistState();
+});
+document.getElementById("homeDetailBtn")?.addEventListener("click", ()=>{
+  if(document.getElementById("homeDetailBtn")?.disabled) return;
+  openLoanDetailModal();
+});
+document.getElementById("loanDetailAddPrepayBtn")?.addEventListener("click", ()=>{
+  if(!loanDetailDraft) fillLoanDetailModalFromStored();
+  syncLoanDetailDraftFromModal();
+  loanDetailDraft.prepayPlans.push({id:`plan_${Date.now()}`, age:0, amount:0, mode:"期間短縮型"});
+  renderLoanDetailModal();
+});
+document.getElementById("loanDetailPrepayRows")?.addEventListener("click", (e)=>{
+  const btn = e.target.closest("[data-loan-prepay-delete]");
+  if(!btn || !loanDetailDraft) return;
+  syncLoanDetailDraftFromModal();
+  const idx = +(btn.dataset.loanPrepayDelete || -1);
+  if(idx >= 0){
+    loanDetailDraft.prepayPlans.splice(idx, 1);
+    renderLoanDetailModal();
+  }
+});
+document.getElementById("loanDetailModal")?.addEventListener("input", (e)=>{
+  if(!e.target.closest("#loanDetailModal")) return;
+  renderLoanDetailResult();
+});
+document.getElementById("cancelLoanDetailBtn")?.addEventListener("click", closeLoanDetailModal);
+document.getElementById("saveLoanDetailBtn")?.addEventListener("click", saveLoanDetailModal);
+document.getElementById("loanDetailModal")?.addEventListener("click", (e)=>{
+  if(e.target.id === "loanDetailModal") closeLoanDetailModal();
+});
+document.querySelector("#loanDetailModal .loan-detail-modal")?.addEventListener("click", (e)=>e.stopPropagation());
+["mousedown","mouseup","dblclick","selectstart"].forEach(evt=>{
+  document.querySelector("#loanDetailModal .loan-detail-modal")?.addEventListener(evt, (e)=>e.stopPropagation());
+});
 document.getElementById("incomeCurveAddPointBtn")?.addEventListener("click", addIncomeCurvePoint);
 document.getElementById("cancelIncomeCurveBtn")?.addEventListener("click", closeIncomeCurveModal);
 document.getElementById("saveIncomeCurveBtn")?.addEventListener("click", saveIncomeCurveModal);
@@ -3770,6 +4286,7 @@ document.getElementById("incomeCurveModal")?.addEventListener("input", (e)=>{
 });
 
 window.addEventListener("load", ()=>{
+  updateHomeDetailUIState();
   if(!loadFromURL() && !loadFromLocal()) addTab();
   normalizeScenarioNames();
   if(!scenarios.length) addTab();
