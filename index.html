@@ -372,6 +372,38 @@
   .income-table td:nth-child(2) input{
     margin:0;
   }
+
+  .income-mode-cell{display:flex;flex-direction:column;gap:6px;align-items:flex-start;width:100%;}
+  .income-mode-line{width:100%;min-height:42px;position:relative;}
+  .income-mode-line-normal,
+  .income-mode-line-button{display:block;}
+  .income-mode-line .mode-left{display:flex;align-items:center;gap:8px;justify-content:flex-start;text-align:left;min-width:0;position:relative;z-index:1;}
+  .income-mode-line .mode-spacer{display:block;min-height:1px;}
+  .income-mode-line input[type=radio]{margin:0;}
+  .income-mode-line .mode-label{white-space:nowrap;min-width:0;text-align:left;}
+  .income-mode-line-normal .input-unit{justify-content:flex-start;min-width:0;max-width:none;width:190px;margin:0;position:absolute;left:50%;top:0;transform:translateX(-50%);padding-left:0;}
+  .income-mode-line-button .curve-btn{margin:0;position:absolute;right:0;bottom:0;}
+  .income-mode-line input[disabled], .income-curve-table input[disabled]{background:#f3f4f6;color:#6b7280;}
+  .curve-btn{padding:6px 10px;white-space:nowrap;}
+  .curve-btn[disabled]{opacity:.45;cursor:not-allowed;}
+  .income-curve-modal{width:min(980px, calc(100vw - 24px));max-height:min(92vh, 920px);overflow:auto;}
+  .income-curve-chart-wrap{height:320px;margin-bottom:12px;}
+  .income-curve-grid{display:flex;flex-direction:column;gap:10px;}
+  .income-curve-table-wrap{overflow-x:visible;}
+  .income-curve-table{width:100%;border-collapse:collapse;table-layout:fixed;}
+  .income-curve-table th,.income-curve-table td{border:1px solid var(--border);padding:6px;text-align:center;vertical-align:middle;}
+  .income-curve-table th{background:#fafafa;line-height:1.25;}
+  .income-curve-table .readonly-cell{background:#fafafa;font-weight:bold;}
+  .income-curve-table th:nth-child(1), .income-curve-table td:nth-child(1){width:20%;}
+  .income-curve-table th:nth-child(2), .income-curve-table td:nth-child(2){width:30%;}
+  .income-curve-table th:nth-child(3), .income-curve-table td:nth-child(3){width:30%;}
+  .income-curve-table th:nth-child(4), .income-curve-table td:nth-child(4){width:20%;}
+  .income-curve-table .age-input,.income-curve-table .money-input{width:100%;min-width:0;max-width:100%;box-sizing:border-box;}
+  .income-curve-controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;}
+  .income-curve-checks{display:flex;flex-direction:column;gap:8px;align-items:flex-start;}
+  .income-curve-checks label{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .income-curve-note{color:var(--muted);font-size:.92rem;line-height:1.5;}
+
   .modal-backdrop{
     position:fixed;
     inset:0;
@@ -429,7 +461,7 @@
     padding:9px 10px;
   }
   .tab-context-menu button:hover{background:#f4f4f4;}
-  @media (max-width:900px){
+  @media (max-width:900px), (pointer:coarse){
     #chartWrap{
       position:static;
       padding-bottom:8px;
@@ -470,6 +502,27 @@
     .reginc-table select, .inc-table select, .expense-range-table select, .expense-point-table select{font-size:12px;padding:5px 4px;}
     .reginc-table .agebox, .reginc-table .moneybox, .inc-table .agebox, .inc-table .moneybox, .expense-range-table .agebox, .expense-range-table .moneybox, .expense-point-table .agebox, .expense-point-table .moneybox{width:72px !important;}
     .reginc-table .suffix, .inc-table .suffix, .expense-range-table .suffix, .expense-point-table .suffix{font-size:11px;}
+    .income-mode-line{min-height:38px;position:static;}
+    .income-mode-line-normal,
+    .income-mode-line-button{display:flex;flex-direction:column;gap:6px;align-items:stretch;}
+    .income-mode-line .mode-left{gap:4px;max-width:none;position:static;z-index:auto;justify-content:flex-start;width:100%;}
+    .income-mode-line-normal .input-unit{width:190px;max-width:min(190px, 100%);position:static;left:auto;top:auto;transform:none;align-self:center;justify-content:flex-start;margin:0 auto;}
+    .income-mode-line .mode-label{font-size:12px;}
+    .income-mode-line-normal .mode-left{padding-left:0;}
+    .income-mode-line-button .mode-left{padding-left:0;}
+    .income-mode-line-normal .input-unit .moneybox{width:96px !important;}
+    .income-mode-line-button .curve-btn{font-size:12px;position:static;align-self:flex-end;padding:6px 10px;}
+    .curve-btn{padding:5px 8px;font-size:12px;}
+    .income-curve-modal{width:min(100vw - 12px, 980px);padding:14px 10px 12px;}
+    .income-curve-chart-wrap{height:260px;}
+    .income-curve-table th,.income-curve-table td{padding:4px 3px;font-size:12px;}
+    .income-curve-table th:nth-child(1), .income-curve-table td:nth-child(1){width:20%;}
+    .income-curve-table th:nth-child(2), .income-curve-table td:nth-child(2){width:30%;}
+    .income-curve-table th:nth-child(3), .income-curve-table td:nth-child(3){width:30%;}
+    .income-curve-table th:nth-child(4), .income-curve-table td:nth-child(4){width:20%;}
+    .income-curve-table .readonly-cell{font-size:11px;}
+    .income-curve-table .age-input,.income-curve-table .money-input{font-size:12px;padding:4px 3px;}
+    .delete-curve-point-btn{padding:4px 6px;font-size:11px;min-width:auto;}
   }
 
   .numeric-assist{display:none !important;
@@ -555,6 +608,34 @@
     <button id="tabMenuDuplicateBtn" type="button">複製</button>
     <button id="tabMenuRenameBtn" type="button">条件名変更</button>
     <button id="tabMenuDeleteBtn" type="button">削除</button>
+  </div>
+
+
+  <div id="incomeCurveModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal-card income-curve-modal" role="dialog" aria-modal="true" aria-labelledby="incomeCurveTitle">
+      <div id="incomeCurveTitle" class="modal-text" style="font-weight:bold;margin-bottom:10px;">収入カーブ編集</div>
+      <div class="income-curve-grid">
+        <div class="income-curve-chart-wrap"><canvas id="incomeCurveChart"></canvas></div>
+        <div class="income-curve-table-wrap">
+          <table class="income-curve-table">
+            <thead><tr><th>年齢</th><th>手取り<br>（月）</th><th>ボーナス<br>（年）</th><th>操作</th></tr></thead>
+            <tbody id="incomeCurveRows"></tbody>
+          </table>
+        </div>
+        <div class="income-curve-controls">
+          <button type="button" id="incomeCurveAddPointBtn" class="add-row-btn">＋中間点追加</button>
+          <div class="income-curve-checks">
+            <label><input id="incomeCurveSalaryGrowthOn" type="checkbox"> 手取り（月）を毎年一定率で増加させる <input id="incomeCurveSalaryGrowthPct" type="number" class="ratebox" value="3" step="0.1"><span class="suffix">%</span></label>
+            <label><input id="incomeCurveBonusLinkedOn" type="checkbox"> ボーナス（年）を年間手取り額の <input id="incomeCurveBonusLinkedPct" type="number" class="ratebox" value="33" step="0.1"><span class="suffix">%</span> で計算する</label>
+          </div>
+        </div>
+        <div class="income-curve-note">※ 初期状態では「現在年齢」と「リタイア年齢」の2点のみ表示します。必要に応じて中間点を追加してください。補間は線形です。</div>
+      </div>
+      <div class="modal-actions" style="margin-top:14px;">
+        <button type="button" id="cancelIncomeCurveBtn">キャンセル</button>
+        <button type="button" id="saveIncomeCurveBtn">OK</button>
+      </div>
+    </div>
   </div>
 
   <div id="deleteTabModal" class="modal-backdrop" aria-hidden="true">
@@ -683,13 +764,16 @@
       <h2>収入</h2>
       <div class="stack-note">※ 収入は手取りベースで入力してください。</div>
       <div class="stack-note">※ 退職金・DC受取は上の専用表で受取方法を管理します。</div>
+      <div class="stack-note">※ 年単位計算のため、開始年齢・リタイア年齢に設定した年の収入は含みます。リタイア年齢と年金開始年齢が同じ場合、その年は月収入・ボーナスと年金の両方を含みます。</div>
       <div class="grid2">
         <div>
           <div class="subhead">本人</div>
           <table class="center-table income-table">
             <tr><th>項目</th><th>入力</th></tr>
-            <tr><td>手取り（月）</td><td><div class="input-unit center"><input id="self_salary_month" type="number" class="moneybox" value="40" step="0.1"><span class="suffix">万円 / 月</span></div></td></tr>
-            <tr><td>ボーナス（年）</td><td><div class="input-unit center"><input id="self_bonus_year" type="number" class="moneybox" value="100"><span class="suffix">万円 / 年</span></div></td></tr>
+            
+            <tr><td>手取り（月）</td><td><div class="income-mode-cell"><div class="income-mode-line income-mode-line-normal"><div class="mode-left"><input id="self_salary_mode_normal" name="self_salary_mode" type="radio" value="normal" checked><span class="mode-label">定額</span></div><div class="input-unit center"><input id="self_salary_month" type="number" class="moneybox" value="40" step="0.1"><span class="suffix">万円 / 月</span></div></div><div class="income-mode-line income-mode-line-button"><div class="mode-left"><input id="self_salary_mode_custom" name="self_salary_mode" type="radio" value="custom"><span class="mode-label">カスタム</span></div><span class="mode-spacer"></span></div><input id="self_income_curve_json" type="hidden" value=""></div></td></tr>
+            <tr><td>ボーナス（年）</td><td><div class="income-mode-cell"><div class="income-mode-line income-mode-line-normal"><div class="mode-left"><input id="self_bonus_mode_normal" name="self_bonus_mode" type="radio" value="normal" checked><span class="mode-label">定額</span></div><div class="input-unit center"><input id="self_bonus_year" type="number" class="moneybox" value="100"><span class="suffix">万円 / 年</span></div></div><div class="income-mode-line income-mode-line-button"><div class="mode-left"><input id="self_bonus_mode_custom" name="self_bonus_mode" type="radio" value="custom"><span class="mode-label">カスタム</span></div><button type="button" id="self_income_curve_btn" class="curve-btn" data-income-curve-owner="self" disabled>カーブ編集</button></div></div></td></tr>
+
             <tr><td>リタイア年齢</td><td><div class="input-unit center"><input id="self_retire_age" type="number" class="agebox" value="65"><span class="suffix">歳</span></div></td></tr>
             <tr><td>退職金</td><td><div class="input-unit center"><input id="self_retire_pay" type="number" class="moneybox" value="1000"><span class="suffix">万円</span></div></td></tr>
             <tr><td>年金開始年齢</td><td><div class="input-unit center"><input id="self_pension_age" type="number" class="agebox" value="65"><span class="suffix">歳</span></div></td></tr>
@@ -700,8 +784,10 @@
           <div class="subhead">配偶者</div>
           <table class="center-table income-table">
             <tr><th>項目</th><th>入力</th></tr>
-            <tr><td>手取り（月）</td><td><div class="input-unit center"><input id="sp_salary_month" type="number" class="moneybox" value="20" step="0.1"><span class="suffix">万円 / 月</span></div></td></tr>
-            <tr><td>ボーナス（年）</td><td><div class="input-unit center"><input id="sp_bonus_year" type="number" class="moneybox" value="50"><span class="suffix">万円 / 年</span></div></td></tr>
+            
+            <tr><td>手取り（月）</td><td><div class="income-mode-cell"><div class="income-mode-line income-mode-line-normal"><div class="mode-left"><input id="sp_salary_mode_normal" name="sp_salary_mode" type="radio" value="normal" checked><span class="mode-label">定額</span></div><div class="input-unit center"><input id="sp_salary_month" type="number" class="moneybox" value="20" step="0.1"><span class="suffix">万円 / 月</span></div></div><div class="income-mode-line income-mode-line-button"><div class="mode-left"><input id="sp_salary_mode_custom" name="sp_salary_mode" type="radio" value="custom"><span class="mode-label">カスタム</span></div><span class="mode-spacer"></span></div><input id="sp_income_curve_json" type="hidden" value=""></div></td></tr>
+            <tr><td>ボーナス（年）</td><td><div class="income-mode-cell"><div class="income-mode-line income-mode-line-normal"><div class="mode-left"><input id="sp_bonus_mode_normal" name="sp_bonus_mode" type="radio" value="normal" checked><span class="mode-label">定額</span></div><div class="input-unit center"><input id="sp_bonus_year" type="number" class="moneybox" value="50"><span class="suffix">万円 / 年</span></div></div><div class="income-mode-line income-mode-line-button"><div class="mode-left"><input id="sp_bonus_mode_custom" name="sp_bonus_mode" type="radio" value="custom"><span class="mode-label">カスタム</span></div><button type="button" id="sp_income_curve_btn" class="curve-btn" data-income-curve-owner="sp" disabled>カーブ編集</button></div></div></td></tr>
+
             <tr><td>リタイア年齢</td><td><div class="input-unit center"><input id="sp_retire_age" type="number" class="agebox" value="60"><span class="suffix">歳</span></div></td></tr>
             <tr><td>退職金</td><td><div class="input-unit center"><input id="sp_retire_pay" type="number" class="moneybox" value="500"><span class="suffix">万円</span></div></td></tr>
             <tr><td>年金開始年齢</td><td><div class="input-unit center"><input id="sp_pension_age" type="number" class="agebox" value="65"><span class="suffix">歳</span></div></td></tr>
@@ -1111,6 +1197,11 @@ function migrateLegacyData(data){
     if(data[`sumInv${i}_accountType`] === "NISA") data[`sumInv${i}_accountType`] = "成長NISA";
     if(data[`sumInv${i}_idecoCategory`] == null) data[`sumInv${i}_idecoCategory`] = "";
   }
+  ["self","sp"].forEach(prefix=>{
+    if(!data[`${prefix}_salary_mode_normal`] && !data[`${prefix}_salary_mode_custom`]) data[`${prefix}_salary_mode_normal`] = true;
+    if(!data[`${prefix}_bonus_mode_normal`] && !data[`${prefix}_bonus_mode_custom`]) data[`${prefix}_bonus_mode_normal`] = true;
+    if(data[`${prefix}_income_curve_json`] == null) data[`${prefix}_income_curve_json`] = "";
+  });
   delete data.taxOn;
   return data;
 }
@@ -1442,6 +1533,7 @@ function setAllInputs(data){
   refreshRowLabelTexts();
   enhanceNumericInputs(document);
   formatAllNumericInputs(document, true);
+  updateIncomeCurveControls();
 }
 function ensureScenarioSaved(){
   if(scenarios.length && currentTab >= 0 && scenarios[currentTab]) scenarios[currentTab].data = migrateLegacyData(getAllInputs());
@@ -1740,6 +1832,9 @@ function getScenarioFromDOM(){
     incomeSelf:{
       salaryMonth:numInput("self_salary_month", 0),
       bonusYear:numInput("self_bonus_year", 0),
+      salaryMode:document.getElementById("self_salary_mode_custom")?.checked ? "custom" : "normal",
+      bonusMode:document.getElementById("self_bonus_mode_custom")?.checked ? "custom" : "normal",
+      incomeCurve:parseIncomeCurveJson(document.getElementById("self_income_curve_json")?.value),
       retireAge:numInput("self_retire_age", 200)||200,
       retirePay:numInput("self_retire_pay", 0),
       pensionMonth:numInput("self_pension_month", 0),
@@ -1748,6 +1843,9 @@ function getScenarioFromDOM(){
     incomeSp:{
       salaryMonth:numInput("sp_salary_month", 0),
       bonusYear:numInput("sp_bonus_year", 0),
+      salaryMode:document.getElementById("sp_salary_mode_custom")?.checked ? "custom" : "normal",
+      bonusMode:document.getElementById("sp_bonus_mode_custom")?.checked ? "custom" : "normal",
+      incomeCurve:parseIncomeCurveJson(document.getElementById("sp_income_curve_json")?.value),
       retireAge:numInput("sp_retire_age", 200)||200,
       retirePay:numInput("sp_retire_pay", 0),
       pensionMonth:numInput("sp_pension_month", 0),
@@ -1931,13 +2029,100 @@ function getChildAllowanceForYear(cfg, yearIndex){
   });
   return total;
 }
+
+function parseIncomeCurveJson(raw){
+  if(!raw) return null;
+  try{
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : null;
+  }catch(e){
+    return null;
+  }
+}
+function normalizeIncomeCurveConfig(curve, currentAge, retireAge, salaryMonth, bonusYear){
+  const cfg = curve && typeof curve === "object" ? deepClone(curve) : {};
+  let points = Array.isArray(cfg.points) ? cfg.points.map(p=>(
+    {age:Number(p.age), salary:Number(p.salary), bonus:Number(p.bonus)}
+  )).filter(p=>Number.isFinite(p.age)) : [];
+  if(!points.length){
+    points = [
+      {age:currentAge, salary:salaryMonth, bonus:bonusYear},
+      {age:retireAge, salary:salaryMonth, bonus:bonusYear}
+    ];
+  }
+  points.sort((a,b)=>a.age-b.age);
+  const salaryAtCurrent = Number.isFinite(points[0]?.salary) ? points[0].salary : salaryMonth;
+  const bonusAtCurrent = Number.isFinite(points[0]?.bonus) ? points[0].bonus : bonusYear;
+  const endSource = points[points.length-1] || {salary:salaryMonth, bonus:bonusYear};
+  points = points.filter(p=>p.age > currentAge && p.age < retireAge).map(p=>(
+    {age:p.age, salary:Number.isFinite(p.salary)?p.salary:salaryAtCurrent, bonus:Number.isFinite(p.bonus)?p.bonus:bonusAtCurrent}
+  ));
+  points.unshift({age:currentAge, salary:salaryAtCurrent, bonus:bonusAtCurrent});
+  points.push({age:retireAge, salary:Number.isFinite(endSource.salary)?endSource.salary:salaryMonth, bonus:Number.isFinite(endSource.bonus)?endSource.bonus:bonusYear});
+  return {
+    points,
+    salaryGrowthOn: !!cfg.salaryGrowthOn,
+    salaryGrowthPct: Number.isFinite(Number(cfg.salaryGrowthPct)) ? Number(cfg.salaryGrowthPct) : 3,
+    bonusLinkedOn: !!cfg.bonusLinkedOn,
+    bonusLinkedPct: Number.isFinite(Number(cfg.bonusLinkedPct)) ? Number(cfg.bonusLinkedPct) : 33
+  };
+}
+function buildIncomeCurveSeries(incomeCfg, baseAge, targetAge){
+  const currentAge = baseAge;
+  const retireAge = Number(incomeCfg.retireAge) || 200;
+  const salaryMonth = Number(incomeCfg.salaryMonth) || 0;
+  const bonusYear = Number(incomeCfg.bonusYear) || 0;
+  const curve = normalizeIncomeCurveConfig(incomeCfg.incomeCurve, currentAge, retireAge, salaryMonth, bonusYear);
+  const salaryCustom = incomeCfg.salaryMode === "custom";
+  const bonusCustom = incomeCfg.bonusMode === "custom";
+  let points = curve.points.map(p=>({...p}));
+  if(curve.salaryGrowthOn && salaryCustom){
+    points = points.map(p=>({...p, salary: salaryMonth * Math.pow(1 + (curve.salaryGrowthPct||0)/100, Math.max(0, p.age - currentAge))}));
+  }
+  if(curve.bonusLinkedOn && bonusCustom){
+    points = points.map(p=>({...p, bonus: p.salary * 12 * (curve.bonusLinkedPct||0) / 100}));
+  }
+  function interpLinear(key, fixedValue){
+    if(targetAge > retireAge) return 0;
+    if(!(key === "salary" ? salaryCustom : bonusCustom)) return fixedValue;
+    if(targetAge <= points[0].age) return Number(points[0][key]) || 0;
+    for(let i=0;i<points.length-1;i++){
+      const a = points[i], b = points[i+1];
+      if(targetAge <= b.age){
+        const span = Math.max(1e-9, b.age - a.age);
+        const ratio = Math.max(0, Math.min(1, (targetAge - a.age) / span));
+        return (Number(a[key])||0) + ((Number(b[key])||0) - (Number(a[key])||0)) * ratio;
+      }
+    }
+    return Number(points[points.length-1][key]) || 0;
+  }
+  let salaryResult = curve.salaryGrowthOn && salaryCustom && targetAge <= retireAge
+    ? salaryMonth * Math.pow(1 + (curve.salaryGrowthPct||0)/100, Math.max(0, targetAge - currentAge))
+    : interpLinear("salary", salaryMonth);
+  let bonusResult;
+  if(curve.bonusLinkedOn && bonusCustom && targetAge <= retireAge){
+    bonusResult = salaryResult * 12 * (curve.bonusLinkedPct||0) / 100;
+  }else{
+    bonusResult = interpLinear("bonus", bonusYear);
+  }
+  return {
+    salaryMonth: salaryResult,
+    bonusYear: bonusResult,
+    points,
+    curve
+  };
+}
+
 function getIncomeForYear(cfg, age, investments, receiptState){
   const parts = {self:0,spouse:0,pension:0,regular:0,extra:0,childAllowance:0,retirePay:0};
 
-  if(age < cfg.incomeSelf.retireAge) parts.self += cfg.incomeSelf.salaryMonth*12 + cfg.incomeSelf.bonusYear;
+  const selfIncomeCurve = buildIncomeCurveSeries(cfg.incomeSelf, cfg.age, age);
+  const spIncomeCurve = buildIncomeCurveSeries(cfg.incomeSp, cfg.age, age);
+
+  if(age <= cfg.incomeSelf.retireAge) parts.self += selfIncomeCurve.salaryMonth*12 + selfIncomeCurve.bonusYear;
   if(age >= cfg.incomeSelf.pensionAge) parts.pension += cfg.incomeSelf.pensionMonth*12;
 
-  if(age < cfg.incomeSp.retireAge) parts.spouse += cfg.incomeSp.salaryMonth*12 + cfg.incomeSp.bonusYear;
+  if(age <= cfg.incomeSp.retireAge) parts.spouse += spIncomeCurve.salaryMonth*12 + spIncomeCurve.bonusYear;
   if(age >= cfg.incomeSp.pensionAge) parts.pension += cfg.incomeSp.pensionMonth*12;
 
   parts.regular = getRegularIncomeForYear(cfg, age, age - cfg.age);
@@ -2961,7 +3146,7 @@ function saveToURL(){
   history.replaceState(null, "", location.pathname + "?d=" + encodeData(getSaveData()));
 }
 function saveToLocal(){
-  localStorage.setItem("asset_life_sim_state_v13", JSON.stringify(getSaveData()));
+  localStorage.setItem("asset_life_sim_state", JSON.stringify(getSaveData()));
 }
 function loadFromURL(){
   const d = new URLSearchParams(location.search).get("d");
@@ -2981,7 +3166,7 @@ function loadFromURL(){
   }
 }
 function loadFromLocal(){
-  const raw = localStorage.getItem("asset_life_sim_state_v13");
+  const raw = localStorage.getItem("asset_life_sim_state");
   if(!raw) return false;
   try{
     const data = JSON.parse(raw);
@@ -3009,6 +3194,239 @@ async function copyURL(){
   }catch(e){
     alert("URLコピーに失敗しました。");
   }
+}
+
+
+let incomeCurveChart = null;
+let activeIncomeCurveOwner = null;
+let incomeCurveDraft = null;
+function getIncomeOwnerConfig(owner){
+  const prefix = owner === "sp" ? "sp" : "self";
+  return {
+    prefix,
+    label: prefix === "sp" ? "配偶者" : "本人",
+    salaryInputId: `${prefix}_salary_month`,
+    bonusInputId: `${prefix}_bonus_year`,
+    retireInputId: `${prefix}_retire_age`,
+    salaryNormalId: `${prefix}_salary_mode_normal`,
+    salaryCustomId: `${prefix}_salary_mode_custom`,
+    bonusNormalId: `${prefix}_bonus_mode_normal`,
+    bonusCustomId: `${prefix}_bonus_mode_custom`,
+    curveJsonId: `${prefix}_income_curve_json`,
+    buttonId: `${prefix}_income_curve_btn`
+  };
+}
+function getIncomeModes(owner){
+  const c = getIncomeOwnerConfig(owner);
+  return {
+    salary: !!document.getElementById(c.salaryCustomId)?.checked ? "custom" : "normal",
+    bonus: !!document.getElementById(c.bonusCustomId)?.checked ? "custom" : "normal"
+  };
+}
+function updateIncomeCurveControls(){
+  ["self","sp"].forEach(owner=>{
+    const c = getIncomeOwnerConfig(owner);
+    const salaryCustom = !!document.getElementById(c.salaryCustomId)?.checked;
+    const bonusCustom = !!document.getElementById(c.bonusCustomId)?.checked;
+    const btn = document.getElementById(c.buttonId);
+    const salaryInput = document.getElementById(c.salaryInputId);
+    const bonusInput = document.getElementById(c.bonusInputId);
+    if(btn) btn.disabled = !(salaryCustom || bonusCustom);
+    if(salaryInput) salaryInput.disabled = salaryCustom;
+    if(bonusInput) bonusInput.disabled = bonusCustom;
+  });
+}
+function buildDefaultIncomeCurveForOwner(owner){
+  const c = getIncomeOwnerConfig(owner);
+  const currentAge = numInput("age", 50) || 50;
+  const retireAge = numInput(c.retireInputId, 65) || 65;
+  const salary = numInput(c.salaryInputId, 0);
+  const bonus = numInput(c.bonusInputId, 0);
+  return normalizeIncomeCurveConfig(null, currentAge, retireAge, salary, bonus);
+}
+function getStoredIncomeCurveForOwner(owner){
+  const c = getIncomeOwnerConfig(owner);
+  const currentAge = numInput("age", 50) || 50;
+  const retireAge = numInput(c.retireInputId, 65) || 65;
+  const salary = numInput(c.salaryInputId, 0);
+  const bonus = numInput(c.bonusInputId, 0);
+  return normalizeIncomeCurveConfig(parseIncomeCurveJson(document.getElementById(c.curveJsonId)?.value), currentAge, retireAge, salary, bonus);
+}
+function syncIncomeInputsFromCurve(owner, curve){
+  const c = getIncomeOwnerConfig(owner);
+  const cfg = normalizeIncomeCurveConfig(curve, numInput("age", 50) || 50, numInput(c.retireInputId, 65) || 65, numInput(c.salaryInputId, 0), numInput(c.bonusInputId, 0));
+  const first = cfg.points[0] || {salary:0, bonus:0};
+  const salaryInput = document.getElementById(c.salaryInputId);
+  const bonusInput = document.getElementById(c.bonusInputId);
+  const hidden = document.getElementById(c.curveJsonId);
+  if(hidden) hidden.value = JSON.stringify(cfg);
+  if(salaryInput) salaryInput.value = String(Math.round((Number(first.salary)||0) * 10) / 10);
+  if(bonusInput) bonusInput.value = String(Math.round((Number(first.bonus)||0) * 10) / 10);
+  formatNumericInputDisplay(salaryInput, true);
+  formatNumericInputDisplay(bonusInput, true);
+}
+function openIncomeCurveModal(owner){
+  const c = getIncomeOwnerConfig(owner);
+  const modes = getIncomeModes(owner);
+  if(modes.salary !== "custom" && modes.bonus !== "custom") return;
+  activeIncomeCurveOwner = owner;
+  incomeCurveDraft = getStoredIncomeCurveForOwner(owner);
+  document.getElementById("incomeCurveTitle").textContent = `${c.label} 収入カーブ編集`;
+  document.getElementById("incomeCurveModal").classList.add("show");
+  renderIncomeCurveModal();
+}
+function closeIncomeCurveModal(){
+  activeIncomeCurveOwner = null;
+  incomeCurveDraft = null;
+  if(incomeCurveChart){ incomeCurveChart.destroy(); incomeCurveChart = null; }
+  document.getElementById("incomeCurveModal").classList.remove("show");
+}
+function getIncomeCurveModalModes(){
+  if(!activeIncomeCurveOwner) return {salary:"normal", bonus:"normal"};
+  return getIncomeModes(activeIncomeCurveOwner);
+}
+function renderIncomeCurveModal(){
+  if(!activeIncomeCurveOwner || !incomeCurveDraft) return;
+  const c = getIncomeOwnerConfig(activeIncomeCurveOwner);
+  const currentAge = numInput("age", 50) || 50;
+  const retireAge = numInput(c.retireInputId, 65) || 65;
+  incomeCurveDraft = normalizeIncomeCurveConfig(incomeCurveDraft, currentAge, retireAge, numInput(c.salaryInputId, 0), numInput(c.bonusInputId, 0));
+  const modes = getIncomeCurveModalModes();
+  document.getElementById("incomeCurveSalaryGrowthOn").checked = !!incomeCurveDraft.salaryGrowthOn;
+  document.getElementById("incomeCurveSalaryGrowthPct").value = incomeCurveDraft.salaryGrowthPct ?? 3;
+  document.getElementById("incomeCurveBonusLinkedOn").checked = !!incomeCurveDraft.bonusLinkedOn;
+  document.getElementById("incomeCurveBonusLinkedPct").value = incomeCurveDraft.bonusLinkedPct ?? 33;
+  formatNumericInputDisplay(document.getElementById("incomeCurveSalaryGrowthPct"), true);
+  formatNumericInputDisplay(document.getElementById("incomeCurveBonusLinkedPct"), true);
+  const tbody = document.getElementById("incomeCurveRows");
+  tbody.innerHTML = incomeCurveDraft.points.map((p, idx)=>{
+    const fixed = idx === 0 || idx === incomeCurveDraft.points.length - 1;
+    return `<tr data-idx="${idx}"><td class="${fixed ? "readonly-cell" : ""}">${fixed ? `${Math.round(p.age)}歳` : `<input type="number" class="agebox age-input" data-curve-field="age" value="${attrValue(p.age)}">`}</td><td><input type="number" class="moneybox money-input" data-curve-field="salary" value="${attrValue(p.salary,0)}" ${modes.salary !== "custom" || incomeCurveDraft.salaryGrowthOn ? "disabled" : ""}></td><td><input type="number" class="moneybox money-input" data-curve-field="bonus" value="${attrValue(p.bonus,0)}" ${modes.bonus !== "custom" || incomeCurveDraft.bonusLinkedOn ? "disabled" : ""}></td><td>${fixed ? "固定" : `<button type="button" class="delete-curve-point-btn" data-curve-delete="${idx}">削除</button>`}</td></tr>`;
+  }).join("");
+  enhanceNumericInputs(document.getElementById("incomeCurveModal"));
+  formatAllNumericInputs(document.getElementById("incomeCurveModal"), true);
+  updateIncomeCurveAutoControlStates();
+  drawIncomeCurveChart();
+}
+function updateIncomeCurveAutoControlStates(){
+  const modes = getIncomeCurveModalModes();
+  const salaryAuto = document.getElementById("incomeCurveSalaryGrowthOn").checked;
+  const bonusAuto = document.getElementById("incomeCurveBonusLinkedOn").checked;
+  document.getElementById("incomeCurveSalaryGrowthPct").disabled = !salaryAuto || modes.salary !== "custom";
+  document.getElementById("incomeCurveBonusLinkedPct").disabled = !bonusAuto || modes.bonus !== "custom";
+  document.querySelectorAll('#incomeCurveRows input[data-curve-field="salary"]').forEach(el=>{ el.disabled = modes.salary !== "custom" || salaryAuto; });
+  document.querySelectorAll('#incomeCurveRows input[data-curve-field="bonus"]').forEach(el=>{ el.disabled = modes.bonus !== "custom" || bonusAuto; });
+}
+function syncIncomeCurveDraftFromModal(){
+  if(!activeIncomeCurveOwner || !incomeCurveDraft) return;
+  incomeCurveDraft.salaryGrowthOn = document.getElementById("incomeCurveSalaryGrowthOn").checked;
+  incomeCurveDraft.salaryGrowthPct = numInput("incomeCurveSalaryGrowthPct", 3);
+  incomeCurveDraft.bonusLinkedOn = document.getElementById("incomeCurveBonusLinkedOn").checked;
+  incomeCurveDraft.bonusLinkedPct = numInput("incomeCurveBonusLinkedPct", 33);
+  const rows = [];
+  document.querySelectorAll("#incomeCurveRows tr[data-idx]").forEach((tr, visualIdx)=>{
+    const currentAge = numInput("age", 50) || 50;
+    const retireAge = numInput(getIncomeOwnerConfig(activeIncomeCurveOwner).retireInputId, 65) || 65;
+    const base = incomeCurveDraft.points[visualIdx] || {age:currentAge, salary:0, bonus:0};
+    const ageInput = tr.querySelector('input[data-curve-field="age"]');
+    const salaryInput = tr.querySelector('input[data-curve-field="salary"]');
+    const bonusInput = tr.querySelector('input[data-curve-field="bonus"]');
+    rows.push({
+      age: ageInput ? numValue(ageInput.value, base.age) : base.age,
+      salary: salaryInput ? numValue(salaryInput.value, base.salary) : base.salary,
+      bonus: bonusInput ? numValue(bonusInput.value, base.bonus) : base.bonus,
+      fixed: visualIdx === 0 || visualIdx === incomeCurveDraft.points.length - 1
+    });
+  });
+  if(rows.length >= 2){
+    const first = rows[0], last = rows[rows.length-1];
+    const middle = rows.slice(1, -1).sort((a,b)=>a.age - b.age).map(r=>({age:Math.max(first.age + 0.1, Math.min(last.age - 0.1, r.age)), salary:r.salary, bonus:r.bonus}));
+    incomeCurveDraft.points = [{age:first.age, salary:first.salary, bonus:first.bonus}, ...middle, {age:last.age, salary:last.salary, bonus:last.bonus}];
+  }
+}
+function getRenderedIncomeCurve(owner, curve){
+  const c = getIncomeOwnerConfig(owner);
+  const modes = getIncomeModes(owner);
+  return buildIncomeCurveSeries({
+    salaryMonth:numInput(c.salaryInputId, 0),
+    bonusYear:numInput(c.bonusInputId, 0),
+    salaryMode:modes.salary,
+    bonusMode:modes.bonus,
+    incomeCurve:curve,
+    retireAge:numInput(c.retireInputId, 65) || 65
+  }, numInput("age", 50) || 50, numInput(c.retireInputId, 65) || 65);
+}
+function drawIncomeCurveChart(){
+  if(!activeIncomeCurveOwner || !incomeCurveDraft) return;
+  syncIncomeCurveDraftFromModal();
+  const c = getIncomeOwnerConfig(activeIncomeCurveOwner);
+  const currentAge = numInput("age", 50) || 50;
+  const retireAge = numInput(c.retireInputId, 65) || 65;
+  const postYears = Math.max(2, Math.ceil(Math.max(0, retireAge - currentAge) * 0.25));
+  const chartEndAge = retireAge + postYears;
+  const seriesCfg = {salaryMonth:numInput(c.salaryInputId,0), bonusYear:numInput(c.bonusInputId,0), salaryMode:getIncomeModes(activeIncomeCurveOwner).salary, bonusMode:getIncomeModes(activeIncomeCurveOwner).bonus, incomeCurve:incomeCurveDraft, retireAge};
+  const salaryPoints = [];
+  const bonusPoints = [];
+  for(let age=Math.floor(currentAge); age<=Math.ceil(retireAge); age++){
+    const s = buildIncomeCurveSeries(seriesCfg, currentAge, age);
+    salaryPoints.push({x:age, y:s.salaryMonth});
+    bonusPoints.push({x:age, y:s.bonusYear});
+  }
+  const retirePoint = buildIncomeCurveSeries(seriesCfg, currentAge, retireAge);
+  salaryPoints.push({x:retireAge, y:retirePoint.salaryMonth});
+  bonusPoints.push({x:retireAge, y:retirePoint.bonusYear});
+  salaryPoints.push({x:retireAge + 1, y:0}, {x:chartEndAge, y:0});
+  bonusPoints.push({x:retireAge + 1, y:0}, {x:chartEndAge, y:0});
+  const ctx = document.getElementById("incomeCurveChart").getContext("2d");
+  if(incomeCurveChart) incomeCurveChart.destroy();
+  incomeCurveChart = new Chart(ctx, {
+    type:"line",
+    data:{
+      datasets:[
+        {label:"手取り（月）", data:salaryPoints, parsing:false, borderColor:"#2563eb", backgroundColor:"#2563eb", pointRadius:0, borderWidth:2, yAxisID:"y", spanGaps:false},
+        {label:"ボーナス（年）", data:bonusPoints, parsing:false, borderColor:"#d97706", backgroundColor:"#d97706", pointRadius:0, borderWidth:2, yAxisID:"y1", spanGaps:false}
+      ]
+    },
+    options:{
+      animation:false,responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true}},
+      scales:{
+        x:{type:"linear", min:currentAge, max:chartEndAge, title:{display:true,text:"年齢（歳）"}, ticks:{stepSize:1}},
+        y:{position:"left", title:{display:true,text:"月手取り（万円）"}, beginAtZero:true, grace:"12%"},
+        y1:{position:"right", title:{display:true,text:"年間ボーナス（万円）"}, beginAtZero:true, grace:"12%", grid:{drawOnChartArea:false}}
+      }
+    },
+    plugins:[{id:"retireLine", afterDraw(chart){ const xScale=chart.scales.x; const area=chart.chartArea; const px=xScale.getPixelForValue(retireAge); const ctx=chart.ctx; ctx.save(); ctx.strokeStyle="#dc2626"; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(px, area.top); ctx.lineTo(px, area.bottom); ctx.stroke(); ctx.fillStyle="#dc2626"; ctx.font="12px Arial"; ctx.fillText("リタイア年齢", Math.min(px+6, area.right-72), area.top+14); ctx.restore(); }}]
+  });
+}
+function addIncomeCurvePoint(){
+  if(!activeIncomeCurveOwner || !incomeCurveDraft) return;
+  syncIncomeCurveDraftFromModal();
+  const points = incomeCurveDraft.points;
+  if(points.length < 2) return;
+  let insertIdx = points.length - 1;
+  let bestGap = -Infinity;
+  for(let i=0;i<points.length-1;i++){
+    const gap = points[i+1].age - points[i].age;
+    if(gap > bestGap){ bestGap = gap; insertIdx = i + 1; }
+  }
+  const prev = points[insertIdx - 1], next = points[insertIdx];
+  const age = Math.round(((prev.age + next.age) / 2) * 10) / 10;
+  points.splice(insertIdx, 0, {age, salary:(prev.salary + next.salary)/2, bonus:(prev.bonus + next.bonus)/2});
+  renderIncomeCurveModal();
+}
+function saveIncomeCurveModal(){
+  if(!activeIncomeCurveOwner || !incomeCurveDraft) return;
+  syncIncomeCurveDraftFromModal();
+  const c = getIncomeOwnerConfig(activeIncomeCurveOwner);
+  const hidden = document.getElementById(c.curveJsonId);
+  if(hidden) hidden.value = JSON.stringify(incomeCurveDraft);
+  syncIncomeInputsFromCurve(activeIncomeCurveOwner, incomeCurveDraft);
+  syncCurrentScenarioFromDOM(true);
+  updateIncomeCurveControls();
+  draw();
+  persistState();
+  closeIncomeCurveModal();
 }
 
 document.getElementById("addTabBtn").addEventListener("click", ()=>{
@@ -3152,6 +3570,49 @@ function commitMainInputChange(e){
 }
 document.addEventListener("change", commitMainInputChange);
 document.addEventListener("focusout", commitMainInputChange, true);
+
+
+["age","self_retire_age","sp_retire_age","self_salary_month","self_bonus_year","sp_salary_month","sp_bonus_year"].forEach(id=>{
+  document.getElementById(id)?.addEventListener("input", ()=>{
+    updateIncomeCurveControls();
+    if(activeIncomeCurveOwner) renderIncomeCurveModal();
+  });
+});
+["self","sp"].forEach(owner=>{
+  const c = getIncomeOwnerConfig(owner);
+  [c.salaryNormalId,c.salaryCustomId,c.bonusNormalId,c.bonusCustomId].forEach(id=>{
+    document.getElementById(id)?.addEventListener("change", ()=>{
+      updateIncomeCurveControls();
+      syncCurrentScenarioFromDOM(true);
+      draw();
+      persistState();
+    });
+  });
+  document.getElementById(c.buttonId)?.addEventListener("click", ()=>openIncomeCurveModal(owner));
+});
+document.getElementById("incomeCurveAddPointBtn")?.addEventListener("click", addIncomeCurvePoint);
+document.getElementById("cancelIncomeCurveBtn")?.addEventListener("click", closeIncomeCurveModal);
+document.getElementById("saveIncomeCurveBtn")?.addEventListener("click", saveIncomeCurveModal);
+document.querySelector("#incomeCurveModal .income-curve-modal")?.addEventListener("click", (e)=>e.stopPropagation());
+["mousedown","mouseup","dblclick","selectstart"].forEach(evt=>{
+  document.querySelector("#incomeCurveModal .income-curve-modal")?.addEventListener(evt, (e)=>e.stopPropagation());
+  document.getElementById("incomeCurveRows")?.addEventListener(evt, (e)=>e.stopPropagation());
+});
+document.getElementById("incomeCurveRows")?.addEventListener("click", (e)=>{
+  const btn = e.target.closest("[data-curve-delete]");
+  if(!btn || !incomeCurveDraft) return;
+  syncIncomeCurveDraftFromModal();
+  const idx = +(btn.dataset.curveDelete || -1);
+  if(idx > 0 && idx < incomeCurveDraft.points.length - 1){
+    incomeCurveDraft.points.splice(idx, 1);
+    renderIncomeCurveModal();
+  }
+});
+document.getElementById("incomeCurveModal")?.addEventListener("input", (e)=>{
+  if(!e.target.closest("#incomeCurveModal")) return;
+  if(e.target.id === "incomeCurveSalaryGrowthOn" || e.target.id === "incomeCurveBonusLinkedOn") updateIncomeCurveAutoControlStates();
+  if(activeIncomeCurveOwner) drawIncomeCurveChart();
+});
 
 window.addEventListener("load", ()=>{
   if(!loadFromURL() && !loadFromLocal()) addTab();
