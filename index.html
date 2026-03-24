@@ -376,13 +376,13 @@
   .income-mode-cell{display:flex;flex-direction:column;gap:6px;align-items:flex-start;width:100%;}
   .income-mode-line{width:100%;min-height:42px;position:relative;}
   .income-mode-line-normal,
-  .income-mode-line-button{display:block;}
-  .income-mode-line .mode-left{display:flex;align-items:center;gap:8px;justify-content:flex-start;text-align:left;min-width:0;position:relative;z-index:1;}
+  .income-mode-line-button{display:flex;flex-direction:column;gap:6px;align-items:stretch;}
+  .income-mode-line .mode-left{display:flex;align-items:center;gap:8px;justify-content:flex-start;text-align:left;min-width:0;position:relative;z-index:1;width:100%;}
   .income-mode-line .mode-spacer{display:block;min-height:1px;}
-  .income-mode-line input[type=radio]{margin:0;}
+  .income-mode-line input[type=radio]{margin:0;flex:0 0 auto;}
   .income-mode-line .mode-label{white-space:nowrap;min-width:0;text-align:left;}
-  .income-mode-line-normal .input-unit{justify-content:flex-start;min-width:0;max-width:none;width:190px;margin:0;position:absolute;left:50%;top:0;transform:translateX(-50%);padding-left:0;z-index:2;pointer-events:auto;}
-  .income-mode-line-button .curve-btn{margin:0;position:absolute;right:0;bottom:0;}
+  .income-mode-line-normal .input-unit{justify-content:flex-start;min-width:0;max-width:none;width:190px;margin:0 auto;position:static;left:auto;top:auto;transform:none;padding-left:0;z-index:2;pointer-events:auto;align-self:center;}
+  .income-mode-line-button .curve-btn{margin:0;align-self:flex-end;}
   .income-mode-line input[disabled], .income-curve-table input[disabled]{background:#f3f4f6;color:#6b7280;}
   .curve-btn{padding:6px 10px;white-space:nowrap;}
   .curve-btn[disabled]{opacity:.45;cursor:not-allowed;}
@@ -503,15 +503,13 @@
     .reginc-table .agebox, .reginc-table .moneybox, .inc-table .agebox, .inc-table .moneybox, .expense-range-table .agebox, .expense-range-table .moneybox, .expense-point-table .agebox, .expense-point-table .moneybox{width:72px !important;}
     .reginc-table .suffix, .inc-table .suffix, .expense-range-table .suffix, .expense-point-table .suffix{font-size:11px;}
     .income-mode-line{min-height:38px;position:static;}
-    .income-mode-line-normal,
-    .income-mode-line-button{display:flex;flex-direction:column;gap:6px;align-items:stretch;}
     .income-mode-line .mode-left{gap:4px;max-width:none;position:static;z-index:auto;justify-content:flex-start;width:100%;}
-    .income-mode-line-normal .input-unit{width:190px;max-width:min(190px, 100%);position:static;left:auto;top:auto;transform:none;align-self:center;justify-content:flex-start;margin:0 auto;}
+    .income-mode-line-normal .input-unit{width:190px;max-width:min(190px, 100%);align-self:center;justify-content:flex-start;margin:0 auto;}
     .income-mode-line .mode-label{font-size:12px;}
     .income-mode-line-normal .mode-left{padding-left:0;}
     .income-mode-line-button .mode-left{padding-left:0;}
     .income-mode-line-normal .input-unit .moneybox{width:96px !important;}
-    .income-mode-line-button .curve-btn{font-size:12px;position:static;align-self:flex-end;padding:6px 10px;}
+    .income-mode-line-button .curve-btn{font-size:12px;align-self:flex-end;padding:6px 10px;}
     .curve-btn{padding:5px 8px;font-size:12px;}
     .income-curve-modal{width:min(100vw - 12px, 980px);padding:14px 10px 12px;}
     .income-curve-chart-wrap{height:260px;}
@@ -1338,6 +1336,7 @@ function renderDynamicSections(data = {}){
   renderPointRows("extra","extraRows","臨時支出","万円",55,400,data);
   buildEducationGrid(data);
   enhanceNumericInputs(document);
+  applyTabOrder();
 }
 function rerenderDynamicSection(type, nextCount){
   const data = migrateLegacyData(getAllInputs());
@@ -1492,6 +1491,32 @@ function updatePeriodDisplays(){
     xMaxEl.value = String(Math.min(120, Math.max(100, currentAge)));
     formatNumericInputDisplay(xMaxEl, true);
   }
+}
+
+let pendingSelectAllOnTabFocus = false;
+function isTabNavigableElement(el){
+  if(!el || !el.matches) return false;
+  if(!el.matches('input:not([type="hidden"]), select, button, textarea')) return false;
+  if(el.disabled) return false;
+  if(el.closest('[aria-hidden="true"]')) return false;
+  if(el.closest('#tabContextMenu:not(.show), #rowContextMenu:not(.show), #incomeCurveModal:not(.show)')) return false;
+  return el.getClientRects().length > 0;
+}
+function shouldSelectAllOnTabFocus(el){
+  if(!el || !el.matches) return false;
+  if(el.disabled || el.readOnly) return false;
+  return el.matches('input[type="text"], input[type="search"], input[type="url"], input[type="tel"], input[type="email"], input[data-numeric-ready="1"], textarea');
+}
+function applyTabOrder(){
+  const allCandidates = Array.from(document.querySelectorAll('input:not([type="hidden"]), select, button, textarea'));
+  allCandidates.forEach(el=>{
+    if(el.dataset.keepNaturalTab === '1') return;
+    if(!isTabNavigableElement(el)){
+      el.tabIndex = -1;
+      return;
+    }
+    el.tabIndex = 0;
+  });
 }
 
 let inputPersistTimer = null;
@@ -1688,6 +1713,7 @@ function renderTabs(){
     ["touchend","touchmove","touchcancel"].forEach(ev=>btn.addEventListener(ev, clearPressTimer, {passive:true}));
   });
   updateInputsVisibility();
+  applyTabOrder();
 }
 function rangeRows(prefix, amountField = "val"){
   const arr = [];
@@ -3291,6 +3317,7 @@ function closeIncomeCurveModal(){
   incomeCurveDraft = null;
   if(incomeCurveChart){ incomeCurveChart.destroy(); incomeCurveChart = null; }
   document.getElementById("incomeCurveModal").classList.remove("show");
+  applyTabOrder();
 }
 function getIncomeCurveModalModes(){
   if(!activeIncomeCurveOwner) return {salary:"normal", bonus:"normal"};
@@ -3317,6 +3344,7 @@ function renderIncomeCurveModal(){
   enhanceNumericInputs(document.getElementById("incomeCurveModal"));
   formatAllNumericInputs(document.getElementById("incomeCurveModal"), true);
   updateIncomeCurveAutoControlStates();
+  applyTabOrder();
   drawIncomeCurveChart();
 }
 function updateIncomeCurveAutoControlStates(){
@@ -3539,6 +3567,22 @@ document.getElementById("rowContextMenu")?.addEventListener("click", (e)=>{
 document.getElementById("cancelDeleteRowBtn")?.addEventListener("click", closeDeleteRowModal);
 document.getElementById("confirmDeleteRowBtn")?.addEventListener("click", confirmDeleteRow);
 
+document.addEventListener("keydown", (e)=>{
+  if(e.key === "Tab") pendingSelectAllOnTabFocus = true;
+});
+["mousedown","pointerdown","touchstart"].forEach(evt=>{
+  document.addEventListener(evt, ()=>{ pendingSelectAllOnTabFocus = false; }, true);
+});
+document.addEventListener("focusin", (e)=>{
+  const el = e.target;
+  if(!pendingSelectAllOnTabFocus || !shouldSelectAllOnTabFocus(el)) return;
+  pendingSelectAllOnTabFocus = false;
+  requestAnimationFrame(()=>{
+    if(document.activeElement !== el) return;
+    try{ el.select(); }catch(_e){}
+  });
+});
+
 document.addEventListener("click", (e)=>{
   const addBtn = e.target.closest("[data-add-row]");
   if(addBtn){
@@ -3640,6 +3684,7 @@ window.addEventListener("load", ()=>{
   updatePeriodDisplays();
   enhanceNumericInputs(document);
   formatAllNumericInputs(document, true);
+  applyTabOrder();
   draw();
 });
 </script>
