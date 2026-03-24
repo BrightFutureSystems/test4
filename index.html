@@ -381,7 +381,7 @@
   .income-mode-line .mode-spacer{display:block;min-height:1px;}
   .income-mode-line input[type=radio]{margin:0;}
   .income-mode-line .mode-label{white-space:nowrap;min-width:0;text-align:left;}
-  .income-mode-line-normal .input-unit{justify-content:flex-start;min-width:0;max-width:none;width:190px;margin:0;position:absolute;left:50%;top:0;transform:translateX(-50%);padding-left:0;}
+  .income-mode-line-normal .input-unit{justify-content:flex-start;min-width:0;max-width:none;width:190px;margin:0;position:absolute;left:50%;top:0;transform:translateX(-50%);padding-left:0;z-index:2;pointer-events:auto;}
   .income-mode-line-button .curve-btn{margin:0;position:absolute;right:0;bottom:0;}
   .income-mode-line input[disabled], .income-curve-table input[disabled]{background:#f3f4f6;color:#6b7280;}
   .curve-btn{padding:6px 10px;white-space:nowrap;}
@@ -3223,6 +3223,14 @@ function getIncomeModes(owner){
     bonus: !!document.getElementById(c.bonusCustomId)?.checked ? "custom" : "normal"
   };
 }
+function ensureIncomeCurveSeed(owner){
+  const c = getIncomeOwnerConfig(owner);
+  const hidden = document.getElementById(c.curveJsonId);
+  if(!hidden) return;
+  const current = parseIncomeCurveJson(hidden.value);
+  if(current && Array.isArray(current.points) && current.points.length >= 2) return;
+  hidden.value = JSON.stringify(buildDefaultIncomeCurveForOwner(owner));
+}
 function updateIncomeCurveControls(){
   ["self","sp"].forEach(owner=>{
     const c = getIncomeOwnerConfig(owner);
@@ -3231,9 +3239,10 @@ function updateIncomeCurveControls(){
     const btn = document.getElementById(c.buttonId);
     const salaryInput = document.getElementById(c.salaryInputId);
     const bonusInput = document.getElementById(c.bonusInputId);
+    if(salaryCustom || bonusCustom) ensureIncomeCurveSeed(owner);
     if(btn) btn.disabled = !(salaryCustom || bonusCustom);
-    if(salaryInput) salaryInput.disabled = salaryCustom;
-    if(bonusInput) bonusInput.disabled = bonusCustom;
+    if(salaryInput) salaryInput.disabled = false;
+    if(bonusInput) bonusInput.disabled = false;
   });
 }
 function buildDefaultIncomeCurveForOwner(owner){
@@ -3577,11 +3586,18 @@ document.addEventListener("focusout", commitMainInputChange, true);
     updateIncomeCurveControls();
     if(activeIncomeCurveOwner) renderIncomeCurveModal();
   });
+  document.getElementById(id)?.addEventListener("change", ()=>{
+    updateIncomeCurveControls();
+    if(activeIncomeCurveOwner) renderIncomeCurveModal();
+  });
 });
 ["self","sp"].forEach(owner=>{
   const c = getIncomeOwnerConfig(owner);
   [c.salaryNormalId,c.salaryCustomId,c.bonusNormalId,c.bonusCustomId].forEach(id=>{
     document.getElementById(id)?.addEventListener("change", ()=>{
+      if(id === c.salaryCustomId || id === c.bonusCustomId){
+        ensureIncomeCurveSeed(owner);
+      }
       updateIncomeCurveControls();
       syncCurrentScenarioFromDOM(true);
       draw();
