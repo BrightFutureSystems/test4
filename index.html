@@ -339,17 +339,19 @@
   .loan-detail-field .input-unit{max-width:none;width:100%;justify-content:flex-start;}
   .loan-detail-field select,.loan-detail-field input[type=number],.loan-detail-field input[type=text]{width:100%;max-width:100%;min-width:0;}
   .loan-detail-field-wide{grid-column:1 / -1;}
+  #loanDetailMethodSelect{min-width:0;width:100%;}
   .loan-prepay-table-wrap{overflow-x:visible;max-width:100%;}
   .loan-prepay-table{width:100%;min-width:0;border-collapse:collapse;table-layout:fixed;}
   .loan-prepay-table th,.loan-prepay-table td{border:1px solid var(--border);padding:5px 4px;text-align:center;vertical-align:middle;}
   .loan-prepay-table th{background:#fafafa;line-height:1.2;white-space:nowrap;}
-  .loan-prepay-table th:nth-child(1),.loan-prepay-table td:nth-child(1){width:21%;}
-  .loan-prepay-table th:nth-child(2),.loan-prepay-table td:nth-child(2){width:27%;}
-  .loan-prepay-table th:nth-child(3),.loan-prepay-table td:nth-child(3){width:38%;}
-  .loan-prepay-table th:nth-child(4),.loan-prepay-table td:nth-child(4){width:14%;}
+  .loan-prepay-table th:nth-child(1),.loan-prepay-table td:nth-child(1){width:20%;}
+  .loan-prepay-table th:nth-child(2),.loan-prepay-table td:nth-child(2){width:30%;}
+  .loan-prepay-table th:nth-child(3),.loan-prepay-table td:nth-child(3){width:34%;}
+  .loan-prepay-table th:nth-child(4),.loan-prepay-table td:nth-child(4){width:16%;}
   .loan-prepay-table .input-unit{max-width:none;width:100%;justify-content:flex-start;gap:2px;}
   .loan-prepay-table .suffix{font-size:.8rem;white-space:nowrap;}
   .loan-prepay-table select,.loan-prepay-table input[type=number],.loan-prepay-table button{width:100%;min-width:0;max-width:100%;font-size:.92rem;}
+  .loan-prepay-table button{white-space:nowrap;}
   @media (max-width:640px){
     .loan-prepay-table th,.loan-prepay-table td{padding:4px 2px;font-size:.82rem;}
     .loan-prepay-table .suffix{font-size:.72rem;}
@@ -1815,6 +1817,23 @@ function getStoredLoanDetailDown(){
   if(hidden && hidden.value !== "") return Number(hidden.value) || 0;
   return numInput("homeDown", 0);
 }
+function hasStoredLoanDetailValues(){
+  const ageHidden = document.getElementById("homeDetailBuyAge")?.value ?? "";
+  const downHidden = document.getElementById("homeDetailDown")?.value ?? "";
+  const loanHidden = document.getElementById("homeDetailLoanAmount")?.value ?? "";
+  const rateHidden = document.getElementById("homeDetailRate")?.value ?? "";
+  const yearsHidden = document.getElementById("homeDetailBaseYears")?.value ?? "";
+  const prepayHidden = document.getElementById("homeDetailPrepayJson")?.value ?? "";
+  return [ageHidden, downHidden, loanHidden, rateHidden, yearsHidden].some(v => String(v).trim() !== "") || String(prepayHidden).trim() !== "" && String(prepayHidden).trim() !== "[]";
+}
+function initializeLoanDetailStoredFromSimple(){
+  const ageHidden = document.getElementById("homeDetailBuyAge");
+  const downHidden = document.getElementById("homeDetailDown");
+  const yearsHidden = document.getElementById("homeDetailBaseYears");
+  if(ageHidden) ageHidden.value = String(numInput("homeAge", 0) || 0);
+  if(downHidden) downHidden.value = String(numInput("homeDown", 0) || 0);
+  if(yearsHidden && String(yearsHidden.value || "").trim() === "") yearsHidden.value = String(numInput("homeYears", 0) || 0);
+}
 function getHiddenNumericValue(id, fallback = 0){
   const el = document.getElementById(id);
   if(!el) return fallback;
@@ -2053,7 +2072,14 @@ function formatLoanMonthDelta(months){
 function syncSimpleLoanInputsFromStoredDetailFields(){
   const detail = buildLoanDetailFromHiddenFields();
   detail.enabled = true;
-  return syncSimpleLoanInputsFromDetail(detail);
+  const ok = syncSimpleLoanInputsFromDetail(detail);
+  const currentAge = numInput("age", 0);
+  const sim = simulateLoanDetail(detail);
+  setNumericInputValue("homeAge", Number(detail.buyAge) || 0);
+  setNumericInputValue("homeDown", Number(detail.down) || 0);
+  setNumericInputValue("homePayMonth", Number(sim.valid ? getLoanDisplayPayment(sim, currentAge, detail.buyAge) : 0) || 0);
+  setNumericInputValue("homeYears", Number(sim.valid ? (sim.actualYears || detail.baseYears) : detail.baseYears) || 0);
+  return ok;
 }
 function syncSimpleLoanInputsFromDetail(detailOverride = null){
   const detail = detailOverride || buildLoanDetailFromDOM();
@@ -4013,10 +4039,12 @@ function openLoanDetailModal(){
   const snapshot = captureSimpleLoanInputs();
   fillLoanDetailModalFromStored();
   renderLoanDetailModal();
-  restoreSimpleLoanInputs(snapshot);
   const modal = document.getElementById("loanDetailModal");
   modal?.classList.add("show");
   modal?.setAttribute("aria-hidden", "false");
+  restoreSimpleLoanInputs(snapshot);
+  requestAnimationFrame(()=>restoreSimpleLoanInputs(snapshot));
+  setTimeout(()=>restoreSimpleLoanInputs(snapshot), 0);
 }
 function closeLoanDetailModal(){
   loanDetailDraft = null;
@@ -4415,14 +4443,12 @@ document.addEventListener("focusout", commitMainInputChange, true);
   document.getElementById(c.buttonId)?.addEventListener("click", ()=>openIncomeCurveModal(owner));
 });
 document.getElementById("homeDetailOn")?.addEventListener("change", ()=>{
-  seedLoanDetailHiddenFromSimpleIfNeeded();
-  if(document.getElementById("homeDetailOn")?.checked){
+  const isOn = !!document.getElementById("homeDetailOn")?.checked;
+  if(isOn){
+    if(!hasStoredLoanDetailValues()) initializeLoanDetailStoredFromSimple();
     syncSimpleLoanInputsFromStoredDetailFields();
   }
   updateHomeDetailUIState();
-  if(document.getElementById("homeDetailOn")?.checked){
-    syncSimpleLoanInputsFromStoredDetailFields();
-  }
   updateLoanSummary();
   syncCurrentScenarioFromDOM(false);
   draw();
