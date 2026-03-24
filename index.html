@@ -328,7 +328,7 @@
   .loan-control-box .checkbox-row label{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
   .loan-detail-btn[disabled]{opacity:.45;cursor:not-allowed;}
   .loan-readonly{background:#f3f4f6 !important;color:#6b7280;}
-  .loan-detail-modal{width:min(920px, calc(100vw - 24px));max-height:min(92vh, 960px);overflow:auto;}
+  .loan-detail-modal{width:min(980px, calc(100vw - 20px));max-height:min(92vh, 960px);overflow:auto;}
   .loan-detail-grid{display:flex;flex-direction:column;gap:12px;}
   .loan-detail-note{color:var(--muted);font-size:.92rem;line-height:1.55;}
   .loan-detail-section{border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff;}
@@ -338,14 +338,15 @@
   .loan-detail-field > label{font-size:.92rem;color:#374151;}
   .loan-detail-field .input-unit{max-width:none;width:100%;justify-content:flex-start;}
   .loan-detail-field select,.loan-detail-field input[type=number],.loan-detail-field input[type=text]{width:100%;max-width:100%;min-width:0;}
+  .loan-detail-field-wide{grid-column:1 / -1;}
   .loan-prepay-table-wrap{overflow-x:visible;max-width:100%;}
   .loan-prepay-table{width:100%;min-width:0;border-collapse:collapse;table-layout:fixed;}
   .loan-prepay-table th,.loan-prepay-table td{border:1px solid var(--border);padding:5px 4px;text-align:center;vertical-align:middle;}
-  .loan-prepay-table th{background:#fafafa;line-height:1.25;}
-  .loan-prepay-table th:nth-child(1),.loan-prepay-table td:nth-child(1){width:22%;}
-  .loan-prepay-table th:nth-child(2),.loan-prepay-table td:nth-child(2){width:28%;}
-  .loan-prepay-table th:nth-child(3),.loan-prepay-table td:nth-child(3){width:30%;}
-  .loan-prepay-table th:nth-child(4),.loan-prepay-table td:nth-child(4){width:20%;}
+  .loan-prepay-table th{background:#fafafa;line-height:1.2;white-space:nowrap;}
+  .loan-prepay-table th:nth-child(1),.loan-prepay-table td:nth-child(1){width:21%;}
+  .loan-prepay-table th:nth-child(2),.loan-prepay-table td:nth-child(2){width:27%;}
+  .loan-prepay-table th:nth-child(3),.loan-prepay-table td:nth-child(3){width:38%;}
+  .loan-prepay-table th:nth-child(4),.loan-prepay-table td:nth-child(4){width:14%;}
   .loan-prepay-table .input-unit{max-width:none;width:100%;justify-content:flex-start;gap:2px;}
   .loan-prepay-table .suffix{font-size:.8rem;white-space:nowrap;}
   .loan-prepay-table select,.loan-prepay-table input[type=number],.loan-prepay-table button{width:100%;min-width:0;max-width:100%;font-size:.92rem;}
@@ -699,7 +700,7 @@
             <div class="loan-detail-field"><label for="loanDetailLoanAmount">ローン額</label><div class="input-unit"><input id="loanDetailLoanAmountInput" type="number" class="moneybox" value="5000" step="0.1"><span class="suffix">万円</span></div></div>
             <div class="loan-detail-field"><label for="loanDetailRate">金利</label><div class="input-unit"><input id="loanDetailRateInput" type="number" class="ratebox" value="1.2" step="0.01"><span class="suffix">%</span></div></div>
             <div class="loan-detail-field"><label for="loanDetailYears">返済期間</label><div class="input-unit"><input id="loanDetailYears" type="number" class="agebox" value="30"><span class="suffix">年</span></div></div>
-            <div class="loan-detail-field"><label for="loanDetailMethod">返済方式</label><select id="loanDetailMethodSelect"><option value="元利均等返済">元利均等返済（一般的）</option><option value="元金均等返済">元金均等返済（初期負担大きめ）</option></select></div>
+            <div class="loan-detail-field loan-detail-field-wide"><label for="loanDetailMethod">返済方式</label><select id="loanDetailMethodSelect"><option value="元利均等返済">元利均等返済（一般的）</option><option value="元金均等返済">元金均等返済（初期負担大きめ）</option></select></div>
           </div>
         </div>
         <div class="loan-detail-section">
@@ -1760,7 +1761,7 @@ function setAllInputs(data){
   updateIncomeCurveControls();
   seedLoanDetailHiddenFromSimpleIfNeeded();
   if(document.getElementById("homeDetailOn")?.checked){
-    syncSimpleLoanInputsFromDetail();
+    syncSimpleLoanInputsFromStoredDetailFields();
   }
   updateHomeDetailUIState();
   updateLoanSummary();
@@ -1813,6 +1814,54 @@ function getStoredLoanDetailDown(){
   const hidden = document.getElementById("homeDetailDown");
   if(hidden && hidden.value !== "") return Number(hidden.value) || 0;
   return numInput("homeDown", 0);
+}
+function getHiddenNumericValue(id, fallback = 0){
+  const el = document.getElementById(id);
+  if(!el) return fallback;
+  const raw = sanitizeNumericText(el.value, true);
+  if(raw === "") return fallback;
+  const n = parseFloat(raw);
+  return Number.isFinite(n) ? n : fallback;
+}
+function setNumericInputValue(id, value){
+  const el = document.getElementById(id);
+  if(!el) return;
+  const rounded = Math.round((Number(value) || 0) * 10) / 10;
+  const textValue = String(rounded);
+  el.value = textValue;
+  el.setAttribute("value", textValue);
+  formatNumericInputDisplay(el, true);
+}
+function buildLoanDetailFromHiddenFields(){
+  return {
+    enabled: !!document.getElementById("homeDetailOn")?.checked,
+    buyAge: getHiddenNumericValue("homeDetailBuyAge", 0),
+    down: getHiddenNumericValue("homeDetailDown", 0),
+    loanAmount: getHiddenNumericValue("homeDetailLoanAmount", 0),
+    ratePct: getHiddenNumericValue("homeDetailRate", 0),
+    baseYears: getHiddenNumericValue("homeDetailBaseYears", 0),
+    method: document.getElementById("homeDetailMethod")?.value || "元利均等返済",
+    prepayPlans: normalizeLoanPrepayPlans(parseLoanPrepayJson(document.getElementById("homeDetailPrepayJson")?.value || "[]"))
+  };
+}
+function captureSimpleLoanInputs(){
+  return {
+    homeAge: document.getElementById("homeAge")?.value ?? "",
+    homeDown: document.getElementById("homeDown")?.value ?? "",
+    homePayMonth: document.getElementById("homePayMonth")?.value ?? "",
+    homeYears: document.getElementById("homeYears")?.value ?? ""
+  };
+}
+function restoreSimpleLoanInputs(snapshot){
+  if(!snapshot) return;
+  ["homeAge","homeDown","homePayMonth","homeYears"].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(Object.prototype.hasOwnProperty.call(snapshot, id)){
+      el.value = snapshot[id];
+      formatNumericInputDisplay(el, true);
+    }
+  });
 }
 function seedLoanDetailHiddenFromSimpleIfNeeded(force = false){
   const ageHidden = document.getElementById("homeDetailBuyAge");
@@ -1959,23 +2008,29 @@ function getLoanPrepayImpact(detail, sim = null){
     reducedPaymentBefore: 0,
     reducedPaymentAfter: 0
   };
-  const maxAge = Math.max(base.endAge || 0, result.endAge || 0);
-  for(const plan of plans.filter(p=>p.mode === "返済額軽減型").sort((a,b)=>a.age-b.age)){
-    for(let age = plan.age; age <= maxAge; age++){
-      const before = Number(base.monthlyAtAge?.[age] || 0);
-      const after = Number(result.monthlyAtAge?.[age] || 0);
-      if(before > 0 && after < before - 1e-8){
-        impact.reducedPaymentAge = age;
-        impact.reducedPaymentBefore = before;
-        impact.reducedPaymentAfter = after;
-        return impact;
-      }
-      if(before > 0 && after <= 1e-8){
-        impact.reducedPaymentAge = age;
-        impact.reducedPaymentBefore = before;
-        impact.reducedPaymentAfter = 0;
-        return impact;
-      }
+  const reductionPlans = plans.filter(p=>p.mode === "返済額軽減型").sort((a,b)=>a.age-b.age);
+  const findMonthlyAtOrAfter = (monthlyMap, startAge, fallbackEndAge=0)=>{
+    const ages = Object.keys(monthlyMap || {}).map(v=>+v).filter(v=>v >= startAge).sort((a,b)=>a-b);
+    if(ages.length) return {age:ages[0], payment:Number(monthlyMap[ages[0]] || 0)};
+    if(fallbackEndAge > 0 && fallbackEndAge <= startAge) return {age:startAge, payment:0};
+    return null;
+  };
+  for(const plan of reductionPlans){
+    const directBefore = Number(base.monthlyAtAge?.[plan.age] || 0);
+    const directAfter = Number(result.monthlyAtAge?.[plan.age] || 0);
+    if(directBefore > 0 && directAfter < directBefore - 1e-8){
+      impact.reducedPaymentAge = plan.age;
+      impact.reducedPaymentBefore = directBefore;
+      impact.reducedPaymentAfter = directAfter;
+      return impact;
+    }
+    const beforeInfo = findMonthlyAtOrAfter(base.monthlyAtAge, plan.age, base.endAge || 0);
+    const afterInfo = findMonthlyAtOrAfter(result.monthlyAtAge, plan.age, result.endAge || 0);
+    if(beforeInfo && (!afterInfo || afterInfo.payment < beforeInfo.payment - 1e-8 || afterInfo.age > beforeInfo.age)){
+      impact.reducedPaymentAge = beforeInfo.age;
+      impact.reducedPaymentBefore = beforeInfo.payment;
+      impact.reducedPaymentAfter = afterInfo ? afterInfo.payment : 0;
+      return impact;
     }
   }
   return impact;
@@ -1995,25 +2050,24 @@ function formatLoanMonthDelta(months){
   if(y > 0) return `${y}年`;
   return `${r}か月`;
 }
+function syncSimpleLoanInputsFromStoredDetailFields(){
+  const detail = buildLoanDetailFromHiddenFields();
+  detail.enabled = true;
+  return syncSimpleLoanInputsFromDetail(detail);
+}
 function syncSimpleLoanInputsFromDetail(detailOverride = null){
   const detail = detailOverride || buildLoanDetailFromDOM();
   if(!detail?.enabled) return false;
   const sim = simulateLoanDetail(detail);
   const currentAge = numInput("age", 0);
-  const setValue = (id, value)=>{
-    const el = document.getElementById(id);
-    if(!el) return;
-    el.value = value;
-    formatNumericInputDisplay(el, true);
-  };
   const ageValue = Math.round((Number(detail.buyAge) || 0) * 10) / 10;
   const downValue = Math.round((Number(detail.down) || 0) * 10) / 10;
   const baseYearsValue = Math.round((Number(sim.valid ? (sim.actualYears || detail.baseYears) : detail.baseYears) || 0) * 10) / 10;
   const payValue = Math.round((Number(sim.valid ? getLoanDisplayPayment(sim, currentAge, detail.buyAge) : 0) || 0) * 10) / 10;
-  setValue("homeAge", ageValue);
-  setValue("homeDown", downValue);
-  setValue("homePayMonth", payValue);
-  setValue("homeYears", baseYearsValue);
+  setNumericInputValue("homeAge", ageValue);
+  setNumericInputValue("homeDown", downValue);
+  setNumericInputValue("homePayMonth", payValue);
+  setNumericInputValue("homeYears", baseYearsValue);
   const hiddenAge = document.getElementById("homeDetailBuyAge");
   const hiddenDown = document.getElementById("homeDetailDown");
   if(hiddenAge) hiddenAge.value = String(ageValue);
@@ -3872,13 +3926,13 @@ function getStoredLoanDetail(){
   return buildLoanDetailFromDOM();
 }
 function fillLoanDetailModalFromStored(){
-  const stored = getStoredLoanDetail();
+  const stored = buildLoanDetailFromHiddenFields();
   loanDetailDraft = {
-    buyAge: stored.buyAge || numInput("age", 0) || 50,
+    buyAge: stored.buyAge || 40,
     down: stored.down || 0,
     loanAmount: stored.loanAmount || 0,
     ratePct: stored.ratePct || 0,
-    baseYears: stored.baseYears || numInput("homeYears", 0) || 35,
+    baseYears: stored.baseYears || 35,
     method: stored.method || "元利均等返済",
     prepayPlans: normalizeLoanPrepayPlans(stored.prepayPlans || [])
   };
@@ -3891,7 +3945,7 @@ function renderLoanDetailPrepayRows(){
     body.innerHTML = `<tr><td colspan="4" style="color:#6b7280;">繰上返済計画がまだありません</td></tr>`;
     return;
   }
-  body.innerHTML = rows.map((row, idx)=>`<tr>
+  body.innerHTML = rows.map((row, idx)=>`<tr data-loan-prepay-row-id="${attrValue(row.id || `plan_${idx+1}`)}">
     <td><div class="input-unit"><input type="number" class="agebox" data-loan-prepay-field="age" data-loan-prepay-index="${idx}" value="${attrValue(row.age, 0)}"><span class="suffix">歳</span></div></td>
     <td><div class="input-unit"><input type="number" class="moneybox" data-loan-prepay-field="amount" data-loan-prepay-index="${idx}" value="${attrValue(row.amount, 0)}" step="0.1"><span class="suffix">万円</span></div></td>
     <td><select data-loan-prepay-field="mode" data-loan-prepay-index="${idx}"><option value="期間短縮型" ${row.mode === "期間短縮型" ? "selected" : ""}>期間短縮型</option><option value="返済額軽減型" ${row.mode === "返済額軽減型" ? "selected" : ""}>返済額軽減型</option></select></td>
@@ -3908,12 +3962,17 @@ function syncLoanDetailDraftFromModal(){
   loanDetailDraft.ratePct = numInput("loanDetailRateInput", 0);
   loanDetailDraft.baseYears = numInput("loanDetailYears", 0);
   loanDetailDraft.method = document.getElementById("loanDetailMethodSelect")?.value || "元利均等返済";
-  loanDetailDraft.prepayPlans = (loanDetailDraft.prepayPlans || []).map((row, idx)=>({
-    id: row.id || `plan_${idx+1}`,
-    age: numValue(document.querySelector(`[data-loan-prepay-field="age"][data-loan-prepay-index="${idx}"]`)?.value, row.age || 0),
-    amount: numValue(document.querySelector(`[data-loan-prepay-field="amount"][data-loan-prepay-index="${idx}"]`)?.value, row.amount || 0),
-    mode: document.querySelector(`[data-loan-prepay-field="mode"][data-loan-prepay-index="${idx}"]`)?.value || row.mode || "期間短縮型"
-  }));
+  const rows = [];
+  document.querySelectorAll("#loanDetailPrepayRows tr[data-loan-prepay-row-id]").forEach((tr, idx)=>{
+    const rowId = tr.dataset.loanPrepayRowId || `plan_${idx+1}`;
+    rows.push({
+      id: rowId,
+      age: numValue(tr.querySelector('[data-loan-prepay-field="age"]')?.value, 0),
+      amount: numValue(tr.querySelector('[data-loan-prepay-field="amount"]')?.value, 0),
+      mode: tr.querySelector('[data-loan-prepay-field="mode"]')?.value || "期間短縮型"
+    });
+  });
+  loanDetailDraft.prepayPlans = rows;
 }
 function renderLoanDetailResult(){
   syncLoanDetailDraftFromModal();
@@ -3951,8 +4010,10 @@ function renderLoanDetailModal(){
   renderLoanDetailResult();
 }
 function openLoanDetailModal(){
+  const snapshot = captureSimpleLoanInputs();
   fillLoanDetailModalFromStored();
   renderLoanDetailModal();
+  restoreSimpleLoanInputs(snapshot);
   const modal = document.getElementById("loanDetailModal");
   modal?.classList.add("show");
   modal?.setAttribute("aria-hidden", "false");
@@ -3967,8 +4028,8 @@ function saveLoanDetailModal(){
   syncLoanDetailDraftFromModal();
   const sim = simulateLoanDetail(loanDetailDraft);
   if(!sim.valid) return;
-  document.getElementById("homeAge").value = loanDetailDraft.buyAge || 0;
-  document.getElementById("homeDown").value = loanDetailDraft.down || 0;
+  setNumericInputValue("homeAge", loanDetailDraft.buyAge || 0);
+  setNumericInputValue("homeDown", loanDetailDraft.down || 0);
   document.getElementById("homeDetailBuyAge").value = loanDetailDraft.buyAge || 0;
   document.getElementById("homeDetailDown").value = loanDetailDraft.down || 0;
   document.getElementById("homeDetailLoanAmount").value = loanDetailDraft.loanAmount || 0;
@@ -4356,9 +4417,12 @@ document.addEventListener("focusout", commitMainInputChange, true);
 document.getElementById("homeDetailOn")?.addEventListener("change", ()=>{
   seedLoanDetailHiddenFromSimpleIfNeeded();
   if(document.getElementById("homeDetailOn")?.checked){
-    syncSimpleLoanInputsFromDetail();
+    syncSimpleLoanInputsFromStoredDetailFields();
   }
   updateHomeDetailUIState();
+  if(document.getElementById("homeDetailOn")?.checked){
+    syncSimpleLoanInputsFromStoredDetailFields();
+  }
   updateLoanSummary();
   syncCurrentScenarioFromDOM(false);
   draw();
