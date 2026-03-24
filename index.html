@@ -1493,32 +1493,120 @@ function updatePeriodDisplays(){
   }
 }
 
+
 let pendingSelectAllOnTabFocus = false;
+function isVisibleForTab(el){
+  if(!el || !el.getClientRects || !el.getClientRects().length) return false;
+  const style = window.getComputedStyle(el);
+  return style.visibility !== 'hidden' && style.display !== 'none';
+}
+function isInsideHiddenLayer(el){
+  if(!el || !el.closest) return false;
+  return !!el.closest('#tabContextMenu:not(.show), #rowContextMenu:not(.show), #incomeCurveModal:not(.show), #deleteRowModal:not(.show), #deleteTabModal:not(.show), [hidden], [aria-hidden="true"]');
+}
 function isTabNavigableElement(el){
   if(!el || !el.matches) return false;
   if(!el.matches('input:not([type="hidden"]), select, button, textarea')) return false;
   if(el.disabled) return false;
-  if(el.closest('[aria-hidden="true"]')) return false;
-  if(el.closest('#tabContextMenu:not(.show), #rowContextMenu:not(.show), #incomeCurveModal:not(.show)')) return false;
-  return el.getClientRects().length > 0;
+  if(isInsideHiddenLayer(el)) return false;
+  if(!isVisibleForTab(el)) return false;
+  return true;
 }
 function shouldSelectAllOnTabFocus(el){
   if(!el || !el.matches) return false;
   if(el.disabled || el.readOnly) return false;
-  return el.matches('input[type="text"], input[type="search"], input[type="url"], input[type="tel"], input[type="email"], input[data-numeric-ready="1"], textarea');
+  return el.matches('input[type="text"], input[type="search"], input[type="url"], input[type="tel"], input[type="email"], input[type="number"], input[data-numeric-ready="1"], textarea');
+}
+function getOpenModal(){
+  return document.querySelector('#incomeCurveModal.show, #deleteRowModal.show, #deleteTabModal.show');
+}
+function getTabScopeRoot(){
+  return getOpenModal() || document.body;
+}
+function getFocusableDescendants(container){
+  if(!container || !container.querySelectorAll) return [];
+  return Array.from(container.querySelectorAll('input:not([type="hidden"]), select, button, textarea')).filter(isTabNavigableElement);
+}
+function collectTableFocusables(table){
+  const out = [];
+  if(!table || !table.rows) return out;
+  const seen = new Set();
+  Array.from(table.rows).forEach(row => {
+    Array.from(row.cells).forEach(cell => {
+      getFocusableDescendants(cell).forEach(el => {
+        if(seen.has(el)) return;
+        seen.add(el);
+        out.push(el);
+      });
+    });
+  });
+  return out;
+}
+function collectFocusableFlow(node, scopeRoot, out, seen){
+  if(!node || node.nodeType !== 1 || seen.has(node)) return;
+  if(node !== scopeRoot && node.matches){
+    if(node.matches('#tabContextMenu, #rowContextMenu, #incomeCurveModal:not(.show), #deleteRowModal:not(.show), #deleteTabModal:not(.show), [hidden], [aria-hidden="true"]')) return;
+  }
+
+  if(node !== scopeRoot && isTabNavigableElement(node)){
+    seen.add(node);
+    out.push(node);
+    return;
+  }
+
+  if(node.matches && node.matches('table')){
+    collectTableFocusables(node).forEach(el => {
+      if(seen.has(el)) return;
+      seen.add(el);
+      out.push(el);
+    });
+    return;
+  }
+
+  Array.from(node.children || []).forEach(child => collectFocusableFlow(child, scopeRoot, out, seen));
+}
+function getOrderedFocusableElements(scopeRoot = getTabScopeRoot()){
+  const root = scopeRoot || document.body;
+  const out = [];
+  const seen = new Set();
+  collectFocusableFlow(root, root, out, seen);
+  return out.filter(isTabNavigableElement);
 }
 function applyTabOrder(){
+  const modal = getOpenModal();
+  const scopeRoot = modal || document.body;
+  const ordered = getOrderedFocusableElements(scopeRoot);
+  const inScope = new Set(ordered);
   const allCandidates = Array.from(document.querySelectorAll('input:not([type="hidden"]), select, button, textarea'));
-  allCandidates.forEach(el=>{
+  ordered.forEach(el => {
     if(el.dataset.keepNaturalTab === '1') return;
-    if(!isTabNavigableElement(el)){
-      el.tabIndex = -1;
-      return;
-    }
     el.tabIndex = 0;
   });
+  allCandidates.forEach(el => {
+    if(el.dataset.keepNaturalTab === '1') return;
+    if(!inScope.has(el) || !isTabNavigableElement(el)){
+      el.tabIndex = -1;
+    }
+  });
 }
-
+function focusElementForTab(el){
+  if(!el) return;
+  pendingSelectAllOnTabFocus = true;
+  try{ el.focus({preventScroll:false}); }catch(_e){ try{ el.focus(); }catch(__e){} }
+}
+function moveFocusByTabDirection(backward){
+  const ordered = getOrderedFocusableElements(getTabScopeRoot());
+  if(!ordered.length) return false;
+  const active = document.activeElement;
+  let idx = ordered.indexOf(active);
+  if(idx < 0){
+    focusElementForTab(backward ? ordered[ordered.length - 1] : ordered[0]);
+    return true;
+  }
+  idx = (idx + (backward ? -1 : 1) + ordered.length) % ordered.length;
+  focusElementForTab(ordered[idx]);
+  return true;
+}
 let inputPersistTimer = null;
 function getAllInputs(){
   const data = {};
@@ -3568,18 +3656,23 @@ document.getElementById("cancelDeleteRowBtn")?.addEventListener("click", closeDe
 document.getElementById("confirmDeleteRowBtn")?.addEventListener("click", confirmDeleteRow);
 
 document.addEventListener("keydown", (e)=>{
-  if(e.key === "Tab") pendingSelectAllOnTabFocus = true;
-});
+  if(e.key !== "Tab") return;
+  if(e.altKey || e.ctrlKey || e.metaKey) return;
+  const active = document.activeElement;
+  if(active && active.matches && active.matches('textarea') && !active.readOnly && !active.disabled) return;
+  const handled = moveFocusByTabDirection(!!e.shiftKey);
+  if(handled) e.preventDefault();
+}, true);
 ["mousedown","pointerdown","touchstart"].forEach(evt=>{
   document.addEventListener(evt, ()=>{ pendingSelectAllOnTabFocus = false; }, true);
 });
 document.addEventListener("focusin", (e)=>{
   const el = e.target;
   if(!pendingSelectAllOnTabFocus || !shouldSelectAllOnTabFocus(el)) return;
-  pendingSelectAllOnTabFocus = false;
   requestAnimationFrame(()=>{
     if(document.activeElement !== el) return;
     try{ el.select(); }catch(_e){}
+    pendingSelectAllOnTabFocus = false;
   });
 });
 
