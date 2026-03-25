@@ -79,6 +79,8 @@
   .add-row-btn{min-width:36px;padding:6px 10px;font-weight:bold;}
   .row-label-btn{display:inline-block;padding:2px 6px;border-radius:6px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;cursor:context-menu;}
   .row-label-btn:hover{background:#f3f4f6;}
+  .row-label-readonly{cursor:default;}
+  .row-label-readonly:hover{background:transparent;}
   .asset-invest-table{table-layout:fixed;}
   .asset-invest-table th:nth-child(1),.asset-invest-table td:nth-child(1){width:132px;min-width:132px;}
   .asset-invest-table th:nth-child(2),.asset-invest-table td:nth-child(2){width:92px;min-width:92px;}
@@ -302,9 +304,9 @@
     justify-content:flex-start;
     margin:0 auto;
   }
-  #eduBody .edu-cell-inner{display:flex;flex-direction:column;align-items:flex-start;width:138px;margin:0 auto;}
-  #eduBody select{width:138px;display:block;margin:0;}
-  #eduBody .input-unit{justify-content:flex-start;width:138px;padding-left:0;}
+  #eduBody .edu-cell-inner{display:flex;flex-direction:column;align-items:flex-start;width:154px;margin:0 auto;}
+  #eduBody select{width:154px;display:block;margin:0;}
+  #eduBody .input-unit{justify-content:flex-start;width:154px;padding-left:0;}
   #eduBody .moneybox{width:78px !important;}
   .loan-wrap{overflow-x:auto;}
   .loan-table{min-width:520px;}
@@ -338,6 +340,41 @@
   .loan-detail-field > label{font-size:.92rem;color:#374151;}
   .loan-detail-field .input-unit{max-width:none;width:100%;justify-content:flex-start;}
   .loan-detail-field select,.loan-detail-field input[type=number],.loan-detail-field input[type=text]{width:100%;max-width:100%;min-width:0;}
+
+  .edu-detail-modal{width:min(980px, calc(100vw - 20px));max-height:min(92vh, 960px);overflow:auto;}
+  .edu-detail-grid{display:flex;flex-direction:column;gap:12px;}
+  .edu-detail-note{color:var(--muted);font-size:.92rem;line-height:1.55;}
+  .edu-detail-section{border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff;}
+  .edu-detail-section-title{font-weight:700;margin-bottom:8px;color:#0f172a;}
+  .edu-detail-fields{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px 12px;}
+  .edu-detail-pairs{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px 12px;grid-column:1 / -1;}
+  .edu-detail-pair-row{display:contents;}
+  .edu-detail-onetime-actions{display:flex;justify-content:flex-end;margin:0 0 8px;}
+  .edu-detail-onetime-table-wrap{overflow-x:auto;}
+  .edu-detail-onetime-table{width:100%;border-collapse:collapse;font-size:.95rem;}
+  .edu-detail-onetime-table th,.edu-detail-onetime-table td{border:1px solid var(--border);padding:8px;vertical-align:middle;background:#fff;}
+  .edu-detail-onetime-table th{background:#f8fafc;font-weight:700;text-align:center;}
+  .edu-detail-onetime-table td .input-unit,.edu-detail-onetime-table td select,.edu-detail-onetime-table td input[type=text],.edu-detail-onetime-table td input[type=number]{width:100%;max-width:100%;}
+  .edu-detail-onetime-table .icon-btn{min-width:34px;height:34px;padding:0;}
+  .edu-detail-field{display:flex;flex-direction:column;gap:4px;min-width:0;}
+  .edu-detail-field > label{font-size:.92rem;color:#374151;}
+  .edu-detail-static{display:flex;align-items:center;min-height:38px;padding:8px 10px;border:1px solid var(--border);border-radius:10px;background:#f8fafc;color:#111827;font-weight:600;}
+  .edu-detail-subgroup{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px 12px;grid-column:1 / -1;padding-top:4px;}
+  .edu-detail-subgroup-title{grid-column:1 / -1;font-size:.9rem;font-weight:700;color:#0f172a;margin-top:2px;}
+  .edu-detail-hidden{display:none !important;}
+  .edu-detail-field .input-unit{max-width:none;width:100%;justify-content:flex-start;}
+  .edu-detail-field select,.edu-detail-field input[type=number],.edu-detail-field input[type=text]{width:100%;max-width:100%;min-width:0;}
+  .edu-detail-field-wide{grid-column:1 / -1;}
+  .edu-detail-summary{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:6px 12px;font-size:.92rem;}
+  .edu-detail-summary-linebreak{grid-column:1 / -1;height:0;}
+  .edu-detail-summary-item-full{grid-column:1 / -1;}
+  .edu-detail-summary-item{display:flex;gap:6px;align-items:flex-start;}
+  .edu-detail-summary-label{color:#6b7280;white-space:nowrap;}
+  .edu-detail-summary-value{color:#111827;font-weight:600;word-break:break-word;}
+  .edu-detail-block-toggle{margin:0 0 10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .edu-detail-block.disabled{opacity:.6;}
+  .edu-detail-block.disabled .edu-detail-fields{pointer-events:none;}
+  .edu-detail-inline-note{color:#6b7280;font-size:.85rem;line-height:1.45;}
   .loan-detail-field-wide{grid-column:1 / -1;}
   #loanDetailMethodSelect{min-width:0;width:100%;}
   .loan-prepay-table-wrap{overflow-x:visible;max-width:100%;}
@@ -401,8 +438,19 @@
     overflow-x:auto;
   }
   .edu-cell{
-    min-width:170px;
+    min-width:184px;
   }
+  .edu-wrap th:first-child,
+  .edu-wrap td:first-child{min-width:84px;width:84px;}
+  .edu-wrap th:nth-child(2),
+  .edu-wrap td:nth-child(2){min-width:88px;width:88px;}
+  #eduBody td:first-child .row-label-btn{display:inline-block;min-width:52px;white-space:nowrap;}
+  .edu-cell-readonly{display:flex;align-items:center;justify-content:center;min-height:38px;width:100%;padding:0 4px;color:#111827;white-space:nowrap;text-align:center;}
+  .edu-wrap th:last-child,
+  .edu-wrap td:last-child{min-width:58px !important;width:58px !important;max-width:58px !important;white-space:nowrap;padding-left:4px;padding-right:4px;}
+  .edu-cell-detail{min-width:58px !important;width:58px !important;max-width:58px !important;}
+  .edu-cell-detail .edu-cell-inner{width:auto;align-items:center;}
+  .edu-cell-detail .loan-detail-btn{width:48px;min-width:48px;padding-left:0;padding-right:0;} 
   .help{
     font-size:12px;
     color:var(--muted);
@@ -564,6 +612,8 @@
     .curve-btn{padding:5px 8px;font-size:12px;}
     .income-curve-modal{width:min(100vw - 12px, 980px);padding:14px 10px 12px;}
     .loan-detail-modal{width:min(100vw - 12px, 920px);padding:14px 10px 12px;}
+    .edu-detail-modal{width:min(100vw - 12px, 920px);padding:14px 10px 12px;}
+    .edu-detail-fields,.edu-detail-summary{grid-template-columns:1fr;}
     .loan-detail-fields{grid-template-columns:1fr;}
     .income-curve-chart-wrap{height:260px;}
     .income-curve-table th,.income-curve-table td{padding:4px 3px;font-size:12px;}
@@ -727,6 +777,86 @@
     </div>
   </div>
 
+
+  <div id="educationDetailModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal-card edu-detail-modal" role="dialog" aria-modal="true" aria-labelledby="educationDetailTitle">
+      <div id="educationDetailTitle" class="modal-text" style="font-weight:bold;margin-bottom:10px;">教育費詳細</div>
+      <div class="edu-detail-grid">
+        <div class="edu-detail-note">※ v106では教育費詳細モードの項目設計を改訂しています。大学・大学院は標準値を表示しつつ編集できる形に整理し、学校に紐づく入学金は各学校ブロック側へ集約します。</div>
+        <div class="edu-detail-section">
+          <div class="edu-detail-section-title">簡単モードの要約</div>
+          <div id="educationDetailSimpleSummary" class="edu-detail-summary"></div>
+        </div>
+        <div id="educationDetailUniversityBlock" class="edu-detail-section edu-detail-block">
+          <label class="edu-detail-block-toggle"><input id="eduDetailUniversityEnabled" type="checkbox"> 大学詳細を使用する</label>
+          <div class="edu-detail-fields">
+            <div class="edu-detail-field"><label for="eduDetailUniversitySchoolType">学校種別</label><select id="eduDetailUniversitySchoolType"><option value="junior_college">短大</option><option value="national_public">国公立</option><option value="national_public_medical">国公立医歯系</option><option value="private_liberal">私立文系</option><option value="private_science">私立理系</option><option value="private_medical">私立医歯系</option></select></div>
+            <div class="edu-detail-field"><label for="eduDetailUniversityLiving">通学形態</label><select id="eduDetailUniversityLiving"><option value="home">自宅</option><option value="away">自宅外</option></select></div>
+            <div class="edu-detail-field"><label for="eduDetailUniversityYears">在学年数</label><select id="eduDetailUniversityYears"><option value="2">2</option><option value="4">4</option><option value="6">6</option></select></div>
+            <div class="edu-detail-pairs">
+              <div class="edu-detail-field"><label>標準入学一時金</label><div id="eduDetailUniversityStandardEntrance" class="edu-detail-static">0 万円</div></div>
+              <div class="edu-detail-field"><label for="eduDetailUniversityEntranceCost">入学一時金（編集可）</label><div class="input-unit"><input id="eduDetailUniversityEntranceCost" type="number" class="moneybox" value="0" step="1"><span class="suffix">万円</span></div></div>
+              <div class="edu-detail-field"><label>標準学費</label><div id="eduDetailUniversityStandardAnnual" class="edu-detail-static">0 万円 / 年</div></div>
+              <div class="edu-detail-field"><label for="eduDetailUniversityAnnualCost">学費年額（編集可）</label><div class="input-unit"><input id="eduDetailUniversityAnnualCost" type="number" class="moneybox" value="0" step="1"><span class="suffix">万円 / 年</span></div></div>
+              <div class="edu-detail-field"><label>標準自宅外費用</label><div id="eduDetailUniversityStandardAwayMonthly" class="edu-detail-static">0 万円 / 月</div></div>
+              <div class="edu-detail-field"><label for="eduDetailUniversityAwayMonthly">自宅外費用（月）（編集可）</label><div class="input-unit"><input id="eduDetailUniversityAwayMonthly" type="number" class="moneybox" value="0" step="0.1"><span class="suffix">万円 / 月</span></div></div>
+            </div>
+            <div class="edu-detail-field edu-detail-field-wide"><label for="eduDetailUniversityExtraMonthly">追加費用（月）</label><div class="input-unit"><input id="eduDetailUniversityExtraMonthly" type="number" class="moneybox" value="0" step="0.1"><span class="suffix">万円 / 月</span></div></div>
+          </div>
+        </div>
+        <div id="educationDetailGraduateBlock" class="edu-detail-section edu-detail-block">
+          <label class="edu-detail-block-toggle"><input id="eduDetailGraduateEnabled" type="checkbox"> 大学院詳細を使用する</label>
+          <div class="edu-detail-fields">
+            <div class="edu-detail-field"><label for="eduDetailGraduateDegreeType">区分</label><select id="eduDetailGraduateDegreeType"><option value="none">なし</option><option value="masters_public">修士（国公立）</option><option value="masters_private">修士（私立）</option><option value="doctor_public">博士（国公立）</option><option value="doctor_private">博士（私立）</option><option value="medical_grad_public">医歯系大学院（国公立）</option><option value="medical_grad_private">医歯系大学院（私立）</option></select></div>
+            <div class="edu-detail-field"><label for="eduDetailGraduateLiving">通学形態</label><select id="eduDetailGraduateLiving"><option value="home">自宅</option><option value="away">自宅外</option></select></div>
+            <div class="edu-detail-field"><label for="eduDetailGraduateYears">在学年数</label><input id="eduDetailGraduateYears" type="number" class="agebox" value="2" min="0" max="10" step="1"></div>
+            <div class="edu-detail-pairs">
+              <div id="eduDetailGraduateGeneralEntranceGroup" class="edu-detail-pair-row">
+                <div class="edu-detail-field"><label>標準 修士入学一時金</label><div id="eduDetailGraduateStandardMastersEntrance" class="edu-detail-static">0 万円</div></div>
+                <div class="edu-detail-field"><label for="eduDetailGraduateMastersEntranceCost">修士入学一時金（編集可）</label><div class="input-unit"><input id="eduDetailGraduateMastersEntranceCost" type="number" class="moneybox" value="0" step="1"><span class="suffix">万円</span></div></div>
+                <div class="edu-detail-field"><label>標準 博士入学一時金</label><div id="eduDetailGraduateStandardDoctorEntrance" class="edu-detail-static">0 万円</div></div>
+                <div class="edu-detail-field"><label for="eduDetailGraduateDoctorEntranceCost">博士入学一時金（編集可）</label><div class="input-unit"><input id="eduDetailGraduateDoctorEntranceCost" type="number" class="moneybox" value="0" step="1"><span class="suffix">万円</span></div></div>
+              </div>
+              <div id="eduDetailGraduateMedicalEntranceGroup" class="edu-detail-pair-row edu-detail-hidden">
+                <div class="edu-detail-field"><label>標準 医歯系大学院入学一時金</label><div id="eduDetailGraduateStandardMedicalEntrance" class="edu-detail-static">0 万円</div></div>
+                <div class="edu-detail-field"><label for="eduDetailGraduateMedicalEntranceCost">医歯系大学院入学一時金（編集可）</label><div class="input-unit"><input id="eduDetailGraduateMedicalEntranceCost" type="number" class="moneybox" value="0" step="1"><span class="suffix">万円</span></div></div>
+              </div>
+              <div class="edu-detail-field"><label>標準学費</label><div id="eduDetailGraduateStandardAnnual" class="edu-detail-static">0 万円 / 年</div></div>
+              <div class="edu-detail-field"><label for="eduDetailGraduateAnnualCost">学費年額（編集可）</label><div class="input-unit"><input id="eduDetailGraduateAnnualCost" type="number" class="moneybox" value="0" step="1"><span class="suffix">万円 / 年</span></div></div>
+              <div class="edu-detail-field"><label>標準自宅外費用</label><div id="eduDetailGraduateStandardAwayMonthly" class="edu-detail-static">0 万円 / 月</div></div>
+              <div class="edu-detail-field"><label for="eduDetailGraduateAwayMonthly">自宅外費用（月）（編集可）</label><div class="input-unit"><input id="eduDetailGraduateAwayMonthly" type="number" class="moneybox" value="0" step="0.1"><span class="suffix">万円 / 月</span></div></div>
+            </div>
+            <div class="edu-detail-field edu-detail-field-wide"><label for="eduDetailGraduateExtraMonthly">追加費用（月）</label><div class="input-unit"><input id="eduDetailGraduateExtraMonthly" type="number" class="moneybox" value="0" step="0.1"><span class="suffix">万円 / 月</span></div></div>
+          </div>
+        </div>
+        <div id="educationDetailAbroadBlock" class="edu-detail-section edu-detail-block">
+          <label class="edu-detail-block-toggle"><input id="eduDetailAbroadEnabled" type="checkbox"> 留学詳細を使用する</label>
+          <div class="edu-detail-fields">
+            <div class="edu-detail-field"><label for="eduDetailAbroadTarget">対象</label><select id="eduDetailAbroadTarget"><option value="university">大学</option><option value="graduate">大学院</option></select></div>
+            <div class="edu-detail-field"><label for="eduDetailAbroadStartYear">開始時期</label><select id="eduDetailAbroadStartYear"><option value="1">1年目</option><option value="2">2年目</option><option value="3">3年目</option><option value="4">4年目</option><option value="5">5年目</option><option value="6">6年目</option></select></div>
+            <div class="edu-detail-field"><label for="eduDetailAbroadMonths">期間</label><select id="eduDetailAbroadMonths"><option value="3">3か月</option><option value="6">6か月</option><option value="12">12か月</option></select></div>
+            <div class="edu-detail-field"><label for="eduDetailAbroadCost">留学費用総額</label><div class="input-unit"><input id="eduDetailAbroadCost" type="number" class="moneybox" value="0" step="1"><span class="suffix">万円</span></div></div>
+          </div>
+        </div>
+        <div id="educationDetailOneTimeBlock" class="edu-detail-section edu-detail-block">
+          <div class="edu-detail-section-title">一時費用（任意教育費）</div>
+          <div class="edu-detail-inline-note">例：受験費、PC購入費、留学準備費、引越初期費用、特別講習費 など</div>
+          <div class="edu-detail-onetime-actions"><button type="button" id="eduDetailOneTimeAddBtn" class="ghost-btn">＋</button></div>
+          <div class="edu-detail-onetime-table-wrap">
+            <table class="edu-detail-onetime-table">
+              <thead><tr><th>項目</th><th>発生時期</th><th>金額</th><th>削除</th></tr></thead>
+              <tbody id="eduDetailOneTimeBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions" style="margin-top:14px;">
+        <button type="button" id="cancelEducationDetailBtn">キャンセル</button>
+        <button type="button" id="saveEducationDetailBtn">保存</button>
+      </div>
+    </div>
+  </div>
+
   <div id="deleteTabModal" class="modal-backdrop" aria-hidden="true">
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="deleteTabMessage">
       <div id="deleteTabMessage" class="modal-text"></div>
@@ -790,7 +920,7 @@
       <div class="subhead">預金</div>
       <div class="table-scroll">
       <table class="center-table">
-        <tr><th></th><th>預金額</th><th>通貨</th><th>金利</th></tr>
+        <tr><th>項目</th><th>預金額</th><th>通貨</th><th>金利</th></tr>
         <tbody id="depRows"></tbody>
       </table>
       </div>
@@ -799,7 +929,7 @@
       <div class="subhead">現在の運用資産</div>
       <div class="table-scroll">
       <table class="center-table asset-invest-table current-invest-table">
-        <tr><th></th><th>名義</th><th>口座</th><th>元本</th><th>現在額</th><th>通貨</th><th>利回り</th><th>iDeCo区分</th></tr>
+        <tr><th>項目</th><th>名義</th><th>口座</th><th>元本</th><th>現在額</th><th>通貨</th><th>利回り</th><th>iDeCo区分</th></tr>
         <tbody id="invRows"></tbody>
       </table>
       </div>
@@ -808,7 +938,7 @@
       <div class="subhead">今後の投資</div>
       <div class="table-scroll">
       <table class="center-table asset-invest-table future-invest-table">
-        <tr><th></th><th>名義</th><th>口座</th><th>年齢</th><th>投資額</th><th>通貨</th><th>利回り</th><th>iDeCo区分</th></tr>
+        <tr><th>項目</th><th>名義</th><th>口座</th><th>年齢</th><th>投資額</th><th>通貨</th><th>利回り</th><th>iDeCo区分</th></tr>
         <tbody id="futureInvRows"></tbody>
       </table>
       </div>
@@ -817,7 +947,7 @@
       <div class="subhead">積立投資</div>
       <div class="table-scroll">
       <table class="center-table asset-invest-table sum-invest-table">
-        <tr><th></th><th>名義</th><th>口座</th><th>積立期間</th><th>積立額</th><th>通貨</th><th>利回り</th><th>iDeCo区分</th></tr>
+        <tr><th>項目</th><th>名義</th><th>口座</th><th>積立期間</th><th>積立額</th><th>通貨</th><th>利回り</th><th>iDeCo区分</th></tr>
         <tbody id="sumInvRows"></tbody>
       </table>
       </div>
@@ -951,16 +1081,21 @@
       <input id="homeDetailPrepayJson" type="hidden" value="[]">
 
       <div class="subhead">教育費</div>
-      <div class="help">各セルの上段で学校種別、下段で習い事代（万円 / 月）を入力してください。</div>
+      <div class="help">各セルの上段で区分、下段で追加費用を入力してください。現在の学校を起点に教育費を計算します。</div>
+      <div class="help">追加費用（月）は、標準費用に含まれない個別の上乗せ分です。例：塾、習い事、教材費、通学費、部活費など。大学・大学院で「自宅外」を選んだ場合の標準的な住居費・生活費は基本費用に含む想定です。それを超える分のみ、必要に応じて追加費用（月）に入力してください。</div>
       <div class="edu-wrap">
         <table>
           <tr>
-            <th></th>
-            <th>幼稚園</th>
+            <th>子</th>
+            <th>現在の学校</th>
+            <th>未就学</th>
             <th>小学校</th>
             <th>中学校</th>
             <th>高校</th>
             <th>大学</th>
+            <th>大学院</th>
+            <th>留学加算</th>
+            <th>詳細</th>
           </tr>
           <tbody id="eduBody"></tbody>
         </table>
@@ -1010,10 +1145,10 @@ const IDECO_UNLOCK_AGE = 60;
 const IDECO_POST60_FIRST_JOIN_WAIT_YEARS = 5;
 const IDECO_CATEGORY_OPTIONS = ["","自営業・フリーランス（第1号）","会社員（企業年金なし）","会社員（企業型DCのみ）","会社員（DB等あり）","公務員","専業主婦・主夫（第3号）"];
 const TAB_COLORS = ["#2563eb","#15803d","#dc2626","#7c3aed","#d97706","#0f766e","#db2777","#a16207","#374151"];
-const GRADE_OPTIONS = ["未就園児","年少","年中","年長","小1","小2","小3","小4","小5","小6","中1","中2","中3","高1","高2","高3","大1","大2","大3","大4","社会人"];
-const gradeMap = {"未就園児":-3,"年少":-2,"年中":-1,"年長":0,"小1":1,"小2":2,"小3":3,"小4":4,"小5":5,"小6":6,"中1":7,"中2":8,"中3":9,"高1":10,"高2":11,"高3":12,"大1":13,"大2":14,"大3":15,"大4":16,"社会人":20};
-const STAGE_ORDER = ["kind","elem","junior","high","uni"];
-const EDUCATION_STAGE_LABELS = {kind:"幼稚園",elem:"小学校",junior:"中学校",high:"高校",uni:"大学"};
+const GRADE_OPTIONS = ["年少未満","年少相当","年中相当","年長相当","小1","小2","小3","小4","小5","小6","中1","中2","中3","高1","高2","高3","短大1","短大2","大1","大2","大3","大4","修士1","修士2","博士1","博士2","博士3","卒業後"];
+const gradeMap = {"年少未満":-3,"年少相当":-2,"年中相当":-1,"年長相当":0,"小1":1,"小2":2,"小3":3,"小4":4,"小5":5,"小6":6,"中1":7,"中2":8,"中3":9,"高1":10,"高2":11,"高3":12,"短大1":13,"短大2":14,"大1":15,"大2":16,"大3":17,"大4":18,"修士1":19,"修士2":20,"博士1":21,"博士2":22,"博士3":23,"卒業後":24};
+const STAGE_ORDER = ["preschool","elem","junior","high","uni","grad"];
+const EDUCATION_STAGE_LABELS = {preschool:"未就学",elem:"小学校",junior:"中学校",high:"高校",uni:"大学",grad:"大学院"};
 const DEFAULT_STAGE_OPTIONS = {kind:"公立",elem:"公立",junior:"公立",high:"公立",uni:"国公立（自宅）"};
 const INCOME_COLORS = {self:"#2563eb",spouse:"#60a5fa",pension:"#0f766e",regular:"#16a34a",extra:"#8b5cf6",childAllowance:"#f59e0b",retirePay:"#ec4899"};
 const EXPENSE_COLORS = {life:"#ef4444",rent:"#fb7185",education:"#f97316",loan:"#b91c1c",periodic:"#7c2d12",extra:"#dc2626"};
@@ -1023,6 +1158,8 @@ let chart = null;
 let scenarios = [];
 let currentTab = 0;
 let monteMode = false;
+let educationDetailDraft = null;
+let currentEducationDetailChildIndex = null;
 
 function defaultScenarioName(index){ return `条件${index+1}`; }
 function isDefaultScenarioName(name, index){ return String(name || "") === defaultScenarioName(index); }
@@ -1136,7 +1273,21 @@ function copySectionRowFields(src, dst, data, type, srcIndex, dstIndex){
     const dstKey = `${type}${dstIndex}_${field}`;
     if(data[srcKey] != null) dst[dstKey] = data[srcKey];
   }
-  if(type === "child") for(const stage of STAGE_ORDER){ for(const suffix of ["type","extra"]){ const srcKey=`c${srcIndex}_${stage}_${suffix}`; const dstKey=`c${dstIndex}_${stage}_${suffix}`; if(data[srcKey] != null) dst[dstKey]=data[srcKey]; } }
+  if(type === "child"){
+    if(data[`c${srcIndex}_current_school`] != null) dst[`c${dstIndex}_current_school`] = data[`c${srcIndex}_current_school`];
+    for(const stage of STAGE_ORDER){
+      for(const suffix of ["type","extra"]){
+        const srcKey=`c${srcIndex}_${stage}_${suffix}`;
+        const dstKey=`c${dstIndex}_${stage}_${suffix}`;
+        if(data[srcKey] != null) dst[dstKey]=data[srcKey];
+      }
+    }
+    for(const suffix of ["type","amount"]){
+      const srcKey=`c${srcIndex}_abroad_${suffix}`;
+      const dstKey=`c${dstIndex}_abroad_${suffix}`;
+      if(data[srcKey] != null) dst[dstKey]=data[srcKey];
+    }
+  }
 }
 function normalizeSectionLabels(data, type, count){
   for(let i=1;i<=count;i++){
@@ -1313,6 +1464,26 @@ function migrateLegacyData(data){
   if(data.homeDetailBaseYears == null || data.homeDetailBaseYears === "") data.homeDetailBaseYears = data.homeYears || 30;
   if(data.homeDetailMethod == null || data.homeDetailMethod === "") data.homeDetailMethod = "元利均等返済";
   if(data.homeDetailPrepayJson == null || data.homeDetailPrepayJson === "") data.homeDetailPrepayJson = "[]";
+  const legacySchoolMap = {"未就園児":"年少未満","年少":"年少相当","年中":"年中相当","年長":"年長相当","社会人":"卒業後"};
+  const childCount = inferCount(data, "child");
+  for(let i=1;i<=childCount;i++){
+    const schoolKey = `child${i}_school`;
+    if(legacySchoolMap[data[schoolKey]]) data[schoolKey] = legacySchoolMap[data[schoolKey]];
+    const currentSchoolKey = `c${i}_current_school`;
+    if(data[currentSchoolKey] == null || data[currentSchoolKey] === "") data[currentSchoolKey] = data[schoolKey] || (i===1 ? "小4" : "年少未満");
+    if(legacySchoolMap[data[currentSchoolKey]]) data[currentSchoolKey] = legacySchoolMap[data[currentSchoolKey]];
+    if(data[`c${i}_preschool_type`] == null && data[`c${i}_kind_type`] != null){
+      const legacyType = data[`c${i}_kind_type`];
+      data[`c${i}_preschool_type`] = legacyType === "私立" ? "高め" : "標準";
+    }
+    if(data[`c${i}_preschool_extra`] == null && data[`c${i}_kind_extra`] != null) data[`c${i}_preschool_extra`] = data[`c${i}_kind_extra`];
+    if(data[`c${i}_grad_type`] == null) data[`c${i}_grad_type`] = "なし";
+    if(data[`c${i}_grad_extra`] == null) data[`c${i}_grad_extra`] = 0;
+    if(data[`c${i}_abroad_type`] == null) data[`c${i}_abroad_type`] = "なし";
+    if(data[`c${i}_abroad_amount`] == null) data[`c${i}_abroad_amount`] = 0;
+    delete data[`c${i}_kind_type`];
+    delete data[`c${i}_kind_extra`];
+  }
   delete data.taxOn;
   return data;
 }
@@ -1331,7 +1502,7 @@ function renderChildRows(data = {}){
     html += `<tr>${buildRowLabelCell("child", i, data)}<td><input id="child${i}_enabled" type="checkbox" ${enabled}></td><td><div class="input-unit center"><input id="child${i}_age" type="number" class="agebox" value="${ageVal}"><span class="suffix">歳</span></div></td><td><select id="child${i}_school" class="wide-child-school"></select></td></tr>`;
   }
   body.innerHTML = html;
-  for(let i=1;i<=dynamicCounts.child;i++) buildSchoolSelect(`child${i}_school`, data[`child${i}_school`] ?? (i===1 ? "小4" : "未就園児"));
+  for(let i=1;i<=dynamicCounts.child;i++) buildSchoolSelect(`child${i}_school`, data[`child${i}_school`] ?? (i===1 ? "小4" : "年少未満"));
 }
 function renderDepositRows(data = {}){
   const body = document.getElementById("depRows"); if(!body) return;
@@ -1418,19 +1589,98 @@ function renderSumInvestmentRows(data = {}){
   body.innerHTML = html;
 }
 
+function parseEducationDetailJson(value){
+  if(!value) return null;
+  try{
+    const parsed = JSON.parse(value);
+    return parsed && typeof parsed === "object" ? parsed : null;
+  }catch(_e){ return null; }
+}
+function createDefaultEducationDetail(){
+  return {
+    university:{enabled:false, schoolType:"national_public", living:"home", years:4, annualCost:0, entranceCost:0, extraMonthly:0, awayMonthly:0},
+    graduate:{enabled:false, degreeType:"none", living:"home", years:2, annualCost:0, awayMonthly:0, mastersEntranceCost:0, doctorEntranceCost:0, medicalEntranceCost:0, extraMonthly:0},
+    abroad:{enabled:false, target:"university", startYear:1, months:6, cost:0},
+    oneTime:{rows:[]}
+  };
+}
+function normalizeEducationDetail(detail){
+  const base = createDefaultEducationDetail();
+  const src = detail && typeof detail === "object" ? detail : {};
+  const normalized = {
+    university:{...base.university, ...(src.university || {}), enabled:!!(src.university || {}).enabled},
+    graduate:{...base.graduate, ...(src.graduate || {}), enabled:!!(src.graduate || {}).enabled},
+    abroad:{...base.abroad, ...(src.abroad || {}), enabled:!!(src.abroad || {}).enabled},
+    oneTime:{...base.oneTime, ...(src.oneTime || {})}
+  };
+  if(src.university && src.university.awayPremiumMonthly != null && normalized.university.awayMonthly === 0){
+    normalized.university.awayMonthly = Number(src.university.awayPremiumMonthly) || 0;
+  }
+  if(src.university && src.university.entranceCost != null && normalized.university.entranceCost === 0){
+    normalized.university.entranceCost = Number(src.university.entranceCost) || 0;
+  }
+  if(src.graduate && src.graduate.entranceCost != null){
+    const legacyEntrance = Number(src.graduate.entranceCost) || 0;
+    if(normalized.graduate.mastersEntranceCost === 0) normalized.graduate.mastersEntranceCost = legacyEntrance;
+  }
+  const oneTimeRows = [];
+  if(Array.isArray(src.oneTime?.rows)){
+    src.oneTime.rows.forEach((row, idx)=>{
+      const amount = Number(row?.cost ?? row?.amount ?? 0) || 0;
+      const label = String(row?.label || `任意教育費${idx + 1}`);
+      const stage = String(row?.stage || '');
+      if(label || stage || amount){ oneTimeRows.push({label, stage, cost:amount}); }
+    });
+  } else if(src.oneTime){
+    [1,2,3].forEach(idx=>{
+      const amount = Number(src.oneTime[`extra${idx}Cost`] || 0) || 0;
+      const age = Number(src.oneTime[`extra${idx}Age`] || 0) || 0;
+      if(amount > 0 || age > 0){ oneTimeRows.push({label:`任意教育費${idx}`, stage:'', cost:amount}); }
+    });
+  }
+  normalized.oneTime = {rows: oneTimeRows};
+  return normalized;
+}
+function hasEducationDetailEnabled(detail){
+  const d = normalizeEducationDetail(detail);
+  return !!(d.university.enabled || d.graduate.enabled || d.abroad.enabled || (d.oneTime.rows || []).some(row => Number(row.cost || 0) > 0));
+}
+function getEducationDetailForChildFromData(data, i){
+  return normalizeEducationDetail(parseEducationDetailJson(data[`c${i}_detail_json`] || ""));
+}
 function buildEducationGrid(data = {}){
   const body = document.getElementById("eduBody");
-  const normalOptions = ["公立","私立"];
-  const uniOptions = ["なし","国公立（自宅）","国公立（自宅外）","私立（自宅）","私立（自宅外）"];
+  if(!body) return;
+  const preschoolOptions = ["なし","標準","高め"];
+  const schoolOptions = ["公立","私立"];
+  const uniOptions = ["なし","短大（自宅）","短大（自宅外）","国公立大（自宅）","国公立大（自宅外）","私立大（自宅）","私立大（自宅外）"];
+  const gradOptions = ["なし","修士（自宅）","修士（自宅外）","博士（自宅）","博士（自宅外）"];
+  const abroadOptions = ["なし","あり"];
   let html = "";
   for(let i=1;i<=dynamicCounts.child;i++){
-    html += `<tr>${buildRowLabelCell("child", i, data)}`;
-    STAGE_ORDER.forEach(stage=>{
-      const options = stage === "uni" ? uniOptions : normalOptions;
-      const currentType = data[`c${i}_${stage}_type`] ?? (stage === "uni" ? "国公立（自宅）" : "公立");
-      const currentExtra = attrValue(data[`c${i}_${stage}_extra`], 0);
-      html += `<td class="edu-cell"><div class="edu-cell-inner"><select id="c${i}_${stage}_type">${options.map(opt => `<option value="${escapeAttr(opt)}" ${String(currentType) === String(opt) ? "selected" : ""}>${escapeHtml(opt)}</option>`).join("")}</select><div style="height:6px"></div><div class="input-unit"><input id="c${i}_${stage}_extra" type="number" class="moneybox" value="${currentExtra}" step="0.1"><span class="suffix">万円 / 月</span></div></div></td>`;
+    const childLabel = escapeHtml(getRowLabel(data || {}, "child", i));
+    const currentSchool = data[`child${i}_school`] ?? data[`c${i}_current_school`] ?? (i===1 ? "小4" : "年少未満");
+    const detailObj = getEducationDetailForChildFromData(data, i);
+    const detailBtnLabel = hasEducationDetailEnabled(detailObj) ? "詳細済" : "詳細";
+    html += `<tr><td><span class="row-label-btn row-label-readonly">${childLabel}</span><input type="hidden" id="child${i}_name" value="${escapeAttr(getRowLabel(data || {}, "child", i))}"><input type="hidden" id="child${i}_custom" value="${isRowCustom(data || {}, "child", i) ? "true" : "false"}"></td>`;
+    html += `<td class="edu-cell"><div class="edu-cell-inner"><div class="edu-cell-readonly">${escapeHtml(currentSchool)}</div></div></td>`;
+    const stageDefs = [
+      {key:"preschool", options:preschoolOptions, defaultType:"標準", suffix:"万円 / 月", step:"0.1"},
+      {key:"elem", options:schoolOptions, defaultType:"公立", suffix:"万円 / 月", step:"0.1"},
+      {key:"junior", options:schoolOptions, defaultType:"公立", suffix:"万円 / 月", step:"0.1"},
+      {key:"high", options:schoolOptions, defaultType:"公立", suffix:"万円 / 月", step:"0.1"},
+      {key:"uni", options:uniOptions, defaultType:"国公立大（自宅）", suffix:"万円 / 月", step:"0.1"},
+      {key:"grad", options:gradOptions, defaultType:"なし", suffix:"万円 / 月", step:"0.1"}
+    ];
+    stageDefs.forEach(def=>{
+      const currentType = data[`c${i}_${def.key}_type`] ?? def.defaultType;
+      const currentExtra = attrValue(data[`c${i}_${def.key}_extra`], 0);
+      html += `<td class="edu-cell"><div class="edu-cell-inner"><select id="c${i}_${def.key}_type">${def.options.map(opt => `<option value="${escapeAttr(opt)}" ${String(currentType) === String(opt) ? "selected" : ""}>${escapeHtml(opt)}</option>`).join("")}</select><div style="height:6px"></div><div class="input-unit"><input id="c${i}_${def.key}_extra" type="number" class="moneybox" value="${currentExtra}" step="${def.step}"><span class="suffix">${def.suffix}</span></div></div></td>`;
     });
+    const abroadType = data[`c${i}_abroad_type`] ?? "なし";
+    const abroadAmount = attrValue(data[`c${i}_abroad_amount`], 0);
+    html += `<td class="edu-cell"><div class="edu-cell-inner"><select id="c${i}_abroad_type">${abroadOptions.map(opt => `<option value="${escapeAttr(opt)}" ${String(abroadType) === String(opt) ? "selected" : ""}>${escapeHtml(opt)}</option>`).join("")}</select><div style="height:6px"></div><div class="input-unit"><input id="c${i}_abroad_amount" type="number" class="moneybox" value="${abroadAmount}" step="1"><span class="suffix">万円</span></div></div></td>`;
+    html += `<td class="edu-cell edu-cell-detail"><div class="edu-cell-inner"><button type="button" class="loan-detail-btn edu-detail-open-btn" data-edu-detail-open="${i}">${detailBtnLabel}</button><input type="hidden" id="c${i}_detail_json" value="${escapeAttr(JSON.stringify(detailObj))}"></div></td>`;
     html += `</tr>`;
   }
   body.innerHTML = html;
@@ -1725,7 +1975,7 @@ function getAllInputs(){
   const data = {};
   document.querySelectorAll("input, select").forEach(el=>{
     if(!el.id) return;
-    if(el.closest && (el.closest("#loanDetailModal") || el.closest("#incomeCurveModal"))) return;
+    if(el.closest && (el.closest("#loanDetailModal") || el.closest("#incomeCurveModal") || el.closest("#educationDetailModal"))) return;
     if(el.type === "checkbox") data[el.id] = el.checked;
     else if(el.dataset.numericReady === "1") data[el.id] = sanitizeNumericText(el.value, true);
     else data[el.id] = el.value;
@@ -2409,11 +2659,14 @@ function getScenarioFromDOM(){
   const educationMatrix = {};
   for(let i=1;i<=dynamicCounts.child;i++){
     educationMatrix[i] = {
-      kind:{type:document.getElementById(`c${i}_kind_type`).value, extraMonth:numInput(`c${i}_kind_extra`, 0)},
+      currentSchool: document.getElementById(`child${i}_school`)?.value || document.getElementById(`c${i}_current_school`)?.value || "年少未満",
+      preschool:{type:document.getElementById(`c${i}_preschool_type`).value, extraMonth:numInput(`c${i}_preschool_extra`, 0)},
       elem:{type:document.getElementById(`c${i}_elem_type`).value, extraMonth:numInput(`c${i}_elem_extra`, 0)},
       junior:{type:document.getElementById(`c${i}_junior_type`).value, extraMonth:numInput(`c${i}_junior_extra`, 0)},
       high:{type:document.getElementById(`c${i}_high_type`).value, extraMonth:numInput(`c${i}_high_extra`, 0)},
-      uni:{type:document.getElementById(`c${i}_uni_type`).value, extraMonth:numInput(`c${i}_uni_extra`, 0)}
+      uni:{type:document.getElementById(`c${i}_uni_type`).value, extraMonth:numInput(`c${i}_uni_extra`, 0)},
+      grad:{type:document.getElementById(`c${i}_grad_type`).value, extraMonth:numInput(`c${i}_grad_extra`, 0)},
+      abroad:{type:document.getElementById(`c${i}_abroad_type`).value, amount:numInput(`c${i}_abroad_amount`, 0)}
     };
   }
 
@@ -2529,27 +2782,286 @@ function getScenarioFromDOM(){
   };
 }
 
+function getEducationSimpleSummaryItems(childIndex){
+  const data = migrateLegacyData(getAllInputs());
+  return [
+    ["現在の学校", data[`child${childIndex}_school`] ?? ""],
+    ["未就学", data[`c${childIndex}_preschool_type`] ?? ""],
+    ["小学校", `${data[`c${childIndex}_elem_type`] ?? ""} / 追加${attrValue(data[`c${childIndex}_elem_extra`],0)}万`],
+    ["中学校", `${data[`c${childIndex}_junior_type`] ?? ""} / 追加${attrValue(data[`c${childIndex}_junior_extra`],0)}万`],
+    ["高校", `${data[`c${childIndex}_high_type`] ?? ""} / 追加${attrValue(data[`c${childIndex}_high_extra`],0)}万`],
+    ["大学", `${data[`c${childIndex}_uni_type`] ?? ""} / 追加${attrValue(data[`c${childIndex}_uni_extra`],0)}万`],
+    ["大学院", `${data[`c${childIndex}_grad_type`] ?? ""} / 追加${attrValue(data[`c${childIndex}_grad_extra`],0)}万`],
+    ["留学加算", (data[`c${childIndex}_abroad_type`] === "あり") ? `あり / ${attrValue(data[`c${childIndex}_abroad_amount`],0)}万円` : "なし"]
+  ];
+}
+function getEducationOneTimeStageOptions(){
+  return ["", "年少未満", "年少相当", "年中相当", "年長相当", "小1", "小2", "小3", "小4", "小5", "小6", "中1", "中2", "中3", "高1", "高2", "高3", "短大1", "短大2", "大1", "大2", "大3", "大4", "修士1", "修士2", "博士1", "博士2", "博士3"];
+}
+function formatEduDetailMoneyDisplay(value, suffix){
+  return `${Number(value || 0).toLocaleString("ja-JP")} 万円${suffix ? ` / ${suffix}` : ""}`;
+}
+function getUniversityDetailStandardValues(schoolType){
+  switch(schoolType){
+    case "junior_college": return {years:2, annual:120, entrance:25, awayMonthly:12};
+    case "national_public": return {years:4, annual:80, entrance:28, awayMonthly:14};
+    case "national_public_medical": return {years:6, annual:90, entrance:28, awayMonthly:14};
+    case "private_liberal": return {years:4, annual:120, entrance:25, awayMonthly:14};
+    case "private_science": return {years:4, annual:155, entrance:27, awayMonthly:14};
+    case "private_medical": return {years:6, annual:482, entrance:100, awayMonthly:16};
+    default: return {years:4, annual:0, entrance:0, awayMonthly:0};
+  }
+}
+function getGraduateDetailStandardValues(degreeType){
+  switch(degreeType){
+    case "masters_public": return {years:2, annual:82, awayMonthly:12, mastersEntrance:28, doctorEntrance:28, medicalEntrance:0};
+    case "masters_private": return {years:2, annual:95, awayMonthly:12, mastersEntrance:20, doctorEntrance:20, medicalEntrance:0};
+    case "doctor_public": return {years:5, annual:82, awayMonthly:12, mastersEntrance:28, doctorEntrance:28, medicalEntrance:0};
+    case "doctor_private": return {years:5, annual:95, awayMonthly:12, mastersEntrance:20, doctorEntrance:20, medicalEntrance:0};
+    case "medical_grad_public": return {years:4, annual:90, awayMonthly:12, mastersEntrance:0, doctorEntrance:0, medicalEntrance:28};
+    case "medical_grad_private": return {years:4, annual:120, awayMonthly:14, mastersEntrance:0, doctorEntrance:0, medicalEntrance:30};
+    default: return {years:2, annual:0, awayMonthly:0, mastersEntrance:0, doctorEntrance:0, medicalEntrance:0};
+  }
+}
+function updateEducationDetailStandardDisplays(){
+  const univType = document.getElementById('eduDetailUniversitySchoolType')?.value || 'national_public';
+  const univStd = getUniversityDetailStandardValues(univType);
+  const univAnnualEl = document.getElementById('eduDetailUniversityStandardAnnual');
+  const univEntranceEl = document.getElementById('eduDetailUniversityStandardEntrance');
+  const univAwayEl = document.getElementById('eduDetailUniversityStandardAwayMonthly');
+  if(univAnnualEl) univAnnualEl.textContent = formatEduDetailMoneyDisplay(univStd.annual, '年');
+  if(univEntranceEl) univEntranceEl.textContent = formatEduDetailMoneyDisplay(univStd.entrance, '');
+  if(univAwayEl) univAwayEl.textContent = formatEduDetailMoneyDisplay(univStd.awayMonthly, '月');
+
+  const gradType = document.getElementById('eduDetailGraduateDegreeType')?.value || 'none';
+  const gradStd = getGraduateDetailStandardValues(gradType);
+  const gradAnnualEl = document.getElementById('eduDetailGraduateStandardAnnual');
+  const gradAwayEl = document.getElementById('eduDetailGraduateStandardAwayMonthly');
+  const gradMastersStdEl = document.getElementById('eduDetailGraduateStandardMastersEntrance');
+  const gradDoctorStdEl = document.getElementById('eduDetailGraduateStandardDoctorEntrance');
+  const gradMedicalStdEl = document.getElementById('eduDetailGraduateStandardMedicalEntrance');
+  if(gradAnnualEl) gradAnnualEl.textContent = formatEduDetailMoneyDisplay(gradStd.annual, '年');
+  if(gradAwayEl) gradAwayEl.textContent = formatEduDetailMoneyDisplay(gradStd.awayMonthly, '月');
+  if(gradMastersStdEl) gradMastersStdEl.textContent = formatEduDetailMoneyDisplay(gradStd.mastersEntrance, '');
+  if(gradDoctorStdEl) gradDoctorStdEl.textContent = formatEduDetailMoneyDisplay(gradStd.doctorEntrance, '');
+  if(gradMedicalStdEl) gradMedicalStdEl.textContent = formatEduDetailMoneyDisplay(gradStd.medicalEntrance, '');
+}
+function renderEducationDetailSimpleSummary(childIndex){
+  const box = document.getElementById('educationDetailSimpleSummary');
+  if(!box) return;
+  const items = getEducationSimpleSummaryItems(childIndex);
+  const first = items[0];
+  const rest = items.slice(1);
+  let html = '';
+  if(first){
+    html += `<div class="edu-detail-summary-item edu-detail-summary-item-full"><span class="edu-detail-summary-label">${escapeHtml(first[0])}：</span><span class="edu-detail-summary-value">${escapeHtml(String(first[1] ?? ''))}</span></div>`;
+  }
+  html += '<div class="edu-detail-summary-linebreak"></div>';
+  html += rest.map(([label,val])=>`<div class="edu-detail-summary-item"><span class="edu-detail-summary-label">${escapeHtml(label)}：</span><span class="edu-detail-summary-value">${escapeHtml(String(val ?? ''))}</span></div>`).join('');
+  box.innerHTML = html;
+}
+function syncEducationDetailBlockStates(){
+  [['educationDetailUniversityBlock','eduDetailUniversityEnabled'],['educationDetailGraduateBlock','eduDetailGraduateEnabled'],['educationDetailAbroadBlock','eduDetailAbroadEnabled']].forEach(([blockId,checkId])=>{
+    const block = document.getElementById(blockId);
+    const on = !!document.getElementById(checkId)?.checked;
+    if(block) block.classList.toggle('disabled', !on);
+  });
+  const univAwayField = document.getElementById('eduDetailUniversityAwayMonthly');
+  if(univAwayField){ univAwayField.disabled = !document.getElementById('eduDetailUniversityEnabled')?.checked || document.getElementById('eduDetailUniversityLiving')?.value !== 'away'; }
+  const gradAwayField = document.getElementById('eduDetailGraduateAwayMonthly');
+  if(gradAwayField){ gradAwayField.disabled = !document.getElementById('eduDetailGraduateEnabled')?.checked || document.getElementById('eduDetailGraduateLiving')?.value !== 'away'; }
+  const gradType = document.getElementById('eduDetailGraduateDegreeType')?.value || 'none';
+  const isMedicalGrad = gradType === 'medical_grad_public' || gradType === 'medical_grad_private';
+  const generalGroup = document.getElementById('eduDetailGraduateGeneralEntranceGroup');
+  const medicalGroup = document.getElementById('eduDetailGraduateMedicalEntranceGroup');
+  if(generalGroup) generalGroup.classList.toggle('edu-detail-hidden', isMedicalGrad);
+  if(medicalGroup) medicalGroup.classList.toggle('edu-detail-hidden', !isMedicalGrad);
+}
+function addEducationDetailOneTimeRow(){
+  const d = normalizeEducationDetail(educationDetailDraft);
+  const rows = Array.isArray(d.oneTime.rows) ? d.oneTime.rows.slice() : [];
+  rows.push({label:`任意教育費${rows.length + 1}`, stage:'', cost:0});
+  educationDetailDraft = {...d, oneTime:{rows}};
+  renderEducationDetailOneTimeRows();
+}
+function removeEducationDetailOneTimeRow(index){
+  const d = normalizeEducationDetail(educationDetailDraft);
+  const rows = (d.oneTime.rows || []).filter((_, i)=>i !== index).map((row, idx)=>({label:`任意教育費${idx + 1}`, stage:String(row.stage || ''), cost:Number(row.cost || 0) || 0}));
+  educationDetailDraft = {...d, oneTime:{rows}};
+  renderEducationDetailOneTimeRows();
+}
+function renderEducationDetailOneTimeRows(){
+  const body = document.getElementById('eduDetailOneTimeBody');
+  if(!body) return;
+  const rows = normalizeEducationDetail(educationDetailDraft).oneTime.rows || [];
+  const stageOptions = getEducationOneTimeStageOptions();
+  body.innerHTML = rows.map((row, idx)=>{
+    const label = escapeHtml(row.label || `任意教育費${idx + 1}`);
+    const stage = String(row.stage || '');
+    const cost = attrValue(row.cost, 0);
+    return `<tr data-one-time-row="${idx}"><td>${label}</td><td><select data-one-time-stage="${idx}">${stageOptions.map(opt => `<option value="${escapeAttr(opt)}" ${stage===opt?'selected':''}>${opt ? escapeHtml(opt) : '選択'}</option>`).join('')}</select></td><td><div class="input-unit"><input data-one-time-cost="${idx}" type="number" class="moneybox" value="${cost}" step="1"><span class="suffix">万円</span></div></td><td style="text-align:center;"><button type="button" class="icon-btn" data-one-time-remove="${idx}">×</button></td></tr>`;
+  }).join('');
+  enhanceNumericInputs(body);
+}
+function fillEducationDetailModalFromDraft(){
+  const d = normalizeEducationDetail(educationDetailDraft);
+  const univStd = getUniversityDetailStandardValues(d.university.schoolType || 'national_public');
+  const gradStd = getGraduateDetailStandardValues(d.graduate.degreeType || 'none');
+  document.getElementById('eduDetailUniversityEnabled').checked = !!d.university.enabled;
+  document.getElementById('eduDetailUniversitySchoolType').value = d.university.schoolType || 'national_public';
+  document.getElementById('eduDetailUniversityLiving').value = d.university.living || 'home';
+  document.getElementById('eduDetailUniversityYears').value = String(d.university.years || univStd.years || 4);
+  setNumericInputValue('eduDetailUniversityAnnualCost', d.university.annualCost || univStd.annual || 0);
+  setNumericInputValue('eduDetailUniversityEntranceCost', d.university.entranceCost || univStd.entrance || 0);
+  setNumericInputValue('eduDetailUniversityExtraMonthly', d.university.extraMonthly || 0);
+  setNumericInputValue('eduDetailUniversityAwayMonthly', d.university.awayMonthly || univStd.awayMonthly || 0);
+  document.getElementById('eduDetailGraduateEnabled').checked = !!d.graduate.enabled;
+  document.getElementById('eduDetailGraduateDegreeType').value = d.graduate.degreeType || 'none';
+  document.getElementById('eduDetailGraduateLiving').value = d.graduate.living || 'home';
+  setNumericInputValue('eduDetailGraduateYears', d.graduate.years || gradStd.years || 2);
+  setNumericInputValue('eduDetailGraduateAnnualCost', d.graduate.annualCost || gradStd.annual || 0);
+  setNumericInputValue('eduDetailGraduateAwayMonthly', d.graduate.awayMonthly || gradStd.awayMonthly || 0);
+  setNumericInputValue('eduDetailGraduateMastersEntranceCost', d.graduate.mastersEntranceCost || gradStd.mastersEntrance || 0);
+  setNumericInputValue('eduDetailGraduateDoctorEntranceCost', d.graduate.doctorEntranceCost || gradStd.doctorEntrance || 0);
+  setNumericInputValue('eduDetailGraduateMedicalEntranceCost', d.graduate.medicalEntranceCost || gradStd.medicalEntrance || 0);
+  setNumericInputValue('eduDetailGraduateExtraMonthly', d.graduate.extraMonthly || 0);
+  document.getElementById('eduDetailAbroadEnabled').checked = !!d.abroad.enabled;
+  document.getElementById('eduDetailAbroadTarget').value = d.abroad.target || 'university';
+  document.getElementById('eduDetailAbroadStartYear').value = String(d.abroad.startYear || 1);
+  document.getElementById('eduDetailAbroadMonths').value = String(d.abroad.months || 6);
+  setNumericInputValue('eduDetailAbroadCost', d.abroad.cost || 0);
+  renderEducationDetailOneTimeRows();
+  updateEducationDetailStandardDisplays();
+  syncEducationDetailBlockStates();
+}
+function syncEducationDetailDraftFromModal(){
+  educationDetailDraft = normalizeEducationDetail({
+    university:{
+      enabled: !!document.getElementById('eduDetailUniversityEnabled')?.checked,
+      schoolType: document.getElementById('eduDetailUniversitySchoolType')?.value || 'national_public',
+      living: document.getElementById('eduDetailUniversityLiving')?.value || 'home',
+      years: numInput('eduDetailUniversityYears', 4),
+      annualCost: numInput('eduDetailUniversityAnnualCost', 0),
+      entranceCost: numInput('eduDetailUniversityEntranceCost', 0),
+      extraMonthly: numInput('eduDetailUniversityExtraMonthly', 0),
+      awayMonthly: numInput('eduDetailUniversityAwayMonthly', 0)
+    },
+    graduate:{
+      enabled: !!document.getElementById('eduDetailGraduateEnabled')?.checked,
+      degreeType: document.getElementById('eduDetailGraduateDegreeType')?.value || 'none',
+      living: document.getElementById('eduDetailGraduateLiving')?.value || 'home',
+      years: numInput('eduDetailGraduateYears', 2),
+      annualCost: numInput('eduDetailGraduateAnnualCost', 0),
+      awayMonthly: numInput('eduDetailGraduateAwayMonthly', 0),
+      mastersEntranceCost: numInput('eduDetailGraduateMastersEntranceCost', 0),
+      doctorEntranceCost: numInput('eduDetailGraduateDoctorEntranceCost', 0),
+      medicalEntranceCost: numInput('eduDetailGraduateMedicalEntranceCost', 0),
+      extraMonthly: numInput('eduDetailGraduateExtraMonthly', 0)
+    },
+    abroad:{
+      enabled: !!document.getElementById('eduDetailAbroadEnabled')?.checked,
+      target: document.getElementById('eduDetailAbroadTarget')?.value || 'university',
+      startYear: numInput('eduDetailAbroadStartYear', 1),
+      months: numInput('eduDetailAbroadMonths', 6),
+      cost: numInput('eduDetailAbroadCost', 0)
+    },
+    oneTime:{
+      rows: Array.from(document.querySelectorAll('#eduDetailOneTimeBody tr[data-one-time-row]')).map((tr, idx)=>({
+        label:`任意教育費${idx + 1}`,
+        stage: tr.querySelector('[data-one-time-stage]')?.value || '',
+        cost: numValue(tr.querySelector('[data-one-time-cost]')?.value || '', 0)
+      })).filter(row => row.stage || Number(row.cost || 0) > 0)
+    }
+  });
+  return educationDetailDraft;
+}
+function openEducationDetailModal(childIndex){
+  currentEducationDetailChildIndex = childIndex;
+  const data = migrateLegacyData(getAllInputs());
+  const childName = getRowLabel(data, 'child', childIndex);
+  document.getElementById('educationDetailTitle').textContent = `教育費詳細（${childName}）`;
+  renderEducationDetailSimpleSummary(childIndex);
+  educationDetailDraft = getEducationDetailForChildFromData(data, childIndex);
+  fillEducationDetailModalFromDraft();
+  document.getElementById('educationDetailModal').classList.add('show');
+}
+function closeEducationDetailModal(){
+  currentEducationDetailChildIndex = null;
+  educationDetailDraft = null;
+  document.getElementById('educationDetailModal')?.classList.remove('show');
+}
+function saveEducationDetailModal(){
+  if(!currentEducationDetailChildIndex) return;
+  const detail = syncEducationDetailDraftFromModal();
+  const hidden = document.getElementById(`c${currentEducationDetailChildIndex}_detail_json`);
+  if(hidden) hidden.value = JSON.stringify(detail);
+  syncCurrentScenarioFromDOM(false);
+  renderDynamicSections(migrateLegacyData(getAllInputs()));
+  draw();
+  persistState();
+  closeEducationDetailModal();
+}
 function getStageFromGrade(grade){
-  if(grade >= -2 && grade <= 0) return "kind";
+  if(grade >= -3 && grade <= 0) return "preschool";
   if(grade >= 1 && grade <= 6) return "elem";
   if(grade >= 7 && grade <= 9) return "junior";
   if(grade >= 10 && grade <= 12) return "high";
-  if(grade >= 13 && grade <= 16) return "uni";
+  if(grade >= 13 && grade <= 18) return "uni";
+  if(grade >= 19 && grade <= 23) return "grad";
   return null;
 }
 function getBaseEduCost(grade, type){
-  if(grade >= -2 && grade <= 0) return type==="私立" ? 70 : 25;
+  if(grade >= -3 && grade <= 0){
+    if(type === "高め") return 70;
+    if(type === "標準") return 25;
+    return 0;
+  }
   if(grade >= 1 && grade <= 6) return type==="私立" ? 160 : 35;
   if(grade >= 7 && grade <= 9) return type==="私立" ? 140 : 50;
   if(grade >= 10 && grade <= 12) return type==="私立" ? 100 : 45;
-  if(grade >= 13 && grade <= 16){
+  if(grade >= 13 && grade <= 14){
     switch(type){
-      case "国公立（自宅）": return 80;
-      case "国公立（自宅外）": return 250;
-      case "私立（自宅）": return 150;
-      case "私立（自宅外）": return 320;
+      case "短大（自宅）": return 120;
+      case "短大（自宅外）": return 260;
+      default: return 0;
+    }
+  }
+  if(grade >= 15 && grade <= 18){
+    switch(type){
+      case "国公立大（自宅）": return 80;
+      case "国公立大（自宅外）": return 250;
+      case "私立大（自宅）": return 150;
+      case "私立大（自宅外）": return 320;
       default:return 0;
     }
+  }
+  if(grade >= 19 && grade <= 20){
+    switch(type){
+      case "修士（自宅）": return 90;
+      case "修士（自宅外）": return 230;
+      case "博士（自宅）": return 90;
+      case "博士（自宅外）": return 230;
+      default:return 0;
+    }
+  }
+  if(grade >= 21 && grade <= 23){
+    switch(type){
+      case "博士（自宅）": return 90;
+      case "博士（自宅外）": return 230;
+      default:return 0;
+    }
+  }
+  return 0;
+}
+function getStudyAbroadCostForYear(childEdu, startGrade, grade){
+  if(!childEdu || childEdu.abroad?.type !== "あり") return 0;
+  if((childEdu.uni?.type || "なし") !== "なし"){
+    const targetGrade = Math.max(startGrade, 16);
+    return grade === targetGrade ? (childEdu.abroad.amount || 0) : 0;
+  }
+  if((childEdu.grad?.type || "なし") !== "なし"){
+    const targetGrade = Math.max(startGrade, 19);
+    return grade === targetGrade ? (childEdu.abroad.amount || 0) : 0;
   }
   return 0;
 }
@@ -2557,12 +3069,17 @@ function getEducationCostForYear(cfg, yearIndex){
   let total = 0;
   const byChild = {};
   cfg.children.forEach(child=>{
-    const startGrade = gradeMap[child.school] ?? -3;
+    const childEdu = cfg.educationMatrix[child.idx] || {};
+    const startSchool = childEdu.currentSchool || child.school;
+    const startGrade = gradeMap[startSchool] ?? -3;
     const grade = startGrade + yearIndex;
     const stage = getStageFromGrade(grade);
     if(!stage){ byChild[child.idx] = 0; return; }
-    const cell = cfg.educationMatrix[child.idx][stage];
-    const val = getBaseEduCost(grade, cell.type) + ((cell.extraMonth||0) * 12);
+    const cell = childEdu[stage];
+    const baseVal = getBaseEduCost(grade, cell?.type || "");
+    const extraVal = (cell?.extraMonth || 0) * 12;
+    const abroadVal = getStudyAbroadCostForYear(childEdu, startGrade, grade);
+    const val = baseVal + extraVal + abroadVal;
     byChild[child.idx] = val;
     total += val;
   });
@@ -4447,6 +4964,8 @@ document.getElementById("homeDetailOn")?.addEventListener("change", ()=>{
   if(isOn){
     if(!hasStoredLoanDetailValues()) initializeLoanDetailStoredFromSimple();
     syncSimpleLoanInputsFromStoredDetailFields();
+    setNumericInputValue("homeAge", getHiddenNumericValue("homeDetailBuyAge", numInput("homeAge", 0)));
+    setNumericInputValue("homeDown", getHiddenNumericValue("homeDetailDown", numInput("homeDown", 0)));
   }
   updateHomeDetailUIState();
   updateLoanSummary();
@@ -4501,6 +5020,42 @@ document.querySelector("#loanDetailModal .loan-detail-modal")?.addEventListener(
 ["mousedown","mouseup","dblclick","selectstart"].forEach(evt=>{
   document.querySelector("#loanDetailModal .loan-detail-modal")?.addEventListener(evt, (e)=>e.stopPropagation());
 });
+document.getElementById('eduBody')?.addEventListener('click', (e)=>{
+  const btn = e.target.closest('[data-edu-detail-open]');
+  if(!btn) return;
+  openEducationDetailModal(+(btn.dataset.eduDetailOpen || 0));
+});
+document.getElementById('cancelEducationDetailBtn')?.addEventListener('click', closeEducationDetailModal);
+document.getElementById('saveEducationDetailBtn')?.addEventListener('click', saveEducationDetailModal);
+['eduDetailUniversityEnabled','eduDetailGraduateEnabled','eduDetailAbroadEnabled','eduDetailUniversityLiving','eduDetailGraduateLiving','eduDetailUniversitySchoolType','eduDetailGraduateDegreeType'].forEach(id=>{
+  document.getElementById(id)?.addEventListener('change', ()=>{
+    updateEducationDetailStandardDisplays();
+    if(id === 'eduDetailUniversitySchoolType'){
+      const std = getUniversityDetailStandardValues(document.getElementById('eduDetailUniversitySchoolType')?.value || 'national_public');
+      setNumericInputValue('eduDetailUniversityYears', std.years);
+    }
+    if(id === 'eduDetailGraduateDegreeType'){
+      const std = getGraduateDetailStandardValues(document.getElementById('eduDetailGraduateDegreeType')?.value || 'none');
+      setNumericInputValue('eduDetailGraduateYears', std.years);
+    }
+    syncEducationDetailBlockStates();
+  });
+});
+document.getElementById('eduDetailOneTimeAddBtn')?.addEventListener('click', ()=>{ addEducationDetailOneTimeRow(); persistState(); });
+document.getElementById('eduDetailOneTimeBody')?.addEventListener('click', (e)=>{
+  const btn = e.target.closest('[data-one-time-remove]');
+  if(!btn) return;
+  removeEducationDetailOneTimeRow(Number(btn.dataset.oneTimeRemove || 0));
+  persistState();
+});
+document.getElementById('eduDetailOneTimeBody')?.addEventListener('change', ()=>{ syncEducationDetailDraftFromModal(); persistState(); });
+document.querySelector('#educationDetailModal .edu-detail-modal')?.addEventListener('click', (e)=>e.stopPropagation());
+['mousedown','mouseup','dblclick','selectstart'].forEach(evt=>{
+  document.querySelector('#educationDetailModal .edu-detail-modal')?.addEventListener(evt, (e)=>e.stopPropagation());
+});
+let educationDetailBackdropPointerDown = false;
+document.getElementById('educationDetailModal')?.addEventListener('mousedown', (e)=>{ educationDetailBackdropPointerDown = e.target === e.currentTarget; });
+document.getElementById('educationDetailModal')?.addEventListener('mouseup', (e)=>{ if(educationDetailBackdropPointerDown && e.target === e.currentTarget) closeEducationDetailModal(); educationDetailBackdropPointerDown = false; });
 document.getElementById("incomeCurveAddPointBtn")?.addEventListener("click", addIncomeCurvePoint);
 document.getElementById("cancelIncomeCurveBtn")?.addEventListener("click", closeIncomeCurveModal);
 document.getElementById("saveIncomeCurveBtn")?.addEventListener("click", saveIncomeCurveModal);
