@@ -350,11 +350,18 @@
   .edu-detail-pairs{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px 12px;grid-column:1 / -1;}
   .edu-detail-pair-row{display:contents;}
   .edu-detail-onetime-actions{display:flex;justify-content:flex-end;margin:0 0 8px;}
-  .edu-detail-onetime-table-wrap{overflow-x:auto;}
-  .edu-detail-onetime-table{width:100%;border-collapse:collapse;font-size:.95rem;}
+  .edu-detail-onetime-table-wrap{overflow-x:visible;}
+  .edu-detail-onetime-table{width:100%;min-width:0;table-layout:fixed;border-collapse:collapse;font-size:.95rem;}
   .edu-detail-onetime-table th,.edu-detail-onetime-table td{border:1px solid var(--border);padding:8px;vertical-align:middle;background:#fff;}
   .edu-detail-onetime-table th{background:#f8fafc;font-weight:700;text-align:center;}
+  .edu-detail-onetime-table th:nth-child(1),.edu-detail-onetime-table td:nth-child(1){width:21%;}
+  .edu-detail-onetime-table th:nth-child(2),.edu-detail-onetime-table td:nth-child(2){width:30%;}
+  .edu-detail-onetime-table th:nth-child(3),.edu-detail-onetime-table td:nth-child(3){width:35%;}
+  .edu-detail-onetime-table th:nth-child(4),.edu-detail-onetime-table td:nth-child(4){width:14%;}
   .edu-detail-onetime-table td .input-unit,.edu-detail-onetime-table td select,.edu-detail-onetime-table td input[type=text],.edu-detail-onetime-table td input[type=number]{width:100%;max-width:100%;}
+  
+  .edu-detail-onetime-table td:nth-child(2) select{min-width:0;}
+  .edu-detail-onetime-table td:nth-child(3) .input-unit{max-width:220px;margin:0 auto;}
   .edu-detail-onetime-table .icon-btn{min-width:34px;height:34px;padding:0;}
   .edu-detail-field{display:flex;flex-direction:column;gap:4px;min-width:0;}
   .edu-detail-field > label{font-size:.92rem;color:#374151;}
@@ -393,6 +400,12 @@
     .loan-prepay-table th,.loan-prepay-table td{padding:4px 2px;font-size:.82rem;}
     .loan-prepay-table .suffix{font-size:.72rem;}
     .loan-prepay-table select,.loan-prepay-table input[type=number],.loan-prepay-table button{font-size:.82rem;padding:4px 3px;}
+  }
+  @media (max-width:640px){
+    .edu-detail-onetime-table{min-width:520px;}
+    .edu-detail-onetime-table th,.edu-detail-onetime-table td{padding:6px 4px;font-size:.84rem;}
+    .edu-detail-onetime-table td:nth-child(2) select{min-width:112px;}
+    .edu-detail-onetime-table td:nth-child(3) .input-unit{max-width:190px;}
   }
   .loan-detail-result{background:#fafafa;border:1px solid var(--border);border-radius:12px;padding:10px;line-height:1.7;}
   .loan-detail-result strong{color:#0f172a;}
@@ -1083,6 +1096,7 @@
       <div class="subhead">教育費</div>
       <div class="help">各セルの上段で区分、下段で追加費用を入力してください。現在の学校を起点に教育費を計算します。</div>
       <div class="help">追加費用（月）は、標準費用に含まれない個別の上乗せ分です。例：塾、習い事、教材費、通学費、部活費など。大学・大学院で「自宅外」を選んだ場合の標準的な住居費・生活費は基本費用に含む想定です。それを超える分のみ、必要に応じて追加費用（月）に入力してください。</div>
+      <div class="help">詳細設定は大学・大学院・留学ごとに独立して有効になります。初回に詳細設定を開いたときは、その時点の簡単設定をもとに詳細設定の初期値を作成します。以後は簡単設定と詳細設定を独立して保持し、チェックが入っている項目は詳細設定側の値を使用し、チェックが入っていない項目は簡単設定側の値を使用します。詳細設定をいったん保存した後にチェックを外した場合も、入力済みの詳細値は保持したまま、計算では簡単設定側の値を使用します。任意教育費は入力がある場合に加算されます。</div>
       <div class="edu-wrap">
         <table>
           <tr>
@@ -1645,8 +1659,75 @@ function hasEducationDetailEnabled(detail){
   const d = normalizeEducationDetail(detail);
   return !!(d.university.enabled || d.graduate.enabled || d.abroad.enabled || (d.oneTime.rows || []).some(row => Number(row.cost || 0) > 0));
 }
+function mapSimpleUniversityTypeToDetail(simpleType){
+  switch(String(simpleType || '')){
+    case '短大（自宅）': return {schoolType:'junior_college', living:'home'};
+    case '短大（自宅外）': return {schoolType:'junior_college', living:'away'};
+    case '国公立大（自宅外）': return {schoolType:'national_public', living:'away'};
+    case '私立大（自宅）': return {schoolType:'private_liberal', living:'home'};
+    case '私立大（自宅外）': return {schoolType:'private_liberal', living:'away'};
+    case 'なし': return {schoolType:'national_public', living:'home'};
+    case '国公立大（自宅）':
+    default: return {schoolType:'national_public', living:'home'};
+  }
+}
+function mapSimpleGraduateTypeToDetail(simpleType){
+  switch(String(simpleType || '')){
+    case '修士（自宅）': return {degreeType:'masters_public', living:'home'};
+    case '修士（自宅外）': return {degreeType:'masters_public', living:'away'};
+    case '博士（自宅）': return {degreeType:'doctor_public', living:'home'};
+    case '博士（自宅外）': return {degreeType:'doctor_public', living:'away'};
+    case 'なし':
+    default: return {degreeType:'none', living:'home'};
+  }
+}
+function buildEducationDetailInitialFromSimple(data, i){
+  const universityBase = mapSimpleUniversityTypeToDetail(data[`c${i}_uni_type`] || '国公立大（自宅）');
+  const universityStd = getUniversityDetailStandardValues(universityBase.schoolType);
+  const graduateBase = mapSimpleGraduateTypeToDetail(data[`c${i}_grad_type`] || 'なし');
+  const graduateStd = getGraduateDetailStandardValues(graduateBase.degreeType);
+  return normalizeEducationDetail({
+    university:{
+      enabled:false,
+      schoolType: universityBase.schoolType,
+      living: universityBase.living,
+      years: universityStd.years || 4,
+      annualCost: universityStd.annual || 0,
+      entranceCost: universityStd.entrance || 0,
+      extraMonthly: Number(data[`c${i}_uni_extra`] || 0) || 0,
+      awayMonthly: universityBase.living === 'away' ? (universityStd.awayMonthly || 0) : 0
+    },
+    graduate:{
+      enabled:false,
+      degreeType: graduateBase.degreeType,
+      living: graduateBase.living,
+      years: graduateStd.years || 2,
+      annualCost: graduateStd.annual || 0,
+      awayMonthly: graduateBase.living === 'away' ? (graduateStd.awayMonthly || 0) : 0,
+      mastersEntranceCost: graduateBase.degreeType === 'masters_public' || graduateBase.degreeType === 'masters_private' || graduateBase.degreeType === 'doctor_public' || graduateBase.degreeType === 'doctor_private' ? (graduateStd.mastersEntrance || 0) : 0,
+      doctorEntranceCost: graduateBase.degreeType === 'doctor_public' || graduateBase.degreeType === 'doctor_private' ? (graduateStd.doctorEntrance || 0) : 0,
+      medicalEntranceCost: graduateBase.degreeType === 'medical_grad_public' || graduateBase.degreeType === 'medical_grad_private' ? (graduateStd.medicalEntrance || 0) : 0,
+      extraMonthly: Number(data[`c${i}_grad_extra`] || 0) || 0
+    },
+    abroad:{
+      enabled:false,
+      target:'university',
+      startYear:1,
+      months:12,
+      cost:Number(data[`c${i}_abroad_amount`] || 0) || 0
+    },
+    oneTime:{rows:[]}
+  });
+}
 function getEducationDetailForChildFromData(data, i){
-  return normalizeEducationDetail(parseEducationDetailJson(data[`c${i}_detail_json`] || ""));
+  const raw = String(data[`c${i}_detail_json`] || '').trim();
+  if(raw){
+    const parsed = parseEducationDetailJson(raw);
+    if(parsed && typeof parsed === 'object' && Object.keys(parsed).length){
+      return normalizeEducationDetail(parsed);
+    }
+  }
+  return buildEducationDetailInitialFromSimple(data, i);
 }
 function buildEducationGrid(data = {}){
   const body = document.getElementById("eduBody");
@@ -1660,8 +1741,16 @@ function buildEducationGrid(data = {}){
   for(let i=1;i<=dynamicCounts.child;i++){
     const childLabel = escapeHtml(getRowLabel(data || {}, "child", i));
     const currentSchool = data[`child${i}_school`] ?? data[`c${i}_current_school`] ?? (i===1 ? "小4" : "年少未満");
-    const detailObj = getEducationDetailForChildFromData(data, i);
-    const detailBtnLabel = hasEducationDetailEnabled(detailObj) ? "詳細済" : "詳細";
+    const detailRaw = String(data[`c${i}_detail_json`] || '').trim();
+    let detailBtnLabel = "詳細";
+    let detailHiddenValue = '';
+    if(detailRaw){
+      const parsedDetail = parseEducationDetailJson(detailRaw);
+      if(parsedDetail && typeof parsedDetail === 'object'){
+        detailHiddenValue = detailRaw;
+        detailBtnLabel = hasEducationDetailEnabled(parsedDetail) ? "詳細済" : "詳細";
+      }
+    }
     html += `<tr><td><span class="row-label-btn row-label-readonly">${childLabel}</span><input type="hidden" id="child${i}_name" value="${escapeAttr(getRowLabel(data || {}, "child", i))}"><input type="hidden" id="child${i}_custom" value="${isRowCustom(data || {}, "child", i) ? "true" : "false"}"></td>`;
     html += `<td class="edu-cell"><div class="edu-cell-inner"><div class="edu-cell-readonly">${escapeHtml(currentSchool)}</div></div></td>`;
     const stageDefs = [
@@ -1680,7 +1769,7 @@ function buildEducationGrid(data = {}){
     const abroadType = data[`c${i}_abroad_type`] ?? "なし";
     const abroadAmount = attrValue(data[`c${i}_abroad_amount`], 0);
     html += `<td class="edu-cell"><div class="edu-cell-inner"><select id="c${i}_abroad_type">${abroadOptions.map(opt => `<option value="${escapeAttr(opt)}" ${String(abroadType) === String(opt) ? "selected" : ""}>${escapeHtml(opt)}</option>`).join("")}</select><div style="height:6px"></div><div class="input-unit"><input id="c${i}_abroad_amount" type="number" class="moneybox" value="${abroadAmount}" step="1"><span class="suffix">万円</span></div></div></td>`;
-    html += `<td class="edu-cell edu-cell-detail"><div class="edu-cell-inner"><button type="button" class="loan-detail-btn edu-detail-open-btn" data-edu-detail-open="${i}">${detailBtnLabel}</button><input type="hidden" id="c${i}_detail_json" value="${escapeAttr(JSON.stringify(detailObj))}"></div></td>`;
+    html += `<td class="edu-cell edu-cell-detail"><div class="edu-cell-inner"><button type="button" class="loan-detail-btn edu-detail-open-btn" data-edu-detail-open="${i}">${detailBtnLabel}</button><input type="hidden" id="c${i}_detail_json" value="${escapeAttr(detailHiddenValue)}"></div></td>`;
     html += `</tr>`;
   }
   body.innerHTML = html;
@@ -2867,15 +2956,39 @@ function syncEducationDetailBlockStates(){
     if(block) block.classList.toggle('disabled', !on);
   });
   const univAwayField = document.getElementById('eduDetailUniversityAwayMonthly');
-  if(univAwayField){ univAwayField.disabled = !document.getElementById('eduDetailUniversityEnabled')?.checked || document.getElementById('eduDetailUniversityLiving')?.value !== 'away'; }
+  if(univAwayField){
+    const univLivingAway = document.getElementById('eduDetailUniversityLiving')?.value === 'away';
+    const univAwayOn = !!document.getElementById('eduDetailUniversityEnabled')?.checked && univLivingAway;
+    univAwayField.disabled = !univAwayOn;
+    if(!univLivingAway) setNumericInputValue('eduDetailUniversityAwayMonthly', 0);
+  }
   const gradAwayField = document.getElementById('eduDetailGraduateAwayMonthly');
-  if(gradAwayField){ gradAwayField.disabled = !document.getElementById('eduDetailGraduateEnabled')?.checked || document.getElementById('eduDetailGraduateLiving')?.value !== 'away'; }
+  if(gradAwayField){
+    const gradLivingAway = document.getElementById('eduDetailGraduateLiving')?.value === 'away';
+    const gradAwayOn = !!document.getElementById('eduDetailGraduateEnabled')?.checked && gradLivingAway;
+    gradAwayField.disabled = !gradAwayOn;
+    if(!gradLivingAway) setNumericInputValue('eduDetailGraduateAwayMonthly', 0);
+  }
   const gradType = document.getElementById('eduDetailGraduateDegreeType')?.value || 'none';
   const isMedicalGrad = gradType === 'medical_grad_public' || gradType === 'medical_grad_private';
   const generalGroup = document.getElementById('eduDetailGraduateGeneralEntranceGroup');
   const medicalGroup = document.getElementById('eduDetailGraduateMedicalEntranceGroup');
   if(generalGroup) generalGroup.classList.toggle('edu-detail-hidden', isMedicalGrad);
   if(medicalGroup) medicalGroup.classList.toggle('edu-detail-hidden', !isMedicalGrad);
+  if(!isMedicalGrad){
+    const isDoctorTrack = gradType === 'doctor_public' || gradType === 'doctor_private';
+    const doctorField = document.getElementById('eduDetailGraduateDoctorEntranceCost');
+    const mastersField = document.getElementById('eduDetailGraduateMastersEntranceCost');
+    const medicalField = document.getElementById('eduDetailGraduateMedicalEntranceCost');
+    if(doctorField && !isDoctorTrack) setNumericInputValue('eduDetailGraduateDoctorEntranceCost', 0);
+    if(medicalField) setNumericInputValue('eduDetailGraduateMedicalEntranceCost', 0);
+    if(mastersField && gradType === 'none') setNumericInputValue('eduDetailGraduateMastersEntranceCost', 0);
+  } else {
+    const mastersField = document.getElementById('eduDetailGraduateMastersEntranceCost');
+    const doctorField = document.getElementById('eduDetailGraduateDoctorEntranceCost');
+    if(mastersField) setNumericInputValue('eduDetailGraduateMastersEntranceCost', 0);
+    if(doctorField) setNumericInputValue('eduDetailGraduateDoctorEntranceCost', 0);
+  }
 }
 function addEducationDetailOneTimeRow(){
   const d = normalizeEducationDetail(educationDetailDraft);
@@ -2911,20 +3024,20 @@ function fillEducationDetailModalFromDraft(){
   document.getElementById('eduDetailUniversitySchoolType').value = d.university.schoolType || 'national_public';
   document.getElementById('eduDetailUniversityLiving').value = d.university.living || 'home';
   document.getElementById('eduDetailUniversityYears').value = String(d.university.years || univStd.years || 4);
-  setNumericInputValue('eduDetailUniversityAnnualCost', d.university.annualCost || univStd.annual || 0);
-  setNumericInputValue('eduDetailUniversityEntranceCost', d.university.entranceCost || univStd.entrance || 0);
-  setNumericInputValue('eduDetailUniversityExtraMonthly', d.university.extraMonthly || 0);
-  setNumericInputValue('eduDetailUniversityAwayMonthly', d.university.awayMonthly || univStd.awayMonthly || 0);
+  setNumericInputValue('eduDetailUniversityAnnualCost', d.university.annualCost ?? univStd.annual ?? 0);
+  setNumericInputValue('eduDetailUniversityEntranceCost', d.university.entranceCost ?? univStd.entrance ?? 0);
+  setNumericInputValue('eduDetailUniversityExtraMonthly', d.university.extraMonthly ?? 0);
+  setNumericInputValue('eduDetailUniversityAwayMonthly', (d.university.living || 'home') === 'away' ? (d.university.awayMonthly ?? univStd.awayMonthly ?? 0) : 0);
   document.getElementById('eduDetailGraduateEnabled').checked = !!d.graduate.enabled;
   document.getElementById('eduDetailGraduateDegreeType').value = d.graduate.degreeType || 'none';
   document.getElementById('eduDetailGraduateLiving').value = d.graduate.living || 'home';
-  setNumericInputValue('eduDetailGraduateYears', d.graduate.years || gradStd.years || 2);
-  setNumericInputValue('eduDetailGraduateAnnualCost', d.graduate.annualCost || gradStd.annual || 0);
-  setNumericInputValue('eduDetailGraduateAwayMonthly', d.graduate.awayMonthly || gradStd.awayMonthly || 0);
-  setNumericInputValue('eduDetailGraduateMastersEntranceCost', d.graduate.mastersEntranceCost || gradStd.mastersEntrance || 0);
-  setNumericInputValue('eduDetailGraduateDoctorEntranceCost', d.graduate.doctorEntranceCost || gradStd.doctorEntrance || 0);
-  setNumericInputValue('eduDetailGraduateMedicalEntranceCost', d.graduate.medicalEntranceCost || gradStd.medicalEntrance || 0);
-  setNumericInputValue('eduDetailGraduateExtraMonthly', d.graduate.extraMonthly || 0);
+  setNumericInputValue('eduDetailGraduateYears', d.graduate.years ?? gradStd.years ?? 2);
+  setNumericInputValue('eduDetailGraduateAnnualCost', d.graduate.annualCost ?? gradStd.annual ?? 0);
+  setNumericInputValue('eduDetailGraduateAwayMonthly', (d.graduate.living || 'home') === 'away' ? (d.graduate.awayMonthly ?? gradStd.awayMonthly ?? 0) : 0);
+  setNumericInputValue('eduDetailGraduateMastersEntranceCost', d.graduate.mastersEntranceCost ?? gradStd.mastersEntrance ?? 0);
+  setNumericInputValue('eduDetailGraduateDoctorEntranceCost', (d.graduate.degreeType || 'none') === 'doctor_public' || (d.graduate.degreeType || 'none') === 'doctor_private' ? (d.graduate.doctorEntranceCost ?? gradStd.doctorEntrance ?? 0) : 0);
+  setNumericInputValue('eduDetailGraduateMedicalEntranceCost', ((d.graduate.degreeType || 'none') === 'medical_grad_public' || (d.graduate.degreeType || 'none') === 'medical_grad_private') ? (d.graduate.medicalEntranceCost ?? gradStd.medicalEntrance ?? 0) : 0);
+  setNumericInputValue('eduDetailGraduateExtraMonthly', d.graduate.extraMonthly ?? 0);
   document.getElementById('eduDetailAbroadEnabled').checked = !!d.abroad.enabled;
   document.getElementById('eduDetailAbroadTarget').value = d.abroad.target || 'university';
   document.getElementById('eduDetailAbroadStartYear').value = String(d.abroad.startYear || 1);
