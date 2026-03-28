@@ -350,7 +350,7 @@
   .edu-detail-pairs{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px 12px;grid-column:1 / -1;}
   .edu-detail-pair-row{display:contents;}
   .edu-detail-onetime-actions{display:flex;justify-content:flex-end;margin:0 0 8px;}
-  .edu-detail-onetime-table-wrap{overflow-x:visible;}
+  .edu-detail-onetime-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;}
   .edu-detail-onetime-table{width:100%;min-width:0;table-layout:fixed;border-collapse:collapse;font-size:.95rem;}
   .edu-detail-onetime-table th,.edu-detail-onetime-table td{border:1px solid var(--border);padding:8px;vertical-align:middle;background:#fff;}
   .edu-detail-onetime-table th{background:#f8fafc;font-weight:700;text-align:center;}
@@ -362,7 +362,8 @@
   
   .edu-detail-onetime-table td:nth-child(2) select{min-width:0;}
   .edu-detail-onetime-table td:nth-child(3) .input-unit{max-width:220px;margin:0 auto;}
-  .edu-detail-onetime-table .icon-btn{min-width:34px;height:34px;padding:0;}
+  .edu-detail-onetime-table .icon-btn{width:34px;min-width:34px;max-width:34px;height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;}
+  .loan-prepay-table .icon-btn{width:34px;min-width:34px;max-width:34px;height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center;margin:0 auto;}
   .edu-detail-field{display:flex;flex-direction:column;gap:4px;min-width:0;}
   .edu-detail-field > label{font-size:.92rem;color:#374151;}
   .edu-detail-static{display:flex;align-items:center;min-height:38px;padding:8px 10px;border:1px solid var(--border);border-radius:10px;background:#f8fafc;color:#111827;font-weight:600;}
@@ -402,10 +403,17 @@
     .loan-prepay-table select,.loan-prepay-table input[type=number],.loan-prepay-table button{font-size:.82rem;padding:4px 3px;}
   }
   @media (max-width:640px){
-    .edu-detail-onetime-table{min-width:520px;}
-    .edu-detail-onetime-table th,.edu-detail-onetime-table td{padding:6px 4px;font-size:.84rem;}
-    .edu-detail-onetime-table td:nth-child(2) select{min-width:112px;}
-    .edu-detail-onetime-table td:nth-child(3) .input-unit{max-width:190px;}
+    .edu-detail-onetime-table{min-width:0;width:100%;table-layout:fixed;}
+    .edu-detail-onetime-table th,.edu-detail-onetime-table td{padding:6px 3px;font-size:.82rem;}
+    .edu-detail-onetime-table th:nth-child(1),.edu-detail-onetime-table td:nth-child(1){width:24%;}
+    .edu-detail-onetime-table th:nth-child(2),.edu-detail-onetime-table td:nth-child(2){width:30%;}
+    .edu-detail-onetime-table th:nth-child(3),.edu-detail-onetime-table td:nth-child(3){width:30%;}
+    .edu-detail-onetime-table th:nth-child(4),.edu-detail-onetime-table td:nth-child(4){width:16%;}
+    .edu-detail-onetime-table td:nth-child(2) select{min-width:0;font-size:.82rem;padding:4px 3px;}
+    .edu-detail-onetime-table td:nth-child(3) .input-unit{max-width:none;gap:2px;}
+    .edu-detail-onetime-table td:nth-child(3) .moneybox{width:100% !important;min-width:0;}
+    .edu-detail-onetime-table .suffix{font-size:.72rem;white-space:nowrap;}
+    .edu-detail-onetime-table .icon-btn,.loan-prepay-table .icon-btn{width:30px;min-width:30px;max-width:30px;height:30px;}
     .edu-detail-preschool-table{min-width:940px;}
     .edu-detail-preschool-table th,.edu-detail-preschool-table td{padding:6px 4px;font-size:.84rem;}
     .edu-detail-preschool-table td .input-unit{max-width:150px;}
@@ -3288,7 +3296,7 @@ function createBlankEducationDetailOneTimeRow(index){
 function addEducationDetailOneTimeRow(){
   const d = normalizeEducationDetail(educationDetailDraft);
   const currentRows = Array.isArray(d.oneTime.rows) ? d.oneTime.rows.slice() : [];
-  const rows = currentRows.filter(row => row.stage || Number(row.cost || 0) > 0);
+  const rows = currentRows.length ? currentRows.map((row, idx)=>({label:`任意教育費${idx + 1}`, stage:String(row?.stage || ''), cost:Number(row?.cost || 0) || 0})) : [createBlankEducationDetailOneTimeRow(1)];
   rows.push(createBlankEducationDetailOneTimeRow(rows.length + 1));
   educationDetailDraft = {...d, oneTime:{rows}};
   renderEducationDetailOneTimeRows();
