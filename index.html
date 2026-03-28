@@ -406,7 +406,25 @@
     .edu-detail-onetime-table th,.edu-detail-onetime-table td{padding:6px 4px;font-size:.84rem;}
     .edu-detail-onetime-table td:nth-child(2) select{min-width:112px;}
     .edu-detail-onetime-table td:nth-child(3) .input-unit{max-width:190px;}
+    .edu-detail-preschool-table{min-width:940px;}
+    .edu-detail-preschool-table th,.edu-detail-preschool-table td{padding:6px 4px;font-size:.84rem;}
+    .edu-detail-preschool-table td .input-unit{max-width:150px;}
   }
+
+  .edu-detail-preschool-table-wrap{overflow-x:auto;max-width:100%;}
+  .edu-detail-preschool-table{width:100%;min-width:940px;table-layout:fixed;border-collapse:collapse;font-size:.92rem;}
+  .edu-detail-preschool-table th,.edu-detail-preschool-table td{border:1px solid var(--border);padding:6px 5px;text-align:center;vertical-align:middle;background:#fff;}
+  .edu-detail-preschool-table th{background:#f8fafc;font-weight:700;line-height:1.25;white-space:nowrap;}
+  .edu-detail-preschool-table th:nth-child(1),.edu-detail-preschool-table td:nth-child(1){width:9%;}
+  .edu-detail-preschool-table th:nth-child(2),.edu-detail-preschool-table td:nth-child(2){width:17%;}
+  .edu-detail-preschool-table th:nth-child(3),.edu-detail-preschool-table td:nth-child(3){width:13%;}
+  .edu-detail-preschool-table th:nth-child(4),.edu-detail-preschool-table td:nth-child(4){width:17%;}
+  .edu-detail-preschool-table th:nth-child(5),.edu-detail-preschool-table td:nth-child(5){width:13%;}
+  .edu-detail-preschool-table th:nth-child(6),.edu-detail-preschool-table td:nth-child(6){width:15%;}
+  .edu-detail-preschool-table th:nth-child(7),.edu-detail-preschool-table td:nth-child(7){width:16%;}
+  .edu-detail-preschool-table td select,.edu-detail-preschool-table td input[type=number],.edu-detail-preschool-table td .input-unit{width:100%;max-width:100%;}
+  .edu-detail-preschool-table td .input-unit{max-width:160px;margin:0 auto;}
+
   .loan-detail-result{background:#fafafa;border:1px solid var(--border);border-radius:12px;padding:10px;line-height:1.7;}
   .loan-detail-result strong{color:#0f172a;}
   .period-stack{display:flex;flex-direction:column;gap:4px;align-items:center;}
@@ -772,7 +790,7 @@
           <div class="loan-detail-section-title">繰上返済計画</div>
           <div class="loan-prepay-table-wrap">
             <table class="loan-prepay-table">
-              <thead><tr><th>実行年齢</th><th>金額</th><th>方式</th><th>操作</th></tr></thead>
+              <thead><tr><th>実行年齢</th><th>金額</th><th>方式</th><th>削除</th></tr></thead>
               <tbody id="loanDetailPrepayRows"></tbody>
             </table>
           </div>
@@ -795,10 +813,59 @@
     <div class="modal-card edu-detail-modal" role="dialog" aria-modal="true" aria-labelledby="educationDetailTitle">
       <div id="educationDetailTitle" class="modal-text" style="font-weight:bold;margin-bottom:10px;">教育費詳細</div>
       <div class="edu-detail-grid">
-        <div class="edu-detail-note">※ v106では教育費詳細モードの項目設計を改訂しています。大学・大学院は標準値を表示しつつ編集できる形に整理し、学校に紐づく入学金は各学校ブロック側へ集約します。</div>
+        <div class="edu-detail-note">※ 各学校段階の標準値を表示しつつ編集できます。入学一時金は、入学金に加え、制服代・教材初期費用など標準的な入学時費用を含む想定です。</div>
         <div class="edu-detail-section">
           <div class="edu-detail-section-title">簡単モードの要約</div>
           <div id="educationDetailSimpleSummary" class="edu-detail-summary"></div>
+        </div>
+        <div id="educationDetailPreschoolBlock" class="edu-detail-section edu-detail-block">
+          <label class="edu-detail-block-toggle"><input id="eduDetailPreschoolEnabled" type="checkbox"> 未就学詳細を使用する</label>
+          <div class="edu-detail-inline-note">0〜5歳の各年齢ごとに、施設種別・入園金・年額・追加費用を設定できます。</div>
+          <div class="edu-detail-preschool-table-wrap">
+            <table class="edu-detail-preschool-table">
+              <thead><tr><th>年齢</th><th>施設種別</th><th>標準入園金</th><th>入園金（編集可）</th><th>標準年額</th><th>年額（編集可）</th><th>追加費用（月）</th></tr></thead>
+              <tbody id="eduDetailPreschoolBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div id="educationDetailElementaryBlock" class="edu-detail-section edu-detail-block">
+          <label class="edu-detail-block-toggle"><input id="eduDetailElementaryEnabled" type="checkbox"> 小学校詳細を使用する</label>
+          <div class="edu-detail-fields">
+            <div class="edu-detail-field"><label for="eduDetailElementarySchoolType">学校種別</label><select id="eduDetailElementarySchoolType"><option value="public">公立</option><option value="private">私立</option></select></div>
+            <div class="edu-detail-pairs">
+              <div class="edu-detail-field"><label>標準入学一時金</label><div id="eduDetailElementaryStandardEntrance" class="edu-detail-static">0 万円</div></div>
+              <div class="edu-detail-field"><label for="eduDetailElementaryEntranceCost">入学一時金（編集可）</label><div class="input-unit"><input id="eduDetailElementaryEntranceCost" type="number" class="moneybox" value="0" step="1"><span class="suffix">万円</span></div></div>
+              <div class="edu-detail-field"><label>標準学費</label><div id="eduDetailElementaryStandardAnnual" class="edu-detail-static">0 万円 / 年</div></div>
+              <div class="edu-detail-field"><label for="eduDetailElementaryAnnualCost">学費年額（編集可）</label><div class="input-unit"><input id="eduDetailElementaryAnnualCost" type="number" class="moneybox" value="0" step="1"><span class="suffix">万円 / 年</span></div></div>
+            </div>
+            <div class="edu-detail-field edu-detail-field-wide"><label for="eduDetailElementaryExtraMonthly">追加費用（月）</label><div class="input-unit"><input id="eduDetailElementaryExtraMonthly" type="number" class="moneybox" value="0" step="0.1"><span class="suffix">万円 / 月</span></div></div>
+          </div>
+        </div>
+        <div id="educationDetailJuniorBlock" class="edu-detail-section edu-detail-block">
+          <label class="edu-detail-block-toggle"><input id="eduDetailJuniorEnabled" type="checkbox"> 中学校詳細を使用する</label>
+          <div class="edu-detail-fields">
+            <div class="edu-detail-field"><label for="eduDetailJuniorSchoolType">学校種別</label><select id="eduDetailJuniorSchoolType"><option value="public">公立</option><option value="private">私立</option></select></div>
+            <div class="edu-detail-pairs">
+              <div class="edu-detail-field"><label>標準入学一時金</label><div id="eduDetailJuniorStandardEntrance" class="edu-detail-static">0 万円</div></div>
+              <div class="edu-detail-field"><label for="eduDetailJuniorEntranceCost">入学一時金（編集可）</label><div class="input-unit"><input id="eduDetailJuniorEntranceCost" type="number" class="moneybox" value="0" step="1"><span class="suffix">万円</span></div></div>
+              <div class="edu-detail-field"><label>標準学費</label><div id="eduDetailJuniorStandardAnnual" class="edu-detail-static">0 万円 / 年</div></div>
+              <div class="edu-detail-field"><label for="eduDetailJuniorAnnualCost">学費年額（編集可）</label><div class="input-unit"><input id="eduDetailJuniorAnnualCost" type="number" class="moneybox" value="0" step="1"><span class="suffix">万円 / 年</span></div></div>
+            </div>
+            <div class="edu-detail-field edu-detail-field-wide"><label for="eduDetailJuniorExtraMonthly">追加費用（月）</label><div class="input-unit"><input id="eduDetailJuniorExtraMonthly" type="number" class="moneybox" value="0" step="0.1"><span class="suffix">万円 / 月</span></div></div>
+          </div>
+        </div>
+        <div id="educationDetailHighBlock" class="edu-detail-section edu-detail-block">
+          <label class="edu-detail-block-toggle"><input id="eduDetailHighEnabled" type="checkbox"> 高校詳細を使用する</label>
+          <div class="edu-detail-fields">
+            <div class="edu-detail-field"><label for="eduDetailHighSchoolType">学校種別</label><select id="eduDetailHighSchoolType"><option value="public">公立</option><option value="private">私立</option></select></div>
+            <div class="edu-detail-pairs">
+              <div class="edu-detail-field"><label>標準入学一時金</label><div id="eduDetailHighStandardEntrance" class="edu-detail-static">0 万円</div></div>
+              <div class="edu-detail-field"><label for="eduDetailHighEntranceCost">入学一時金（編集可）</label><div class="input-unit"><input id="eduDetailHighEntranceCost" type="number" class="moneybox" value="0" step="1"><span class="suffix">万円</span></div></div>
+              <div class="edu-detail-field"><label>標準学費</label><div id="eduDetailHighStandardAnnual" class="edu-detail-static">0 万円 / 年</div></div>
+              <div class="edu-detail-field"><label for="eduDetailHighAnnualCost">学費年額（編集可）</label><div class="input-unit"><input id="eduDetailHighAnnualCost" type="number" class="moneybox" value="0" step="1"><span class="suffix">万円 / 年</span></div></div>
+            </div>
+            <div class="edu-detail-field edu-detail-field-wide"><label for="eduDetailHighExtraMonthly">追加費用（月）</label><div class="input-unit"><input id="eduDetailHighExtraMonthly" type="number" class="moneybox" value="0" step="0.1"><span class="suffix">万円 / 月</span></div></div>
+          </div>
         </div>
         <div id="educationDetailUniversityBlock" class="edu-detail-section edu-detail-block">
           <label class="edu-detail-block-toggle"><input id="eduDetailUniversityEnabled" type="checkbox"> 大学詳細を使用する</label>
@@ -854,13 +921,13 @@
         <div id="educationDetailOneTimeBlock" class="edu-detail-section edu-detail-block">
           <div class="edu-detail-section-title">一時費用（任意教育費）</div>
           <div class="edu-detail-inline-note">例：受験費、PC購入費、留学準備費、引越初期費用、特別講習費 など</div>
-          <div class="edu-detail-onetime-actions"><button type="button" id="eduDetailOneTimeAddBtn" class="ghost-btn">＋</button></div>
           <div class="edu-detail-onetime-table-wrap">
             <table class="edu-detail-onetime-table">
               <thead><tr><th>項目</th><th>発生時期</th><th>金額</th><th>削除</th></tr></thead>
               <tbody id="eduDetailOneTimeBody"></tbody>
             </table>
           </div>
+          <div class="add-row-wrap" style="margin-top:8px;"><button type="button" id="eduDetailOneTimeAddBtn" class="add-row-btn">＋</button></div>
         </div>
       </div>
       <div class="modal-actions" style="margin-top:14px;">
@@ -1094,9 +1161,10 @@
       <input id="homeDetailPrepayJson" type="hidden" value="[]">
 
       <div class="subhead">教育費</div>
-      <div class="help">各セルの上段で区分、下段で追加費用を入力してください。現在の学校を起点に教育費を計算します。</div>
-      <div class="help">追加費用（月）は、標準費用に含まれない個別の上乗せ分です。例：塾、習い事、教材費、通学費、部活費など。大学・大学院で「自宅外」を選んだ場合の標準的な住居費・生活費は基本費用に含む想定です。それを超える分のみ、必要に応じて追加費用（月）に入力してください。</div>
-      <div class="help">詳細設定は大学・大学院・留学ごとに独立して有効になります。初回に詳細設定を開いたときは、その時点の簡単設定をもとに詳細設定の初期値を作成します。以後は簡単設定と詳細設定を独立して保持し、チェックが入っている項目は詳細設定側の値を使用し、チェックが入っていない項目は簡単設定側の値を使用します。詳細設定をいったん保存した後にチェックを外した場合も、入力済みの詳細値は保持したまま、計算では簡単設定側の値を使用します。任意教育費は入力がある場合に加算されます。</div>
+      <div class="help">各セルの上段で学校種別、下段で追加費用を入力します。現在の学校を起点に教育費を計算します。</div>
+      <div class="help">追加費用（月）は、標準値に含めない家庭差の大きい上乗せ分です。例：塾、習い事、教材費、通学費、部活費など。大学・大学院の自宅外費用は標準値側に含み、超過分のみ追加してください。</div>
+      <div class="help">詳細設定は未就学・小・中・高・大・院・留学・任意教育費ごとに独立して使えます。初回は簡単設定から初期値を作成し、その後は独立保持します。チェック中は詳細値、OFF時は簡単値を使います。任意教育費は入力があれば加算されます。</div>
+      <div class="help">標準値は「学校に通う上で比較的共通にかかる費用」の目安です。塾・習い事など家庭差の大きい費用は追加費用（月）で調整してください。</div>
       <div class="edu-wrap">
         <table>
           <tr>
@@ -1160,6 +1228,7 @@ const IDECO_POST60_FIRST_JOIN_WAIT_YEARS = 5;
 const IDECO_CATEGORY_OPTIONS = ["","自営業・フリーランス（第1号）","会社員（企業年金なし）","会社員（企業型DCのみ）","会社員（DB等あり）","公務員","専業主婦・主夫（第3号）"];
 const TAB_COLORS = ["#2563eb","#15803d","#dc2626","#7c3aed","#d97706","#0f766e","#db2777","#a16207","#374151"];
 const GRADE_OPTIONS = ["年少未満","年少相当","年中相当","年長相当","小1","小2","小3","小4","小5","小6","中1","中2","中3","高1","高2","高3","短大1","短大2","大1","大2","大3","大4","修士1","修士2","博士1","博士2","博士3","卒業後"];
+const PRESCHOOL_DETAIL_AGE_OPTIONS = [0,1,2,3,4,5];
 const gradeMap = {"年少未満":-3,"年少相当":-2,"年中相当":-1,"年長相当":0,"小1":1,"小2":2,"小3":3,"小4":4,"小5":5,"小6":6,"中1":7,"中2":8,"中3":9,"高1":10,"高2":11,"高3":12,"短大1":13,"短大2":14,"大1":15,"大2":16,"大3":17,"大4":18,"修士1":19,"修士2":20,"博士1":21,"博士2":22,"博士3":23,"卒業後":24};
 const STAGE_ORDER = ["preschool","elem","junior","high","uni","grad"];
 const EDUCATION_STAGE_LABELS = {preschool:"未就学",elem:"小学校",junior:"中学校",high:"高校",uni:"大学",grad:"大学院"};
@@ -1612,16 +1681,128 @@ function parseEducationDetailJson(value){
 }
 function createDefaultEducationDetail(){
   return {
+    preschool:{enabled:false, rows:[]},
+    elem:{enabled:false, schoolType:"public", entranceCost:0, annualCost:0, extraMonthly:0},
+    junior:{enabled:false, schoolType:"public", entranceCost:0, annualCost:0, extraMonthly:0},
+    high:{enabled:false, schoolType:"public", entranceCost:0, annualCost:0, extraMonthly:0},
     university:{enabled:false, schoolType:"national_public", living:"home", years:4, annualCost:0, entranceCost:0, extraMonthly:0, awayMonthly:0},
     graduate:{enabled:false, degreeType:"none", living:"home", years:2, annualCost:0, awayMonthly:0, mastersEntranceCost:0, doctorEntranceCost:0, medicalEntranceCost:0, extraMonthly:0},
     abroad:{enabled:false, target:"university", startYear:1, months:6, cost:0},
     oneTime:{rows:[]}
   };
 }
+function getPreschoolFacilityOptions(){
+  return [
+    {value:"none", label:"なし"},
+    {value:"licensed_nursery", label:"認可保育園"},
+    {value:"unlicensed_nursery", label:"認可外保育"},
+    {value:"public_kindergarten", label:"幼稚園（公立）"},
+    {value:"private_kindergarten", label:"幼稚園（私立）"},
+    {value:"public_kodomoen", label:"認定こども園（公立）"},
+    {value:"private_kodomoen", label:"認定こども園（私立）"}
+  ];
+}
+function getPreschoolFacilityStandardValues(type){
+  switch(String(type || 'none')){
+    case 'licensed_nursery': return {entrance:5, annual:45};
+    case 'unlicensed_nursery': return {entrance:10, annual:80};
+    case 'public_kindergarten': return {entrance:5, annual:10};
+    case 'private_kindergarten': return {entrance:15, annual:35};
+    case 'public_kodomoen': return {entrance:5, annual:18};
+    case 'private_kodomoen': return {entrance:15, annual:38};
+    default: return {entrance:0, annual:0};
+  }
+}
+function shouldApplyDefaultPreschoolEntrance(age, type){
+  const t = String(type || 'none');
+  if(t === 'none') return false;
+  if(age <= 0 && (t === 'licensed_nursery' || t === 'unlicensed_nursery')) return true;
+  if(age === 3 && (t === 'public_kindergarten' || t === 'private_kindergarten' || t === 'public_kodomoen' || t === 'private_kodomoen')) return true;
+  return false;
+}
+function normalizePreschoolRows(rows){
+  const byAge = new Map();
+  (Array.isArray(rows) ? rows : []).forEach((row)=>{
+    const age = Math.max(0, Math.min(5, Number(row?.age) || 0));
+    byAge.set(age, {
+      age,
+      type: String(row?.type || 'none'),
+      entranceCost: Number(row?.entranceCost || 0) || 0,
+      annualCost: Number(row?.annualCost || 0) || 0,
+      extraMonthly: Number(row?.extraMonthly || 0) || 0
+    });
+  });
+  return PRESCHOOL_DETAIL_AGE_OPTIONS.map((age)=>{
+    const row = byAge.get(age);
+    return row || {age, type:'none', entranceCost:0, annualCost:0, extraMonthly:0};
+  });
+}
+function buildDefaultPreschoolDetailRows(simpleType, extraMonthly=null){
+  const mode = String(simpleType || 'なし');
+  const hasCustomExtra = extraMonthly != null && extraMonthly !== '';
+  const customExtra = hasCustomExtra ? (Number(extraMonthly || 0) || 0) : 0;
+  return PRESCHOOL_DETAIL_AGE_OPTIONS.map((age)=>{
+    let type = 'none';
+    if(mode === '標準') type = age >= 3 ? 'public_kindergarten' : 'none';
+    else if(mode === '高め') type = age >= 3 ? 'private_kindergarten' : 'none';
+    const std = getPreschoolFacilityStandardValues(type);
+    return {
+      age,
+      type,
+      entranceCost: shouldApplyDefaultPreschoolEntrance(age, type) ? std.entrance : 0,
+      annualCost: std.annual,
+      extraMonthly: type === 'none' ? 0 : (hasCustomExtra ? customExtra : getPreschoolDetailExtraMonthlyDefault(type, age))
+    };
+  });
+}
+function getPreschoolActualAge(child, yearIndex){
+  return Math.max(0, Math.min(5, (Number(child?.age) || 0) + (Number(yearIndex) || 0)));
+}
+function resolveEducationStartGrade(startSchool, childAge, childEdu = null, detail = null){
+  if(startSchool === '年少未満'){
+    const age = Math.max(0, Number(childAge) || 0);
+    if(age <= 0) return -5;
+    if(age === 1) return -4;
+    if(age === 2) return -3;
+    return -3;
+  }
+  if(startSchool === '年少相当') return -2;
+  if(startSchool === '年中相当') return -1;
+  if(startSchool === '年長相当') return 0;
+  if(/^小([1-6])$/.test(startSchool)) return Number(startSchool.slice(1));
+  if(/^中([1-3])$/.test(startSchool)) return 6 + Number(startSchool.slice(1));
+  if(/^高([1-3])$/.test(startSchool)) return 9 + Number(startSchool.slice(1));
+  const uniRange = detail?.university?.enabled ? getUniversityDetailGradeRange(detail.university) : null;
+  const gradRange = detail?.graduate?.enabled ? getGraduateDetailGradeRange(detail.graduate, detail?.university?.enabled ? detail.university : null, childEdu) : null;
+  const simpleRanges = getSimpleHigherEducationRanges(childEdu);
+  const effectiveUni = uniRange || (simpleRanges.uniStart != null ? {startGrade:simpleRanges.uniStart, endGrade:simpleRanges.uniEnd} : null);
+  const effectiveGrad = gradRange || (simpleRanges.gradStart != null ? {startGrade:simpleRanges.gradStart, endGrade:simpleRanges.gradEnd} : null);
+  let m = startSchool.match(/^短大([1-2])$/);
+  if(m && effectiveUni) return effectiveUni.startGrade + Number(m[1]) - 1;
+  m = startSchool.match(/^大([1-6])$/);
+  if(m && effectiveUni) return effectiveUni.startGrade + Number(m[1]) - 1;
+  m = startSchool.match(/^修士([1-2])$/);
+  if(m && effectiveGrad) return effectiveGrad.startGrade + Number(m[1]) - 1;
+  m = startSchool.match(/^博士([1-3])$/);
+  if(m && effectiveGrad){
+    const doctorateOffset = (detail?.graduate?.enabled ? (detail.graduate.degreeType || 'none') : (simpleRanges.gradType || 'none')).includes('doctor') || (detail?.graduate?.enabled ? (detail.graduate.degreeType || 'none') : (simpleRanges.gradType || 'none')).includes('博士') || (detail?.graduate?.enabled ? (detail.graduate.degreeType || 'none') : (simpleRanges.gradType || 'none')).includes('medical_grad');
+    return effectiveGrad.startGrade + (doctorateOffset ? 2 : 0) + Number(m[1]) - 1;
+  }
+  return gradeMap[startSchool] ?? -3;
+}
+function getPreschoolAgeLabel(age){
+  const n = Math.max(0, Math.min(5, Number(age) || 0));
+  return `${n}歳`;
+}
+
 function normalizeEducationDetail(detail){
   const base = createDefaultEducationDetail();
   const src = detail && typeof detail === "object" ? detail : {};
   const normalized = {
+    preschool:{...base.preschool, ...(src.preschool || {}), enabled:!!(src.preschool || {}).enabled},
+    elem:{...base.elem, ...(src.elem || {}), enabled:!!(src.elem || {}).enabled},
+    junior:{...base.junior, ...(src.junior || {}), enabled:!!(src.junior || {}).enabled},
+    high:{...base.high, ...(src.high || {}), enabled:!!(src.high || {}).enabled},
     university:{...base.university, ...(src.university || {}), enabled:!!(src.university || {}).enabled},
     graduate:{...base.graduate, ...(src.graduate || {}), enabled:!!(src.graduate || {}).enabled},
     abroad:{...base.abroad, ...(src.abroad || {}), enabled:!!(src.abroad || {}).enabled},
@@ -1652,12 +1833,16 @@ function normalizeEducationDetail(detail){
       if(amount > 0 || age > 0){ oneTimeRows.push({label:`任意教育費${idx}`, stage:'', cost:amount}); }
     });
   }
+  normalized.preschool = {
+    enabled: !!normalized.preschool.enabled,
+    rows: normalizePreschoolRows(normalized.preschool.rows)
+  };
   normalized.oneTime = {rows: oneTimeRows};
   return normalized;
 }
 function hasEducationDetailEnabled(detail){
   const d = normalizeEducationDetail(detail);
-  return !!(d.university.enabled || d.graduate.enabled || d.abroad.enabled || (d.oneTime.rows || []).some(row => Number(row.cost || 0) > 0));
+  return !!(d.preschool.enabled || d.elem.enabled || d.junior.enabled || d.high.enabled || d.university.enabled || d.graduate.enabled || d.abroad.enabled || (d.oneTime.rows || []).some(row => Number(row.cost || 0) > 0));
 }
 function mapSimpleUniversityTypeToDetail(simpleType){
   switch(String(simpleType || '')){
@@ -1682,11 +1867,40 @@ function mapSimpleGraduateTypeToDetail(simpleType){
   }
 }
 function buildEducationDetailInitialFromSimple(data, i){
+  const preschoolRows = buildDefaultPreschoolDetailRows(data[`c${i}_preschool_type`] || 'なし', data[`c${i}_preschool_extra`]);
+  const elemStd = getLowerSchoolDetailStandardValues('elem', (data[`c${i}_elem_type`] || '公立') === '私立' ? 'private' : 'public');
+  const juniorStd = getLowerSchoolDetailStandardValues('junior', (data[`c${i}_junior_type`] || '公立') === '私立' ? 'private' : 'public');
+  const highStd = getLowerSchoolDetailStandardValues('high', (data[`c${i}_high_type`] || '公立') === '私立' ? 'private' : 'public');
   const universityBase = mapSimpleUniversityTypeToDetail(data[`c${i}_uni_type`] || '国公立大（自宅）');
   const universityStd = getUniversityDetailStandardValues(universityBase.schoolType);
   const graduateBase = mapSimpleGraduateTypeToDetail(data[`c${i}_grad_type`] || 'なし');
   const graduateStd = getGraduateDetailStandardValues(graduateBase.degreeType);
   return normalizeEducationDetail({
+    preschool:{
+      enabled:false,
+      rows: preschoolRows
+    },
+    elem:{
+      enabled:false,
+      schoolType:(data[`c${i}_elem_type`] || '公立') === '私立' ? 'private' : 'public',
+      entranceCost: elemStd.entrance || 0,
+      annualCost: elemStd.annual || 0,
+      extraMonthly: getSimpleEducationExtraInputValue('elem', data[`c${i}_elem_type`] || '公立', data[`c${i}_elem_extra`])
+    },
+    junior:{
+      enabled:false,
+      schoolType:(data[`c${i}_junior_type`] || '公立') === '私立' ? 'private' : 'public',
+      entranceCost: juniorStd.entrance || 0,
+      annualCost: juniorStd.annual || 0,
+      extraMonthly: getSimpleEducationExtraInputValue('junior', data[`c${i}_junior_type`] || '公立', data[`c${i}_junior_extra`])
+    },
+    high:{
+      enabled:false,
+      schoolType:(data[`c${i}_high_type`] || '公立') === '私立' ? 'private' : 'public',
+      entranceCost: highStd.entrance || 0,
+      annualCost: highStd.annual || 0,
+      extraMonthly: getSimpleEducationExtraInputValue('high', data[`c${i}_high_type`] || '公立', data[`c${i}_high_extra`])
+    },
     university:{
       enabled:false,
       schoolType: universityBase.schoolType,
@@ -1694,7 +1908,7 @@ function buildEducationDetailInitialFromSimple(data, i){
       years: universityStd.years || 4,
       annualCost: universityStd.annual || 0,
       entranceCost: universityStd.entrance || 0,
-      extraMonthly: Number(data[`c${i}_uni_extra`] || 0) || 0,
+      extraMonthly: getSimpleEducationExtraInputValue('uni', data[`c${i}_uni_type`] || '国公立大（自宅）', data[`c${i}_uni_extra`]),
       awayMonthly: universityBase.living === 'away' ? (universityStd.awayMonthly || 0) : 0
     },
     graduate:{
@@ -1707,7 +1921,7 @@ function buildEducationDetailInitialFromSimple(data, i){
       mastersEntranceCost: graduateBase.degreeType === 'masters_public' || graduateBase.degreeType === 'masters_private' || graduateBase.degreeType === 'doctor_public' || graduateBase.degreeType === 'doctor_private' ? (graduateStd.mastersEntrance || 0) : 0,
       doctorEntranceCost: graduateBase.degreeType === 'doctor_public' || graduateBase.degreeType === 'doctor_private' ? (graduateStd.doctorEntrance || 0) : 0,
       medicalEntranceCost: graduateBase.degreeType === 'medical_grad_public' || graduateBase.degreeType === 'medical_grad_private' ? (graduateStd.medicalEntrance || 0) : 0,
-      extraMonthly: Number(data[`c${i}_grad_extra`] || 0) || 0
+      extraMonthly: getSimpleEducationExtraInputValue('grad', data[`c${i}_grad_type`] || 'なし', data[`c${i}_grad_extra`])
     },
     abroad:{
       enabled:false,
@@ -1763,8 +1977,9 @@ function buildEducationGrid(data = {}){
     ];
     stageDefs.forEach(def=>{
       const currentType = data[`c${i}_${def.key}_type`] ?? def.defaultType;
-      const currentExtra = attrValue(data[`c${i}_${def.key}_extra`], 0);
-      html += `<td class="edu-cell"><div class="edu-cell-inner"><select id="c${i}_${def.key}_type">${def.options.map(opt => `<option value="${escapeAttr(opt)}" ${String(currentType) === String(opt) ? "selected" : ""}>${escapeHtml(opt)}</option>`).join("")}</select><div style="height:6px"></div><div class="input-unit"><input id="c${i}_${def.key}_extra" type="number" class="moneybox" value="${currentExtra}" step="${def.step}"><span class="suffix">${def.suffix}</span></div></div></td>`;
+      const currentExtraVal = getSimpleEducationExtraInputValue(def.key, currentType, data[`c${i}_${def.key}_extra`]);
+      const currentExtra = attrValue(currentExtraVal, 0);
+      html += `<td class="edu-cell"><div class="edu-cell-inner"><select id="c${i}_${def.key}_type" data-edu-stage="${def.key}" data-prev-type="${escapeAttr(currentType)}">${def.options.map(opt => `<option value="${escapeAttr(opt)}" ${String(currentType) === String(opt) ? "selected" : ""}>${escapeHtml(opt)}</option>`).join("")}</select><div style="height:6px"></div><div class="input-unit"><input id="c${i}_${def.key}_extra" type="number" class="moneybox" value="${currentExtra}" step="${def.step}"><span class="suffix">${def.suffix}</span></div></div></td>`;
     });
     const abroadType = data[`c${i}_abroad_type`] ?? "なし";
     const abroadAmount = attrValue(data[`c${i}_abroad_amount`], 0);
@@ -2755,7 +2970,8 @@ function getScenarioFromDOM(){
       high:{type:document.getElementById(`c${i}_high_type`).value, extraMonth:numInput(`c${i}_high_extra`, 0)},
       uni:{type:document.getElementById(`c${i}_uni_type`).value, extraMonth:numInput(`c${i}_uni_extra`, 0)},
       grad:{type:document.getElementById(`c${i}_grad_type`).value, extraMonth:numInput(`c${i}_grad_extra`, 0)},
-      abroad:{type:document.getElementById(`c${i}_abroad_type`).value, amount:numInput(`c${i}_abroad_amount`, 0)}
+      abroad:{type:document.getElementById(`c${i}_abroad_type`).value, amount:numInput(`c${i}_abroad_amount`, 0)},
+      detail: normalizeEducationDetail(parseEducationDetailJson(document.getElementById(`c${i}_detail_json`)?.value || ''))
     };
   }
 
@@ -2885,34 +3101,98 @@ function getEducationSimpleSummaryItems(childIndex){
   ];
 }
 function getEducationOneTimeStageOptions(){
-  return ["", "年少未満", "年少相当", "年中相当", "年長相当", "小1", "小2", "小3", "小4", "小5", "小6", "中1", "中2", "中3", "高1", "高2", "高3", "短大1", "短大2", "大1", "大2", "大3", "大4", "修士1", "修士2", "博士1", "博士2", "博士3"];
+  return ["", "0歳", "1歳", "2歳", "3歳", "4歳", "5歳", "年少未満", "年少相当", "年中相当", "年長相当", "小1", "小2", "小3", "小4", "小5", "小6", "中1", "中2", "中3", "高1", "高2", "高3", "短大1", "短大2", "大1", "大2", "大3", "大4", "修士1", "修士2", "博士1", "博士2", "博士3"];
 }
 function formatEduDetailMoneyDisplay(value, suffix){
   return `${Number(value || 0).toLocaleString("ja-JP")} 万円${suffix ? ` / ${suffix}` : ""}`;
 }
+function getSimpleEducationExtraMonthlyDefault(stage, type){
+  const key = String(stage || '');
+  const value = String(type || '');
+  if(key === 'preschool'){
+    if(value === '高め') return 1.5;
+    if(value === '標準') return 1;
+    return 0;
+  }
+  if(key === 'elem') return value === '私立' || value === 'private' ? 2 : 1;
+  if(key === 'junior') return value === '私立' || value === 'private' ? 3.5 : 2.5;
+  if(key === 'high') return value === '私立' || value === 'private' ? 4 : 3.5;
+  return 0;
+}
+function getSimpleEducationExtraInputValue(stage, type, rawValue){
+  if(rawValue == null || rawValue === '') return getSimpleEducationExtraMonthlyDefault(stage, type);
+  return Number(rawValue || 0) || 0;
+}
+function getPreschoolDetailExtraMonthlyDefault(type, age){
+  const t = String(type || 'none');
+  const a = Number(age || 0);
+  if(a < 3 || t === 'none') return 0;
+  if(t === 'private_kindergarten' || t === 'private_kodomoen') return 1.5;
+  if(t === 'public_kindergarten' || t === 'public_kodomoen') return 1;
+  return 0;
+}
+function approxEqualNumber(a, b, epsilon = 0.0001){
+  return Math.abs((Number(a) || 0) - (Number(b) || 0)) <= epsilon;
+}
+function getLowerSchoolDetailStandardValues(stage, schoolType){
+  const type = schoolType === 'private' ? 'private' : 'public';
+  if(stage === 'elem') return type === 'private' ? {entrance:25, annual:100} : {entrance:2, annual:12};
+  if(stage === 'junior') return type === 'private' ? {entrance:30, annual:115} : {entrance:10, annual:20};
+  if(stage === 'high') return type === 'private' ? {entrance:25, annual:85} : {entrance:15, annual:35};
+  return {entrance:0, annual:0};
+}
 function getUniversityDetailStandardValues(schoolType){
   switch(schoolType){
-    case "junior_college": return {years:2, annual:120, entrance:25, awayMonthly:12};
-    case "national_public": return {years:4, annual:80, entrance:28, awayMonthly:14};
-    case "national_public_medical": return {years:6, annual:90, entrance:28, awayMonthly:14};
-    case "private_liberal": return {years:4, annual:120, entrance:25, awayMonthly:14};
-    case "private_science": return {years:4, annual:155, entrance:27, awayMonthly:14};
-    case "private_medical": return {years:6, annual:482, entrance:100, awayMonthly:16};
+    case "junior_college": return {years:2, annual:80, entrance:25, awayMonthly:12};
+    case "national_public": return {years:4, annual:54, entrance:30, awayMonthly:12};
+    case "national_public_medical": return {years:6, annual:60, entrance:40, awayMonthly:12};
+    case "private_liberal": return {years:4, annual:97, entrance:25, awayMonthly:12};
+    case "private_science": return {years:4, annual:130, entrance:30, awayMonthly:12};
+    case "private_medical": return {years:6, annual:374, entrance:120, awayMonthly:14};
     default: return {years:4, annual:0, entrance:0, awayMonthly:0};
   }
 }
 function getGraduateDetailStandardValues(degreeType){
   switch(degreeType){
-    case "masters_public": return {years:2, annual:82, awayMonthly:12, mastersEntrance:28, doctorEntrance:28, medicalEntrance:0};
-    case "masters_private": return {years:2, annual:95, awayMonthly:12, mastersEntrance:20, doctorEntrance:20, medicalEntrance:0};
-    case "doctor_public": return {years:5, annual:82, awayMonthly:12, mastersEntrance:28, doctorEntrance:28, medicalEntrance:0};
-    case "doctor_private": return {years:5, annual:95, awayMonthly:12, mastersEntrance:20, doctorEntrance:20, medicalEntrance:0};
-    case "medical_grad_public": return {years:4, annual:90, awayMonthly:12, mastersEntrance:0, doctorEntrance:0, medicalEntrance:28};
-    case "medical_grad_private": return {years:4, annual:120, awayMonthly:14, mastersEntrance:0, doctorEntrance:0, medicalEntrance:30};
+    case "masters_public": return {years:2, annual:55, awayMonthly:12, mastersEntrance:30, doctorEntrance:0, medicalEntrance:0};
+    case "masters_private": return {years:2, annual:90, awayMonthly:12, mastersEntrance:25, doctorEntrance:0, medicalEntrance:0};
+    case "doctor_public": return {years:5, annual:55, awayMonthly:12, mastersEntrance:30, doctorEntrance:30, medicalEntrance:0};
+    case "doctor_private": return {years:5, annual:90, awayMonthly:12, mastersEntrance:25, doctorEntrance:25, medicalEntrance:0};
+    case "medical_grad_public": return {years:4, annual:60, awayMonthly:12, mastersEntrance:0, doctorEntrance:0, medicalEntrance:35};
+    case "medical_grad_private": return {years:4, annual:110, awayMonthly:14, mastersEntrance:0, doctorEntrance:0, medicalEntrance:40};
     default: return {years:2, annual:0, awayMonthly:0, mastersEntrance:0, doctorEntrance:0, medicalEntrance:0};
   }
 }
 function updateEducationDetailStandardDisplays(){
+  PRESCHOOL_DETAIL_AGE_OPTIONS.forEach((age)=>{
+    const type = document.getElementById(`eduDetailPreschoolType_${age}`)?.value || 'none';
+    const std = getPreschoolFacilityStandardValues(type);
+    const entranceEl = document.getElementById(`eduDetailPreschoolStandardEntrance_${age}`);
+    const annualEl = document.getElementById(`eduDetailPreschoolStandardAnnual_${age}`);
+    if(entranceEl) entranceEl.textContent = formatEduDetailMoneyDisplay(std.entrance, '');
+    if(annualEl) annualEl.textContent = formatEduDetailMoneyDisplay(std.annual, '年');
+  });
+  const elemType = document.getElementById('eduDetailElementarySchoolType')?.value || 'public';
+  const elemStd = getLowerSchoolDetailStandardValues('elem', elemType);
+  const elemAnnualEl = document.getElementById('eduDetailElementaryStandardAnnual');
+  const elemEntranceEl = document.getElementById('eduDetailElementaryStandardEntrance');
+  if(elemAnnualEl) elemAnnualEl.textContent = formatEduDetailMoneyDisplay(elemStd.annual, '年');
+  if(elemEntranceEl) elemEntranceEl.textContent = formatEduDetailMoneyDisplay(elemStd.entrance, '');
+
+  const juniorType = document.getElementById('eduDetailJuniorSchoolType')?.value || 'public';
+  const juniorStd = getLowerSchoolDetailStandardValues('junior', juniorType);
+  const juniorAnnualEl = document.getElementById('eduDetailJuniorStandardAnnual');
+  const juniorEntranceEl = document.getElementById('eduDetailJuniorStandardEntrance');
+  if(juniorAnnualEl) juniorAnnualEl.textContent = formatEduDetailMoneyDisplay(juniorStd.annual, '年');
+  if(juniorEntranceEl) juniorEntranceEl.textContent = formatEduDetailMoneyDisplay(juniorStd.entrance, '');
+
+  const highType = document.getElementById('eduDetailHighSchoolType')?.value || 'public';
+  const highStd = getLowerSchoolDetailStandardValues('high', highType);
+  const highAnnualEl = document.getElementById('eduDetailHighStandardAnnual');
+  const highEntranceEl = document.getElementById('eduDetailHighStandardEntrance');
+  if(highAnnualEl) highAnnualEl.textContent = formatEduDetailMoneyDisplay(highStd.annual, '年');
+  if(highEntranceEl) highEntranceEl.textContent = formatEduDetailMoneyDisplay(highStd.entrance, '');
+
   const univType = document.getElementById('eduDetailUniversitySchoolType')?.value || 'national_public';
   const univStd = getUniversityDetailStandardValues(univType);
   const univAnnualEl = document.getElementById('eduDetailUniversityStandardAnnual');
@@ -2950,7 +3230,7 @@ function renderEducationDetailSimpleSummary(childIndex){
   box.innerHTML = html;
 }
 function syncEducationDetailBlockStates(){
-  [['educationDetailUniversityBlock','eduDetailUniversityEnabled'],['educationDetailGraduateBlock','eduDetailGraduateEnabled'],['educationDetailAbroadBlock','eduDetailAbroadEnabled']].forEach(([blockId,checkId])=>{
+  [['educationDetailPreschoolBlock','eduDetailPreschoolEnabled'],['educationDetailElementaryBlock','eduDetailElementaryEnabled'],['educationDetailJuniorBlock','eduDetailJuniorEnabled'],['educationDetailHighBlock','eduDetailHighEnabled'],['educationDetailUniversityBlock','eduDetailUniversityEnabled'],['educationDetailGraduateBlock','eduDetailGraduateEnabled'],['educationDetailAbroadBlock','eduDetailAbroadEnabled']].forEach(([blockId,checkId])=>{
     const block = document.getElementById(blockId);
     const on = !!document.getElementById(checkId)?.checked;
     if(block) block.classList.toggle('disabled', !on);
@@ -2990,38 +3270,133 @@ function syncEducationDetailBlockStates(){
     if(doctorField) setNumericInputValue('eduDetailGraduateDoctorEntranceCost', 0);
   }
 }
+function renderEducationDetailPreschoolRows(){
+  const body = document.getElementById('eduDetailPreschoolBody');
+  if(!body) return;
+  const d = normalizeEducationDetail(educationDetailDraft);
+  const options = getPreschoolFacilityOptions();
+  body.innerHTML = (d.preschool.rows || []).map((row)=>{
+    const std = getPreschoolFacilityStandardValues(row.type);
+    return `<tr data-preschool-age="${row.age}"><td>${row.age}歳</td><td><select id="eduDetailPreschoolType_${row.age}" data-prev-type="${escapeAttr(row.type || 'none')}">${options.map(opt => `<option value="${escapeAttr(opt.value)}" ${String(row.type||'none')===String(opt.value)?'selected':''}>${escapeHtml(opt.label)}</option>`).join('')}</select></td><td><div id="eduDetailPreschoolStandardEntrance_${row.age}" class="edu-detail-static">${formatEduDetailMoneyDisplay(std.entrance, '')}</div></td><td><div class="input-unit"><input id="eduDetailPreschoolEntranceCost_${row.age}" type="number" class="moneybox" value="${attrValue(row.entranceCost,0)}" step="1"><span class="suffix">万円</span></div></td><td><div id="eduDetailPreschoolStandardAnnual_${row.age}" class="edu-detail-static">${formatEduDetailMoneyDisplay(std.annual, '年')}</div></td><td><div class="input-unit"><input id="eduDetailPreschoolAnnualCost_${row.age}" type="number" class="moneybox" value="${attrValue(row.annualCost,0)}" step="1"><span class="suffix">万円 / 年</span></div></td><td><div class="input-unit"><input id="eduDetailPreschoolExtraMonthly_${row.age}" type="number" class="moneybox" value="${attrValue(row.extraMonthly,0)}" step="0.1"><span class="suffix">万円 / 月</span></div></td></tr>`;
+  }).join('');
+  enhanceNumericInputs(body);
+}
+
+function createBlankEducationDetailOneTimeRow(index){
+  return {label:`任意教育費${index}`, stage:'', cost:0};
+}
 function addEducationDetailOneTimeRow(){
   const d = normalizeEducationDetail(educationDetailDraft);
-  const rows = Array.isArray(d.oneTime.rows) ? d.oneTime.rows.slice() : [];
-  rows.push({label:`任意教育費${rows.length + 1}`, stage:'', cost:0});
+  const currentRows = Array.isArray(d.oneTime.rows) ? d.oneTime.rows.slice() : [];
+  const rows = currentRows.filter(row => row.stage || Number(row.cost || 0) > 0);
+  rows.push(createBlankEducationDetailOneTimeRow(rows.length + 1));
   educationDetailDraft = {...d, oneTime:{rows}};
   renderEducationDetailOneTimeRows();
 }
 function removeEducationDetailOneTimeRow(index){
   const d = normalizeEducationDetail(educationDetailDraft);
-  const rows = (d.oneTime.rows || []).filter((_, i)=>i !== index).map((row, idx)=>({label:`任意教育費${idx + 1}`, stage:String(row.stage || ''), cost:Number(row.cost || 0) || 0}));
+  let rows = (d.oneTime.rows || []).filter((_, i)=>i !== index).map((row, idx)=>({label:`任意教育費${idx + 1}`, stage:String(row.stage || ''), cost:Number(row.cost || 0) || 0}));
+  if(!rows.length) rows = [createBlankEducationDetailOneTimeRow(1)];
   educationDetailDraft = {...d, oneTime:{rows}};
   renderEducationDetailOneTimeRows();
 }
 function renderEducationDetailOneTimeRows(){
   const body = document.getElementById('eduDetailOneTimeBody');
   if(!body) return;
-  const rows = normalizeEducationDetail(educationDetailDraft).oneTime.rows || [];
+  const sourceRows = normalizeEducationDetail(educationDetailDraft).oneTime.rows || [];
+  const rows = sourceRows.length ? sourceRows : [createBlankEducationDetailOneTimeRow(1)];
   const stageOptions = getEducationOneTimeStageOptions();
   body.innerHTML = rows.map((row, idx)=>{
     const label = escapeHtml(row.label || `任意教育費${idx + 1}`);
     const stage = String(row.stage || '');
     const cost = attrValue(row.cost, 0);
-    return `<tr data-one-time-row="${idx}"><td>${label}</td><td><select data-one-time-stage="${idx}">${stageOptions.map(opt => `<option value="${escapeAttr(opt)}" ${stage===opt?'selected':''}>${opt ? escapeHtml(opt) : '選択'}</option>`).join('')}</select></td><td><div class="input-unit"><input data-one-time-cost="${idx}" type="number" class="moneybox" value="${cost}" step="1"><span class="suffix">万円</span></div></td><td style="text-align:center;"><button type="button" class="icon-btn" data-one-time-remove="${idx}">×</button></td></tr>`;
+    return `<tr data-one-time-row="${idx}"><td>${label}</td><td><select data-one-time-stage="${idx}">${stageOptions.map(opt => `<option value="${escapeAttr(opt)}" ${stage===opt?'selected':''}>${opt ? escapeHtml(opt) : '選択'}</option>`).join('')}</select></td><td><div class="input-unit"><input data-one-time-cost="${idx}" type="number" class="moneybox" value="${cost}" step="1"><span class="suffix">万円</span></div></td><td style="text-align:center;"><button type="button" class="icon-btn" data-one-time-remove="${idx}">x</button></td></tr>`;
   }).join('');
   enhanceNumericInputs(body);
 }
+function applyPreschoolDetailRowTypeDefaults(age, oldType, newType){
+  const entranceId = `eduDetailPreschoolEntranceCost_${age}`;
+  const annualId = `eduDetailPreschoolAnnualCost_${age}`;
+  const extraId = `eduDetailPreschoolExtraMonthly_${age}`;
+  const oldStd = getPreschoolFacilityStandardValues(oldType);
+  const newStd = getPreschoolFacilityStandardValues(newType);
+  const oldEntranceDefault = shouldApplyDefaultPreschoolEntrance(age, oldType) ? oldStd.entrance : 0;
+  const newEntranceDefault = shouldApplyDefaultPreschoolEntrance(age, newType) ? newStd.entrance : 0;
+  const oldAnnualDefault = oldStd.annual || 0;
+  const newAnnualDefault = newStd.annual || 0;
+  const oldExtraDefault = getPreschoolDetailExtraMonthlyDefault(oldType, age);
+  const newExtraDefault = getPreschoolDetailExtraMonthlyDefault(newType, age);
+  const currentEntrance = numInput(entranceId, 0);
+  const currentAnnual = numInput(annualId, 0);
+  const currentExtra = numInput(extraId, 0);
+  if(approxEqualNumber(currentEntrance, oldEntranceDefault)) setNumericInputValue(entranceId, newEntranceDefault);
+  if(approxEqualNumber(currentAnnual, oldAnnualDefault)) setNumericInputValue(annualId, newAnnualDefault);
+  if(approxEqualNumber(currentExtra, oldExtraDefault)) setNumericInputValue(extraId, newExtraDefault);
+}
+function applyLowerSchoolDetailTypeDefaults(stage, oldType, newType){
+  const stageMap = {
+    elem:{entranceId:'eduDetailElementaryEntranceCost', annualId:'eduDetailElementaryAnnualCost', extraId:'eduDetailElementaryExtraMonthly'},
+    junior:{entranceId:'eduDetailJuniorEntranceCost', annualId:'eduDetailJuniorAnnualCost', extraId:'eduDetailJuniorExtraMonthly'},
+    high:{entranceId:'eduDetailHighEntranceCost', annualId:'eduDetailHighAnnualCost', extraId:'eduDetailHighExtraMonthly'}
+  };
+  const ids = stageMap[stage];
+  if(!ids) return;
+  const oldStd = getLowerSchoolDetailStandardValues(stage, oldType);
+  const newStd = getLowerSchoolDetailStandardValues(stage, newType);
+  if(approxEqualNumber(numInput(ids.entranceId, 0), oldStd.entrance || 0)) setNumericInputValue(ids.entranceId, newStd.entrance || 0);
+  if(approxEqualNumber(numInput(ids.annualId, 0), oldStd.annual || 0)) setNumericInputValue(ids.annualId, newStd.annual || 0);
+  if(approxEqualNumber(numInput(ids.extraId, 0), getSimpleEducationExtraMonthlyDefault(stage, oldType === 'private' ? '私立' : '公立'))) setNumericInputValue(ids.extraId, getSimpleEducationExtraMonthlyDefault(stage, newType === 'private' ? '私立' : '公立'));
+}
+function applyUniversityDetailTypeDefaults(oldType, newType){
+  const oldStd = getUniversityDetailStandardValues(oldType);
+  const newStd = getUniversityDetailStandardValues(newType);
+  if(approxEqualNumber(numInput('eduDetailUniversityYears', oldStd.years || 0), oldStd.years || 0)) setNumericInputValue('eduDetailUniversityYears', newStd.years || 0);
+  if(approxEqualNumber(numInput('eduDetailUniversityEntranceCost', oldStd.entrance || 0), oldStd.entrance || 0)) setNumericInputValue('eduDetailUniversityEntranceCost', newStd.entrance || 0);
+  if(approxEqualNumber(numInput('eduDetailUniversityAnnualCost', oldStd.annual || 0), oldStd.annual || 0)) setNumericInputValue('eduDetailUniversityAnnualCost', newStd.annual || 0);
+  if(approxEqualNumber(numInput('eduDetailUniversityExtraMonthly', 0), 0)) setNumericInputValue('eduDetailUniversityExtraMonthly', 0);
+  if(document.getElementById('eduDetailUniversityLiving')?.value === 'away' && approxEqualNumber(numInput('eduDetailUniversityAwayMonthly', oldStd.awayMonthly || 0), oldStd.awayMonthly || 0)) setNumericInputValue('eduDetailUniversityAwayMonthly', newStd.awayMonthly || 0);
+}
+function applyGraduateDetailTypeDefaults(oldType, newType){
+  const oldStd = getGraduateDetailStandardValues(oldType);
+  const newStd = getGraduateDetailStandardValues(newType);
+  if(approxEqualNumber(numInput('eduDetailGraduateYears', oldStd.years || 0), oldStd.years || 0)) setNumericInputValue('eduDetailGraduateYears', newStd.years || 0);
+  if(approxEqualNumber(numInput('eduDetailGraduateAnnualCost', oldStd.annual || 0), oldStd.annual || 0)) setNumericInputValue('eduDetailGraduateAnnualCost', newStd.annual || 0);
+  if(document.getElementById('eduDetailGraduateLiving')?.value === 'away' && approxEqualNumber(numInput('eduDetailGraduateAwayMonthly', oldStd.awayMonthly || 0), oldStd.awayMonthly || 0)) setNumericInputValue('eduDetailGraduateAwayMonthly', newStd.awayMonthly || 0);
+  if(approxEqualNumber(numInput('eduDetailGraduateMastersEntranceCost', oldStd.mastersEntrance || 0), oldStd.mastersEntrance || 0)) setNumericInputValue('eduDetailGraduateMastersEntranceCost', newStd.mastersEntrance || 0);
+  if(approxEqualNumber(numInput('eduDetailGraduateDoctorEntranceCost', oldStd.doctorEntrance || 0), oldStd.doctorEntrance || 0)) setNumericInputValue('eduDetailGraduateDoctorEntranceCost', newStd.doctorEntrance || 0);
+  if(approxEqualNumber(numInput('eduDetailGraduateMedicalEntranceCost', oldStd.medicalEntrance || 0), oldStd.medicalEntrance || 0)) setNumericInputValue('eduDetailGraduateMedicalEntranceCost', newStd.medicalEntrance || 0);
+  if(approxEqualNumber(numInput('eduDetailGraduateExtraMonthly', 0), 0)) setNumericInputValue('eduDetailGraduateExtraMonthly', 0);
+}
 function fillEducationDetailModalFromDraft(){
   const d = normalizeEducationDetail(educationDetailDraft);
+  document.getElementById('eduDetailPreschoolEnabled').checked = !!d.preschool.enabled;
+  renderEducationDetailPreschoolRows();
+  const elemStd = getLowerSchoolDetailStandardValues('elem', d.elem.schoolType || 'public');
+  const juniorStd = getLowerSchoolDetailStandardValues('junior', d.junior.schoolType || 'public');
+  const highStd = getLowerSchoolDetailStandardValues('high', d.high.schoolType || 'public');
   const univStd = getUniversityDetailStandardValues(d.university.schoolType || 'national_public');
   const gradStd = getGraduateDetailStandardValues(d.graduate.degreeType || 'none');
+  document.getElementById('eduDetailElementaryEnabled').checked = !!d.elem.enabled;
+  document.getElementById('eduDetailElementarySchoolType').value = d.elem.schoolType || 'public';
+  document.getElementById('eduDetailElementarySchoolType').dataset.prevType = d.elem.schoolType || 'public';
+  setNumericInputValue('eduDetailElementaryEntranceCost', d.elem.entranceCost ?? elemStd.entrance ?? 0);
+  setNumericInputValue('eduDetailElementaryAnnualCost', d.elem.annualCost ?? elemStd.annual ?? 0);
+  setNumericInputValue('eduDetailElementaryExtraMonthly', d.elem.extraMonthly ?? 0);
+  document.getElementById('eduDetailJuniorEnabled').checked = !!d.junior.enabled;
+  document.getElementById('eduDetailJuniorSchoolType').value = d.junior.schoolType || 'public';
+  document.getElementById('eduDetailJuniorSchoolType').dataset.prevType = d.junior.schoolType || 'public';
+  setNumericInputValue('eduDetailJuniorEntranceCost', d.junior.entranceCost ?? juniorStd.entrance ?? 0);
+  setNumericInputValue('eduDetailJuniorAnnualCost', d.junior.annualCost ?? juniorStd.annual ?? 0);
+  setNumericInputValue('eduDetailJuniorExtraMonthly', d.junior.extraMonthly ?? 0);
+  document.getElementById('eduDetailHighEnabled').checked = !!d.high.enabled;
+  document.getElementById('eduDetailHighSchoolType').value = d.high.schoolType || 'public';
+  document.getElementById('eduDetailHighSchoolType').dataset.prevType = d.high.schoolType || 'public';
+  setNumericInputValue('eduDetailHighEntranceCost', d.high.entranceCost ?? highStd.entrance ?? 0);
+  setNumericInputValue('eduDetailHighAnnualCost', d.high.annualCost ?? highStd.annual ?? 0);
+  setNumericInputValue('eduDetailHighExtraMonthly', d.high.extraMonthly ?? 0);
   document.getElementById('eduDetailUniversityEnabled').checked = !!d.university.enabled;
   document.getElementById('eduDetailUniversitySchoolType').value = d.university.schoolType || 'national_public';
+  document.getElementById('eduDetailUniversitySchoolType').dataset.prevType = d.university.schoolType || 'national_public';
   document.getElementById('eduDetailUniversityLiving').value = d.university.living || 'home';
   document.getElementById('eduDetailUniversityYears').value = String(d.university.years || univStd.years || 4);
   setNumericInputValue('eduDetailUniversityAnnualCost', d.university.annualCost ?? univStd.annual ?? 0);
@@ -3030,6 +3405,7 @@ function fillEducationDetailModalFromDraft(){
   setNumericInputValue('eduDetailUniversityAwayMonthly', (d.university.living || 'home') === 'away' ? (d.university.awayMonthly ?? univStd.awayMonthly ?? 0) : 0);
   document.getElementById('eduDetailGraduateEnabled').checked = !!d.graduate.enabled;
   document.getElementById('eduDetailGraduateDegreeType').value = d.graduate.degreeType || 'none';
+  document.getElementById('eduDetailGraduateDegreeType').dataset.prevType = d.graduate.degreeType || 'none';
   document.getElementById('eduDetailGraduateLiving').value = d.graduate.living || 'home';
   setNumericInputValue('eduDetailGraduateYears', d.graduate.years ?? gradStd.years ?? 2);
   setNumericInputValue('eduDetailGraduateAnnualCost', d.graduate.annualCost ?? gradStd.annual ?? 0);
@@ -3049,6 +3425,37 @@ function fillEducationDetailModalFromDraft(){
 }
 function syncEducationDetailDraftFromModal(){
   educationDetailDraft = normalizeEducationDetail({
+    preschool:{
+      enabled: !!document.getElementById('eduDetailPreschoolEnabled')?.checked,
+      rows: PRESCHOOL_DETAIL_AGE_OPTIONS.map((age)=>({
+        age,
+        type: document.getElementById(`eduDetailPreschoolType_${age}`)?.value || 'none',
+        entranceCost: numInput(`eduDetailPreschoolEntranceCost_${age}`, 0),
+        annualCost: numInput(`eduDetailPreschoolAnnualCost_${age}`, 0),
+        extraMonthly: numInput(`eduDetailPreschoolExtraMonthly_${age}`, 0)
+      }))
+    },
+    elem:{
+      enabled: !!document.getElementById('eduDetailElementaryEnabled')?.checked,
+      schoolType: document.getElementById('eduDetailElementarySchoolType')?.value || 'public',
+      entranceCost: numInput('eduDetailElementaryEntranceCost', 0),
+      annualCost: numInput('eduDetailElementaryAnnualCost', 0),
+      extraMonthly: numInput('eduDetailElementaryExtraMonthly', 0)
+    },
+    junior:{
+      enabled: !!document.getElementById('eduDetailJuniorEnabled')?.checked,
+      schoolType: document.getElementById('eduDetailJuniorSchoolType')?.value || 'public',
+      entranceCost: numInput('eduDetailJuniorEntranceCost', 0),
+      annualCost: numInput('eduDetailJuniorAnnualCost', 0),
+      extraMonthly: numInput('eduDetailJuniorExtraMonthly', 0)
+    },
+    high:{
+      enabled: !!document.getElementById('eduDetailHighEnabled')?.checked,
+      schoolType: document.getElementById('eduDetailHighSchoolType')?.value || 'public',
+      entranceCost: numInput('eduDetailHighEntranceCost', 0),
+      annualCost: numInput('eduDetailHighAnnualCost', 0),
+      extraMonthly: numInput('eduDetailHighExtraMonthly', 0)
+    },
     university:{
       enabled: !!document.getElementById('eduDetailUniversityEnabled')?.checked,
       schoolType: document.getElementById('eduDetailUniversitySchoolType')?.value || 'national_public',
@@ -3115,84 +3522,261 @@ function saveEducationDetailModal(){
   closeEducationDetailModal();
 }
 function getStageFromGrade(grade){
-  if(grade >= -3 && grade <= 0) return "preschool";
+  if(grade >= -5 && grade <= 0) return "preschool";
   if(grade >= 1 && grade <= 6) return "elem";
   if(grade >= 7 && grade <= 9) return "junior";
   if(grade >= 10 && grade <= 12) return "high";
-  if(grade >= 13 && grade <= 18) return "uni";
-  if(grade >= 19 && grade <= 23) return "grad";
   return null;
 }
-function getBaseEduCost(grade, type){
-  if(grade >= -3 && grade <= 0){
-    if(type === "高め") return 70;
-    if(type === "標準") return 25;
+function getSimpleUniversityYearsFromType(type){
+  switch(String(type || '')){
+    case '短大（自宅）':
+    case '短大（自宅外）': return 2;
+    case '国公立大（自宅）':
+    case '国公立大（自宅外）':
+    case '私立大（自宅）':
+    case '私立大（自宅外）': return 4;
+    default: return 0;
+  }
+}
+function getSimpleGraduateYearsFromType(type){
+  switch(String(type || '')){
+    case '修士（自宅）':
+    case '修士（自宅外）': return 2;
+    case '博士（自宅）':
+    case '博士（自宅外）': return 5;
+    default: return 0;
+  }
+}
+function getSimpleHigherEducationRanges(childEdu){
+  const uniType = childEdu?.uni?.type || 'なし';
+  const gradType = childEdu?.grad?.type || 'なし';
+  const uniYears = getSimpleUniversityYearsFromType(uniType);
+  const uniStart = uniYears > 0 ? 13 : null;
+  const uniEnd = uniYears > 0 ? uniStart + uniYears - 1 : null;
+  const gradYears = getSimpleGraduateYearsFromType(gradType);
+  const gradStart = gradYears > 0 ? ((uniEnd != null ? uniEnd + 1 : 13)) : null;
+  const gradEnd = gradYears > 0 ? gradStart + gradYears - 1 : null;
+  return {uniType, gradType, uniYears, uniStart, uniEnd, gradYears, gradStart, gradEnd};
+}
+function getHigherEducationStageForGrade(childEdu, detail, grade){
+  const uniRange = detail?.university?.enabled ? getUniversityDetailGradeRange(detail.university) : null;
+  const gradRange = detail?.graduate?.enabled ? getGraduateDetailGradeRange(detail.graduate, detail?.university?.enabled ? detail.university : null, childEdu) : null;
+  const simpleRanges = getSimpleHigherEducationRanges(childEdu);
+  const effectiveUni = uniRange || (simpleRanges.uniStart != null ? {startGrade:simpleRanges.uniStart, endGrade:simpleRanges.uniEnd} : null);
+  const effectiveGrad = gradRange || (simpleRanges.gradStart != null ? {startGrade:simpleRanges.gradStart, endGrade:simpleRanges.gradEnd} : null);
+  if(effectiveUni && grade >= effectiveUni.startGrade && grade <= effectiveUni.endGrade) return 'uni';
+  if(effectiveGrad && grade >= effectiveGrad.startGrade && grade <= effectiveGrad.endGrade) return 'grad';
+  return null;
+}
+function getBaseEduCost(grade, type, childEdu = null){
+  if(grade >= -5 && grade <= 0){
+    if(grade <= -3) return 0;
+    if(type === "高め") return 35;
+    if(type === "標準") return 10;
     return 0;
   }
-  if(grade >= 1 && grade <= 6) return type==="私立" ? 160 : 35;
-  if(grade >= 7 && grade <= 9) return type==="私立" ? 140 : 50;
-  if(grade >= 10 && grade <= 12) return type==="私立" ? 100 : 45;
-  if(grade >= 13 && grade <= 14){
+  if(grade >= 1 && grade <= 6) return type==="私立" ? 100 : 12;
+  if(grade >= 7 && grade <= 9) return type==="私立" ? 115 : 20;
+  if(grade >= 10 && grade <= 12) return type==="私立" ? 85 : 35;
+  const ranges = getSimpleHigherEducationRanges(childEdu);
+  if(ranges.uniStart != null && grade >= ranges.uniStart && grade <= ranges.uniEnd){
     switch(type){
-      case "短大（自宅）": return 120;
-      case "短大（自宅外）": return 260;
-      default: return 0;
-    }
-  }
-  if(grade >= 15 && grade <= 18){
-    switch(type){
-      case "国公立大（自宅）": return 80;
-      case "国公立大（自宅外）": return 250;
-      case "私立大（自宅）": return 150;
-      case "私立大（自宅外）": return 320;
+      case "短大（自宅）": return 80;
+      case "短大（自宅外）": return 224;
+      case "国公立大（自宅）": return 54;
+      case "国公立大（自宅外）": return 198;
+      case "私立大（自宅）": return 97;
+      case "私立大（自宅外）": return 241;
       default:return 0;
     }
   }
-  if(grade >= 19 && grade <= 20){
+  if(ranges.gradStart != null && grade >= ranges.gradStart && grade <= ranges.gradEnd){
     switch(type){
-      case "修士（自宅）": return 90;
-      case "修士（自宅外）": return 230;
-      case "博士（自宅）": return 90;
-      case "博士（自宅外）": return 230;
-      default:return 0;
-    }
-  }
-  if(grade >= 21 && grade <= 23){
-    switch(type){
-      case "博士（自宅）": return 90;
-      case "博士（自宅外）": return 230;
+      case "修士（自宅）": return 55;
+      case "修士（自宅外）": return 199;
+      case "博士（自宅）": return 55;
+      case "博士（自宅外）": return 199;
       default:return 0;
     }
   }
   return 0;
+}
+function getBaseEduEntranceCost(grade, type, childEdu = null){
+  if(grade === -2) return type==="高め" ? 15 : (type==="標準" ? 5 : 0);
+  if(grade === 1) return type==="私立" ? 25 : 2;
+  if(grade === 7) return type==="私立" ? 30 : 10;
+  if(grade === 10) return type==="私立" ? 25 : 15;
+  const ranges = getSimpleHigherEducationRanges(childEdu);
+  if(ranges.uniStart != null && grade === ranges.uniStart){
+    switch(type){
+      case "短大（自宅）":
+      case "短大（自宅外）": return 25;
+      case "国公立大（自宅）":
+      case "国公立大（自宅外）": return 30;
+      case "私立大（自宅）":
+      case "私立大（自宅外）": return 25;
+      default:return 0;
+    }
+  }
+  if(ranges.gradStart != null){
+    if((type === "修士（自宅）" || type === "修士（自宅外）") && grade === ranges.gradStart) return 30;
+    if((type === "博士（自宅）" || type === "博士（自宅外）")){
+      if(grade === ranges.gradStart) return 30;
+      if(grade === ranges.gradStart + 2) return 30;
+    }
+  }
+  return 0;
+}
+function getSimpleEducationExtraAnnual(stage, grade, cell){
+  const extraMonth = Number(cell?.extraMonth || 0) || 0;
+  if(extraMonth <= 0) return 0;
+  if(stage === 'preschool') return (grade >= -2 && grade <= 0) ? extraMonth * 12 : 0;
+  return extraMonth * 12;
 }
 function getStudyAbroadCostForYear(childEdu, startGrade, grade){
   if(!childEdu || childEdu.abroad?.type !== "あり") return 0;
+  const ranges = getSimpleHigherEducationRanges(childEdu);
   if((childEdu.uni?.type || "なし") !== "なし"){
-    const targetGrade = Math.max(startGrade, 16);
+    const targetGrade = Math.max(startGrade, (ranges.uniStart != null ? ranges.uniStart + 1 : 14));
     return grade === targetGrade ? (childEdu.abroad.amount || 0) : 0;
   }
   if((childEdu.grad?.type || "なし") !== "なし"){
-    const targetGrade = Math.max(startGrade, 19);
+    const targetGrade = Math.max(startGrade, ranges.gradStart != null ? ranges.gradStart : 13);
     return grade === targetGrade ? (childEdu.abroad.amount || 0) : 0;
   }
   return 0;
+}
+function getGradeLabelFromValue(grade){
+  return Object.keys(gradeMap).find(label => gradeMap[label] === grade) || '';
+}
+function getUniversityDetailGradeRange(detail){
+  const schoolType = detail?.schoolType || 'national_public';
+  const years = Math.max(1, Number(detail?.years) || getUniversityDetailStandardValues(schoolType).years || 4);
+  const startGrade = 13;
+  return {startGrade, endGrade:startGrade + years - 1};
+}
+function getGraduateDetailGradeRange(detail, universityDetail = null, childEdu = null){
+  const degreeType = detail?.degreeType || 'none';
+  if(degreeType === 'none') return null;
+  const years = Math.max(1, Number(detail?.years) || getGraduateDetailStandardValues(degreeType).years || 2);
+  const detailUniRange = universityDetail ? getUniversityDetailGradeRange(universityDetail) : null;
+  const simpleUniYears = getSimpleHigherEducationRanges(childEdu).uniYears;
+  const uniEnd = detailUniRange ? detailUniRange.endGrade : (simpleUniYears > 0 ? 13 + simpleUniYears - 1 : 12);
+  const startGrade = uniEnd + 1;
+  return {startGrade, endGrade:startGrade + years - 1};
+}
+function getDetailedEducationCostForYear(child, childEdu, detail, stage, grade, yearIndex){
+  if(!detail) return null;
+  if(stage === 'preschool' && detail.preschool?.enabled){
+    const actualAge = getPreschoolActualAge(child, yearIndex);
+    const row = normalizePreschoolRows(detail.preschool.rows).find(r => Number(r.age) === actualAge);
+    if(row && row.type !== 'none'){
+      return (Number(row.annualCost) || 0) + (Number(row.extraMonthly) || 0) * 12 + (Number(row.entranceCost) || 0);
+    }
+    return 0;
+  }
+  if(stage === 'elem' && detail.elem?.enabled){
+    return (Number(detail.elem.annualCost) || 0) + (Number(detail.elem.extraMonthly) || 0) * 12 + (grade === 1 ? (Number(detail.elem.entranceCost) || 0) : 0);
+  }
+  if(stage === 'junior' && detail.junior?.enabled){
+    return (Number(detail.junior.annualCost) || 0) + (Number(detail.junior.extraMonthly) || 0) * 12 + (grade === 7 ? (Number(detail.junior.entranceCost) || 0) : 0);
+  }
+  if(stage === 'high' && detail.high?.enabled){
+    return (Number(detail.high.annualCost) || 0) + (Number(detail.high.extraMonthly) || 0) * 12 + (grade === 10 ? (Number(detail.high.entranceCost) || 0) : 0);
+  }
+  if(stage === 'uni' && detail.university?.enabled){
+    const range = getUniversityDetailGradeRange(detail.university);
+    if(grade >= range.startGrade && grade <= range.endGrade){
+      return (Number(detail.university.annualCost) || 0) + (Number(detail.university.extraMonthly) || 0) * 12 + (Number(detail.university.awayMonthly) || 0) * 12 + (grade === range.startGrade ? (Number(detail.university.entranceCost) || 0) : 0);
+    }
+  }
+  if(stage === 'grad' && detail.graduate?.enabled){
+    const range = getGraduateDetailGradeRange(detail.graduate);
+    if(range && grade >= range.startGrade && grade <= range.endGrade){
+      let entrance = 0;
+      const degreeType = detail.graduate?.degreeType || 'none';
+      if(degreeType === 'medical_grad_public' || degreeType === 'medical_grad_private'){
+        if(grade === range.startGrade) entrance += Number(detail.graduate.medicalEntranceCost) || 0;
+      }else if(degreeType === 'masters_public' || degreeType === 'masters_private'){
+        if(grade === range.startGrade) entrance += Number(detail.graduate.mastersEntranceCost) || 0;
+      }else if(degreeType === 'doctor_public' || degreeType === 'doctor_private'){
+        if(grade === range.startGrade) entrance += Number(detail.graduate.mastersEntranceCost) || 0;
+        if(grade === range.startGrade + 2) entrance += Number(detail.graduate.doctorEntranceCost) || 0;
+      }
+      return (Number(detail.graduate.annualCost) || 0) + (Number(detail.graduate.extraMonthly) || 0) * 12 + (Number(detail.graduate.awayMonthly) || 0) * 12 + entrance;
+    }
+  }
+  return null;
+}
+function getDetailAbroadCostForYear(detail, grade, childEdu = null){
+  if(!detail?.abroad?.enabled) return 0;
+  const target = detail.abroad.target || 'university';
+  const startYear = Math.max(1, Number(detail.abroad.startYear) || 1);
+  if(target === 'graduate'){
+    const gradRange = getGraduateDetailGradeRange(detail.graduate || {}, detail.university || null, childEdu);
+    return gradRange && grade === gradRange.startGrade + startYear - 1 ? (Number(detail.abroad.cost) || 0) : 0;
+  }
+  const uniRange = getUniversityDetailGradeRange(detail.university || {});
+  return grade === uniRange.startGrade + startYear - 1 ? (Number(detail.abroad.cost) || 0) : 0;
+}
+function getEducationStageLabelsForGrade(grade, childEdu, detail){
+  const labels = [];
+  const baseLabel = getGradeLabelFromValue(grade);
+  if(baseLabel && grade <= 12) labels.push(baseLabel);
+  if(grade >= 13){
+    const uniRange = detail?.university?.enabled ? getUniversityDetailGradeRange(detail.university) : null;
+    const gradRange = detail?.graduate?.enabled ? getGraduateDetailGradeRange(detail.graduate, detail?.university?.enabled ? detail.university : null, childEdu) : null;
+    const simpleRanges = getSimpleHigherEducationRanges(childEdu);
+    const effectiveUni = uniRange || (simpleRanges.uniStart != null ? {startGrade:simpleRanges.uniStart, endGrade:simpleRanges.uniEnd} : null);
+    const effectiveGrad = gradRange || (simpleRanges.gradStart != null ? {startGrade:simpleRanges.gradStart, endGrade:simpleRanges.gradEnd} : null);
+    if(effectiveUni && grade >= effectiveUni.startGrade && grade <= effectiveUni.endGrade){
+      const yearNo = grade - effectiveUni.startGrade + 1;
+      const schoolType = detail?.university?.enabled ? (detail.university.schoolType || 'national_public') : (simpleRanges.uniType || 'none');
+      if((schoolType === 'junior_college' || schoolType.startsWith('短大')) && yearNo <= 2) labels.push(`短大${yearNo}`);
+      if(yearNo >= 1 && yearNo <= 6) labels.push(`大${yearNo}`);
+    }
+    if(effectiveGrad && grade >= effectiveGrad.startGrade && grade <= effectiveGrad.endGrade){
+      const offset = grade - effectiveGrad.startGrade;
+      const degreeType = detail?.graduate?.enabled ? (detail.graduate.degreeType || 'none') : (simpleRanges.gradType || 'none');
+      if(degreeType === 'masters_public' || degreeType === 'masters_private' || degreeType === '修士（自宅）' || degreeType === '修士（自宅外）'){
+        if(offset >= 0 && offset < 2) labels.push(`修士${offset + 1}`);
+      }else if(degreeType === 'doctor_public' || degreeType === 'doctor_private' || degreeType === '博士（自宅）' || degreeType === '博士（自宅外）'){
+        if(offset >= 0 && offset < 2) labels.push(`修士${offset + 1}`);
+        else if(offset >= 2 && offset < 5) labels.push(`博士${offset - 1}`);
+      }else if(degreeType === 'medical_grad_public' || degreeType === 'medical_grad_private'){
+        if(offset >= 0 && offset < 2) labels.push(`修士${offset + 1}`);
+        else if(offset >= 2 && offset < 5) labels.push(`博士${offset - 1}`);
+      }
+    }
+  }
+  return [...new Set(labels)];
+}
+function getOneTimeEducationCostForYear(detail, grade, child, yearIndex, childEdu){
+  const labels = getEducationStageLabelsForGrade(grade, childEdu, detail);
+  const stage = grade <= 12 ? getStageFromGrade(grade) : getHigherEducationStageForGrade(childEdu, detail, grade);
+  if(stage === 'preschool') labels.push(getPreschoolAgeLabel(getPreschoolActualAge(child, yearIndex)));
+  return (detail?.oneTime?.rows || []).filter(row => labels.includes(String(row.stage || ''))).reduce((sum, row) => sum + (Number(row.cost) || 0), 0);
 }
 function getEducationCostForYear(cfg, yearIndex){
   let total = 0;
   const byChild = {};
   cfg.children.forEach(child=>{
     const childEdu = cfg.educationMatrix[child.idx] || {};
+    const detail = normalizeEducationDetail(childEdu.detail || null);
     const startSchool = childEdu.currentSchool || child.school;
-    const startGrade = gradeMap[startSchool] ?? -3;
+    const startGrade = resolveEducationStartGrade(startSchool, child.age, childEdu, detail);
     const grade = startGrade + yearIndex;
-    const stage = getStageFromGrade(grade);
+    const stage = grade <= 12 ? getStageFromGrade(grade) : getHigherEducationStageForGrade(childEdu, detail, grade);
     if(!stage){ byChild[child.idx] = 0; return; }
     const cell = childEdu[stage];
-    const baseVal = getBaseEduCost(grade, cell?.type || "");
-    const extraVal = (cell?.extraMonth || 0) * 12;
-    const abroadVal = getStudyAbroadCostForYear(childEdu, startGrade, grade);
-    const val = baseVal + extraVal + abroadVal;
+    const detailedVal = getDetailedEducationCostForYear(child, childEdu, detail, stage, grade, yearIndex);
+    const baseVal = detailedVal != null
+      ? detailedVal
+      : (getBaseEduCost(grade, cell?.type || "", childEdu) + getBaseEduEntranceCost(grade, cell?.type || "", childEdu) + getSimpleEducationExtraAnnual(stage, grade, cell));
+    const abroadVal = detail.abroad?.enabled ? getDetailAbroadCostForYear(detail, grade, childEdu) : getStudyAbroadCostForYear(childEdu, startGrade, grade);
+    const oneTimeVal = getOneTimeEducationCostForYear(detail, grade, child, yearIndex, childEdu);
+    const val = baseVal + abroadVal + oneTimeVal;
     byChild[child.idx] = val;
     total += val;
   });
@@ -4596,16 +5180,13 @@ function fillLoanDetailModalFromStored(){
 function renderLoanDetailPrepayRows(){
   const body = document.getElementById("loanDetailPrepayRows");
   if(!body) return;
-  const rows = Array.isArray(loanDetailDraft?.prepayPlans) ? loanDetailDraft.prepayPlans : [];
-  if(!rows.length){
-    body.innerHTML = `<tr><td colspan="4" style="color:#6b7280;">繰上返済計画がまだありません</td></tr>`;
-    return;
-  }
+  const sourceRows = Array.isArray(loanDetailDraft?.prepayPlans) ? loanDetailDraft.prepayPlans : [];
+  const rows = sourceRows.length ? sourceRows : [{id:`plan_${Date.now()}`, age:0, amount:0, mode:"期間短縮型"}];
   body.innerHTML = rows.map((row, idx)=>`<tr data-loan-prepay-row-id="${attrValue(row.id || `plan_${idx+1}`)}">
     <td><div class="input-unit"><input type="number" class="agebox" data-loan-prepay-field="age" data-loan-prepay-index="${idx}" value="${attrValue(row.age, 0)}"><span class="suffix">歳</span></div></td>
     <td><div class="input-unit"><input type="number" class="moneybox" data-loan-prepay-field="amount" data-loan-prepay-index="${idx}" value="${attrValue(row.amount, 0)}" step="0.1"><span class="suffix">万円</span></div></td>
     <td><select data-loan-prepay-field="mode" data-loan-prepay-index="${idx}"><option value="期間短縮型" ${row.mode === "期間短縮型" ? "selected" : ""}>期間短縮型</option><option value="返済額軽減型" ${row.mode === "返済額軽減型" ? "selected" : ""}>返済額軽減型</option></select></td>
-    <td><button type="button" data-loan-prepay-delete="${idx}">削除</button></td>
+    <td><button type="button" class="icon-btn" data-loan-prepay-delete="${idx}">x</button></td>
   </tr>`).join("");
   enhanceNumericInputs(body);
   formatAllNumericInputs(body, true);
@@ -5005,7 +5586,7 @@ document.addEventListener("click", (e)=>{
     e.preventDefault();
     e.stopPropagation();
     const type = addBtn.dataset.addRow;
-    rerenderDynamicSection(type, (dynamicCounts[type] || 1) + 1);
+    rerenderDynamicSection(type, ((dynamicCounts[type] ?? 0)) + 1);
     monteMode = false;
     if(scenarios.length && currentTab >= 0) scenarios[currentTab].data = getAllInputs();
     draw();
@@ -5138,19 +5719,68 @@ document.getElementById('eduBody')?.addEventListener('click', (e)=>{
   if(!btn) return;
   openEducationDetailModal(+(btn.dataset.eduDetailOpen || 0));
 });
+document.getElementById('eduBody')?.addEventListener('change', (e)=>{
+  const select = e.target.closest('select[data-edu-stage]');
+  if(!select) return;
+  const stage = select.dataset.eduStage || '';
+  const match = String(select.id || '').match(/^c(\d+)_(.+)_type$/);
+  if(!match) return;
+  const childIdx = match[1];
+  const extraInput = document.getElementById(`c${childIdx}_${stage}_extra`);
+  if(!extraInput) return;
+  const oldType = select.dataset.prevType || '';
+  const newType = select.value || '';
+  const oldDefault = getSimpleEducationExtraMonthlyDefault(stage, oldType);
+  const newDefault = getSimpleEducationExtraMonthlyDefault(stage, newType);
+  const currentVal = numInput(extraInput.id, 0);
+  if(extraInput.value === '' || approxEqualNumber(currentVal, oldDefault)) setNumericInputValue(extraInput.id, newDefault);
+  select.dataset.prevType = newType;
+  syncCurrentScenarioFromDOM(false);
+  draw();
+  persistState();
+});
 document.getElementById('cancelEducationDetailBtn')?.addEventListener('click', closeEducationDetailModal);
 document.getElementById('saveEducationDetailBtn')?.addEventListener('click', saveEducationDetailModal);
-['eduDetailUniversityEnabled','eduDetailGraduateEnabled','eduDetailAbroadEnabled','eduDetailUniversityLiving','eduDetailGraduateLiving','eduDetailUniversitySchoolType','eduDetailGraduateDegreeType'].forEach(id=>{
-  document.getElementById(id)?.addEventListener('change', ()=>{
+document.getElementById('eduDetailPreschoolBody')?.addEventListener('change', (e)=>{
+  if(e.target && String(e.target.id || '').startsWith('eduDetailPreschoolType_')){
+    const age = Number(String(e.target.id).split('_').pop() || 0);
+    const oldType = e.target.dataset.prevType || 'none';
+    const newType = e.target.value || 'none';
+    applyPreschoolDetailRowTypeDefaults(age, oldType, newType);
+    e.target.dataset.prevType = newType;
     updateEducationDetailStandardDisplays();
+  }
+  syncEducationDetailDraftFromModal();
+  persistState();
+});
+['eduDetailPreschoolEnabled','eduDetailElementaryEnabled','eduDetailJuniorEnabled','eduDetailHighEnabled','eduDetailUniversityEnabled','eduDetailGraduateEnabled','eduDetailAbroadEnabled','eduDetailUniversityLiving','eduDetailGraduateLiving','eduDetailElementarySchoolType','eduDetailJuniorSchoolType','eduDetailHighSchoolType','eduDetailUniversitySchoolType','eduDetailGraduateDegreeType'].forEach(id=>{
+  document.getElementById(id)?.addEventListener('change', ()=>{
+    if(id === 'eduDetailElementarySchoolType'){
+      const el = document.getElementById(id);
+      applyLowerSchoolDetailTypeDefaults('elem', el?.dataset.prevType || 'public', el?.value || 'public');
+      if(el) el.dataset.prevType = el.value || 'public';
+    }
+    if(id === 'eduDetailJuniorSchoolType'){
+      const el = document.getElementById(id);
+      applyLowerSchoolDetailTypeDefaults('junior', el?.dataset.prevType || 'public', el?.value || 'public');
+      if(el) el.dataset.prevType = el.value || 'public';
+    }
+    if(id === 'eduDetailHighSchoolType'){
+      const el = document.getElementById(id);
+      applyLowerSchoolDetailTypeDefaults('high', el?.dataset.prevType || 'public', el?.value || 'public');
+      if(el) el.dataset.prevType = el.value || 'public';
+    }
     if(id === 'eduDetailUniversitySchoolType'){
-      const std = getUniversityDetailStandardValues(document.getElementById('eduDetailUniversitySchoolType')?.value || 'national_public');
-      setNumericInputValue('eduDetailUniversityYears', std.years);
+      const el = document.getElementById(id);
+      applyUniversityDetailTypeDefaults(el?.dataset.prevType || 'national_public', el?.value || 'national_public');
+      if(el) el.dataset.prevType = el.value || 'national_public';
     }
     if(id === 'eduDetailGraduateDegreeType'){
-      const std = getGraduateDetailStandardValues(document.getElementById('eduDetailGraduateDegreeType')?.value || 'none');
-      setNumericInputValue('eduDetailGraduateYears', std.years);
+      const el = document.getElementById(id);
+      applyGraduateDetailTypeDefaults(el?.dataset.prevType || 'none', el?.value || 'none');
+      if(el) el.dataset.prevType = el.value || 'none';
     }
+    updateEducationDetailStandardDisplays();
     syncEducationDetailBlockStates();
   });
 });
