@@ -542,7 +542,24 @@
   .income-mode-line-normal .input-unit{justify-content:flex-start;min-width:0;max-width:none;width:190px;margin:0 auto;position:static;left:auto;top:auto;transform:none;padding-left:0;z-index:2;pointer-events:auto;align-self:center;}
   .income-mode-line-button .curve-btn{margin:0;align-self:flex-end;}
   .income-mode-line input[disabled], .income-curve-table input[disabled]{background:#f3f4f6;color:#6b7280;}
-  .curve-btn{padding:6px 10px;white-space:nowrap;}
+   .curve-btn{padding:6px 10px;white-space:nowrap;}
+  .pension-helper-cell{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;}
+  .pension-helper-cell .input-unit{width:190px;max-width:100%;justify-content:flex-start;margin:0 auto;}
+  .pension-helper-btn{align-self:center;width:160px;max-width:160px;box-sizing:border-box;transform:translateX(-15px);}
+  .pension-helper-modal{width:min(560px, calc(100vw - 20px));max-height:min(92vh, 760px);overflow:auto;}
+  .pension-helper-grid{display:flex;flex-direction:column;gap:12px;}
+  .pension-helper-note{color:var(--muted);font-size:.92rem;line-height:1.55;}
+  .pension-helper-mode-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;}
+  .pension-helper-mode-row label{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .pension-helper-section{border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff;}
+  .pension-helper-section-title{font-weight:700;margin-bottom:8px;color:#0f172a;}
+  .pension-helper-fields{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px 12px;}
+  .pension-helper-field{display:flex;flex-direction:column;gap:4px;min-width:0;}
+  .pension-helper-field > label{font-size:.92rem;color:#374151;}
+  .pension-helper-field .input-unit{max-width:none;width:100%;justify-content:flex-start;}
+  .pension-helper-field input[type=number], .pension-helper-field input[type=text], .pension-helper-field select{width:100%;max-width:100%;min-width:0;}
+  .pension-helper-static{display:flex;align-items:center;min-height:38px;padding:8px 10px;border:1px solid var(--border);border-radius:10px;background:#f8fafc;color:#111827;font-weight:600;}
+  .pension-helper-inline-note{margin-top:8px;color:#6b7280;font-size:.85rem;line-height:1.45;}
   .curve-btn[disabled]{opacity:.45;cursor:not-allowed;}
   .income-curve-modal{width:min(980px, calc(100vw - 24px));max-height:min(92vh, 920px);overflow:auto;}
   .income-curve-chart-wrap{height:320px;margin-bottom:12px;}
@@ -674,6 +691,7 @@
     .edu-detail-modal{width:min(100vw - 12px, 920px);padding:14px 10px 12px;}
     .edu-detail-fields,.edu-detail-summary{grid-template-columns:1fr;}
     .loan-detail-fields{grid-template-columns:1fr;}
+    .pension-helper-fields{grid-template-columns:1fr;}
     .income-curve-chart-wrap{height:260px;}
     .income-curve-table th,.income-curve-table td{padding:4px 3px;font-size:12px;}
     .income-curve-table th:nth-child(1), .income-curve-table td:nth-child(1){width:20%;}
@@ -794,6 +812,41 @@
       <div class="modal-actions" style="margin-top:14px;">
         <button type="button" id="cancelIncomeCurveBtn">キャンセル</button>
         <button type="button" id="saveIncomeCurveBtn">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="pensionHelperModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal-card pension-helper-modal" role="dialog" aria-modal="true" aria-labelledby="pensionHelperTitle">
+      <div id="pensionHelperTitle" class="modal-text" style="font-weight:bold;margin-bottom:10px;">年金入力補助</div>
+      <div class="pension-helper-grid">
+        <div class="pension-helper-note">※ 直接入力のまま使うことも、ねんきん定期便ベースで月額へ換算して反映することもできます。</div>
+        <div class="pension-helper-mode-row">
+          <label><input type="radio" name="pensionHelperMode" id="pensionHelperModeDirect" value="direct" checked> 直接入力</label>
+          <label><input type="radio" name="pensionHelperMode" id="pensionHelperModeNotice" value="nenkin_notice"> ねんきん定期便ベース</label>
+        </div>
+        <div id="pensionHelperDirectBlock" class="pension-helper-section">
+          <div class="pension-helper-section-title">直接入力</div>
+          <div class="pension-helper-fields">
+            <div class="pension-helper-field"><label for="pensionHelperDirectStartAge">年金開始年齢</label><div class="input-unit"><input id="pensionHelperDirectStartAge" type="number" class="agebox" value="65"><span class="suffix">歳</span></div></div>
+            <div class="pension-helper-field"><label for="pensionHelperDirectMonth">年金（月）</label><div class="input-unit"><input id="pensionHelperDirectMonth" type="number" class="moneybox" value="0" step="0.1"><span class="suffix">万円 / 月</span></div></div>
+          </div>
+        </div>
+        <div id="pensionHelperNoticeBlock" class="pension-helper-section">
+          <div class="pension-helper-section-title">ねんきん定期便ベース</div>
+          <div class="pension-helper-fields">
+            <div class="pension-helper-field"><label for="pensionHelperNoticeStartAge">年金開始年齢</label><div class="input-unit"><input id="pensionHelperNoticeStartAge" type="number" class="agebox" value="65"><span class="suffix">歳</span></div></div>
+            <div class="pension-helper-field"><label for="pensionHelperBasicAnnual">老齢基礎年金見込み</label><div class="input-unit"><input id="pensionHelperBasicAnnual" type="number" class="moneybox" value="0" step="0.1"><span class="suffix">万円 / 年</span></div></div>
+            <div class="pension-helper-field"><label for="pensionHelperEmployeeAnnual">老齢厚生年金見込み</label><div class="input-unit"><input id="pensionHelperEmployeeAnnual" type="number" class="moneybox" value="0" step="0.1"><span class="suffix">万円 / 年</span></div></div>
+            <div class="pension-helper-field"><label>年額合計</label><div id="pensionHelperAnnualTotal" class="pension-helper-static">0 万円 / 年</div></div>
+            <div class="pension-helper-field"><label>月額換算</label><div id="pensionHelperMonthlyTotal" class="pension-helper-static">0 万円 / 月</div></div>
+          </div>
+          <div class="pension-helper-inline-note">※ ねんきん定期便などの見込み額を年額で入力してください。月額換算して収入表へ反映します。</div>
+        </div>
+      </div>
+      <div class="modal-actions" style="margin-top:14px;">
+        <button type="button" id="cancelPensionHelperBtn">キャンセル</button>
+        <button type="button" id="savePensionHelperBtn">この内容で反映</button>
       </div>
     </div>
   </div>
@@ -1025,6 +1078,7 @@
 
     <div class="section">
       <h2>資産</h2>
+      <div class="help">預金・現在の運用資産・今後の投資・積立投資に分けて入力します。現在保有分は「現在の運用資産」、将来の一括投資予定は「今後の投資」、継続積立は「積立投資」へ入力してください。</div>
       <div class="subhead">預金</div>
       <div class="table-scroll">
       <table class="center-table">
@@ -1035,6 +1089,7 @@
       <div class="add-row-wrap"><button type="button" class="add-row-btn" data-add-row="dep">＋</button></div>
 
       <div class="subhead">現在の運用資産</div>
+      <div class="help">元本は取得額、現在額は現在の評価額を入力してください。</div>
       <div class="table-scroll">
       <table class="center-table asset-invest-table current-invest-table">
         <tr><th>項目</th><th>名義</th><th>口座</th><th>元本</th><th>現在額</th><th>通貨</th><th>利回り</th><th>iDeCo区分</th></tr>
@@ -1053,6 +1108,7 @@
       <div class="add-row-wrap"><button type="button" class="add-row-btn" data-add-row="futureInv">＋</button></div>
 
       <div class="subhead">積立投資</div>
+      <div class="help">将来の一括投資予定は「今後の投資」、毎月の積立予定は「積立投資」へ入力してください。</div>
       <div class="table-scroll">
       <table class="center-table asset-invest-table sum-invest-table">
         <tr><th>項目</th><th>名義</th><th>口座</th><th>積立期間</th><th>積立額</th><th>通貨</th><th>利回り</th><th>iDeCo区分</th></tr>
@@ -1091,6 +1147,7 @@
       <h2>収入</h2>
       <div class="stack-note">※ 収入は手取りベースで入力してください。</div>
       <div class="stack-note">※ 退職金・DC受取は上の専用表で受取方法を管理します。</div>
+      <div class="stack-note">※ 公的年金は「年金入力補助」から、ねんきん定期便ベースでも入力できます。</div>
       <div class="stack-note">※ 年単位計算のため、開始年齢・リタイア年齢に設定した年の収入は含みます。リタイア年齢と年金開始年齢が同じ場合、その年は月収入・ボーナスと年金の両方を含みます。</div>
       <div class="grid2">
         <div>
@@ -1104,7 +1161,7 @@
             <tr><td>リタイア年齢</td><td><div class="input-unit center"><input id="self_retire_age" type="number" class="agebox" value="65"><span class="suffix">歳</span></div></td></tr>
             <tr><td>退職金</td><td><div class="input-unit center"><input id="self_retire_pay" type="number" class="moneybox" value="1000"><span class="suffix">万円</span></div></td></tr>
             <tr><td>年金開始年齢</td><td><div class="input-unit center"><input id="self_pension_age" type="number" class="agebox" value="65"><span class="suffix">歳</span></div></td></tr>
-            <tr><td>年金（月）</td><td><div class="input-unit center"><input id="self_pension_month" type="number" class="moneybox" value="15" step="0.1"><span class="suffix">万円 / 月</span></div></td></tr>
+            <tr><td>年金（月）</td><td><div class="pension-helper-cell"><div class="input-unit center"><input id="self_pension_month" type="number" class="moneybox" value="15" step="0.1"><span class="suffix">万円 / 月</span></div><button type="button" id="self_pension_helper_btn" class="curve-btn pension-helper-btn">年金入力補助</button><input id="self_pension_input_mode" type="hidden" value="direct"><input id="self_pension_helper_start_age" type="hidden" value="65"><input id="self_pension_helper_basic_annual" type="hidden" value="0"><input id="self_pension_helper_employee_annual" type="hidden" value="0"></div></td></tr>
           </table>
         </div>
         <div>
@@ -1118,12 +1175,13 @@
             <tr><td>リタイア年齢</td><td><div class="input-unit center"><input id="sp_retire_age" type="number" class="agebox" value="60"><span class="suffix">歳</span></div></td></tr>
             <tr><td>退職金</td><td><div class="input-unit center"><input id="sp_retire_pay" type="number" class="moneybox" value="500"><span class="suffix">万円</span></div></td></tr>
             <tr><td>年金開始年齢</td><td><div class="input-unit center"><input id="sp_pension_age" type="number" class="agebox" value="65"><span class="suffix">歳</span></div></td></tr>
-            <tr><td>年金（月）</td><td><div class="input-unit center"><input id="sp_pension_month" type="number" class="moneybox" value="10" step="0.1"><span class="suffix">万円 / 月</span></div></td></tr>
+            <tr><td>年金（月）</td><td><div class="pension-helper-cell"><div class="input-unit center"><input id="sp_pension_month" type="number" class="moneybox" value="10" step="0.1"><span class="suffix">万円 / 月</span></div><button type="button" id="sp_pension_helper_btn" class="curve-btn pension-helper-btn">年金入力補助</button><input id="sp_pension_input_mode" type="hidden" value="direct"><input id="sp_pension_helper_start_age" type="hidden" value="65"><input id="sp_pension_helper_basic_annual" type="hidden" value="0"><input id="sp_pension_helper_employee_annual" type="hidden" value="0"></div></td></tr>
           </table>
         </div>
       </div>
 
       <div class="subhead">定期収入</div>
+      <div class="help">定期収入には、家賃収入・副業収入・私的年金・継続的な仕送りなど、一定期間継続して見込む収入を入力してください。</div>
       <div class="table-scroll">
       <table class="center-table reginc-table">
         <tr><th>項目</th><th>期間</th><th>金額</th><th>インフレ連動</th></tr>
@@ -1133,6 +1191,7 @@
       <div class="add-row-wrap"><button type="button" class="add-row-btn" data-add-row="reginc">＋</button></div>
 
       <div class="subhead">臨時収入</div>
+      <div class="help">臨時収入には、相続・贈与・補助金・一時金など、単発で発生する収入を入力してください。退職金・DC受取は上の専用設定を使ってください。</div>
       <div class="table-scroll">
       <table class="center-table inc-table">
         <tr><th>項目</th><th>年齢</th><th>金額</th><th>インフレ連動</th></tr>
@@ -1148,11 +1207,10 @@
 
     <div class="section">
       <h2>保険</h2>
-      <div class="help">保険料の支払いと、将来確定している受取を管理します。</div>
-      <div class="help">まずは確定しているキャッシュフローのみ対応します。死亡・入院・介護発生などの条件付き保険金は今後対応予定です。</div>
+      <div class="help">保険では、保険料の支払いと、将来確定している受取を管理します。死亡・入院・介護発生などの条件付き受取は、現時点では反映しません。</div>
 
       <div class="subhead">保険料支払い</div>
-      <div class="help">生命保険、医療保険、学資保険、個人年金保険などの保険料を入力します。月払い・年払いのどちらにも対応します。</div>
+      <div class="help">生命保険・医療保険・学資保険・個人年金保険など、継続して支払う保険料を入力してください。月払い・年払いのどちらにも対応します。</div>
       <div class="table-scroll">
       <table class="center-table insurance-pay-table">
         <tr><th>項目</th><th>保険種類</th><th>契約者</th><th>被保険者</th><th>支払期間</th><th>金額</th><th>支払単位</th><th>インフレ連動</th></tr>
@@ -1162,7 +1220,7 @@
       <div class="add-row-wrap"><button type="button" class="add-row-btn" data-add-row="insPay">＋</button></div>
 
       <div class="subhead">保険金・年金受取</div>
-      <div class="help">学資金、満期保険金、個人年金など、将来の受取予定を入力します。一時金は開始年齢と終了年齢を同じにしてください。</div>
+      <div class="help">学資金・満期保険金・個人年金など、将来の受取予定を入力してください。一時金は開始年齢のみ、年金形式は受取期間を設定してください。</div>
       <div class="table-scroll">
       <table class="center-table insurance-recv-table">
         <tr><th>項目</th><th>保険種類</th><th>受取種類</th><th>受取人</th><th>受取時期</th><th>受取期間</th><th>金額</th><th>受取単位</th><th>インフレ連動</th></tr>
@@ -1215,7 +1273,8 @@
       <input id="homeDetailPrepayJson" type="hidden" value="[]">
 
       <div class="subhead">持ち家維持費</div>
-      <div class="help">住宅ローン以外の持ち家コストを入力します。例：固定資産税・都市計画税、火災保険・地震保険、修繕・メンテナンス、管理費・修繕積立金など。</div>
+      <div class="help">持ち家維持費には、固定資産税・都市計画税、火災保険・地震保険、修繕・メンテナンス、管理費・修繕積立金など、住宅保有に伴う継続費を入力してください。</div>
+      <div class="help">住宅以外の支出や、生活費・定期支出としてまとめたいものは、該当ブロックへ入力してください。</div>
       <div class="table-scroll">
       <table class="center-table expense-range-table">
         <tr><th>項目</th><th>期間</th><th>金額</th><th>インフレ連動</th></tr>
@@ -1225,10 +1284,9 @@
       <div class="add-row-wrap"><button type="button" class="add-row-btn" data-add-row="homeMaint">＋</button></div>
 
       <div class="subhead">教育費</div>
-      <div class="help">各セルの上段で学校種別、下段で追加費用を入力します。現在の学校を起点に教育費を計算します。</div>
-      <div class="help">追加費用（月）は、標準値に含めない家庭差の大きい上乗せ分です。例：塾、習い事、教材費、通学費、部活費など。大学・大学院の自宅外費用は標準値側に含み、超過分のみ追加してください。</div>
-      <div class="help">詳細設定は未就学・小・中・高・大・院・留学・任意教育費ごとに独立して使えます。初回は簡単設定から初期値を作成し、その後は独立保持します。チェック中は詳細値、OFF時は簡単値を使います。任意教育費は入力があれば加算されます。</div>
-      <div class="help">標準値は「学校に通う上で比較的共通にかかる費用」の目安です。塾・習い事など家庭差の大きい費用は追加費用（月）で調整してください。</div>
+      <div class="help">追加費用（月）は、塾・習い事・教材費・通学費・部活費など、標準値に含めない上乗せ分を入力してください。</div>
+      <div class="help">大学・大学院の自宅外費用は標準値側で見込むため、追加費用（月）にはその超過分のみ入力してください。</div>
+      <div class="help">詳細設定は各段階ごとに独立して使えます。初回のみ簡単設定から初期値を作成し、その後は独立保持します。</div>
       <div class="edu-wrap">
         <table>
           <tr>
@@ -1251,6 +1309,8 @@
       </div>
 
       <div class="subhead">生活費</div>
+      <div class="help">生活費には、食費・日用品・光熱費・通信費・衣服費・通常医療費・交際費など、毎月の通常生活で継続的にかかる支出を含めてください。</div>
+      <div class="help">旅行・車検・帰省・家電買い替え準備など、毎月ではない支出は「定期支出」へ入力してください。</div>
       <div class="table-scroll">
       <table class="center-table expense-range-table">
         <tr><th>項目</th><th>期間</th><th>金額</th><th>インフレ連動</th></tr>
@@ -1260,6 +1320,8 @@
       <div class="add-row-wrap"><button type="button" class="add-row-btn" data-add-row="life">＋</button></div>
 
       <div class="subhead">定期支出</div>
+      <div class="help">定期支出は、生活費とは別に見込む年単位・季節単位の支出を入力する欄です。例：車検、自動車保険、帰省、旅行、家電買い替え準備など。</div>
+      <div class="help">固定資産税・火災保険・修繕費・管理費などを分けて管理したい場合は、「持ち家維持費」へ入力してください。</div>
       <div class="table-scroll">
       <table class="center-table expense-range-table">
         <tr><th>項目</th><th>期間</th><th>金額</th><th>インフレ連動</th></tr>
@@ -1269,6 +1331,8 @@
       <div class="add-row-wrap"><button type="button" class="add-row-btn" data-add-row="period">＋</button></div>
 
       <div class="subhead">臨時支出</div>
+      <div class="help">臨時支出には、車購入・大規模リフォーム・引っ越し費用・特別な医療費など、単発で発生する大きな支出を入力してください。</div>
+      <div class="help">毎年・数年ごとに見込む支出は「定期支出」、1回限りの大きな支出は「臨時支出」へ入力してください。</div>
       <div class="table-scroll">
       <table class="center-table expense-point-table">
         <tr><th>項目</th><th>年齢</th><th>金額</th><th>インフレ連動</th></tr>
@@ -2305,7 +2369,7 @@ function isVisibleForTab(el){
 }
 function isInsideHiddenLayer(el){
   if(!el || !el.closest) return false;
-  return !!el.closest('#tabContextMenu:not(.show), #rowContextMenu:not(.show), #loanDetailModal:not(.show), #incomeCurveModal:not(.show), #deleteRowModal:not(.show), #deleteTabModal:not(.show), [hidden], [aria-hidden="true"]');
+  return !!el.closest('#tabContextMenu:not(.show), #rowContextMenu:not(.show), #loanDetailModal:not(.show), #incomeCurveModal:not(.show), #pensionHelperModal:not(.show), #deleteRowModal:not(.show), #deleteTabModal:not(.show), [hidden], [aria-hidden="true"]');
 }
 function isTabNavigableElement(el){
   if(!el || !el.matches) return false;
@@ -2321,7 +2385,7 @@ function shouldSelectAllOnTabFocus(el){
   return el.matches('input[type="text"], input[type="search"], input[type="url"], input[type="tel"], input[type="email"], input[type="number"], input[data-numeric-ready="1"], textarea');
 }
 function getOpenModal(){
-  return document.querySelector('#loanDetailModal.show, #incomeCurveModal.show, #deleteRowModal.show, #deleteTabModal.show');
+  return document.querySelector('#loanDetailModal.show, #incomeCurveModal.show, #pensionHelperModal.show, #deleteRowModal.show, #deleteTabModal.show');
 }
 function getTabScopeRoot(){
   return getOpenModal() || document.body;
@@ -2348,7 +2412,7 @@ function collectTableFocusables(table){
 function collectFocusableFlow(node, scopeRoot, out, seen){
   if(!node || node.nodeType !== 1 || seen.has(node)) return;
   if(node !== scopeRoot && node.matches){
-    if(node.matches('#tabContextMenu, #rowContextMenu, #loanDetailModal:not(.show), #incomeCurveModal:not(.show), #deleteRowModal:not(.show), #deleteTabModal:not(.show), [hidden], [aria-hidden="true"]')) return;
+    if(node.matches('#tabContextMenu, #rowContextMenu, #loanDetailModal:not(.show), #incomeCurveModal:not(.show), #pensionHelperModal:not(.show), #deleteRowModal:not(.show), #deleteTabModal:not(.show), [hidden], [aria-hidden="true"]')) return;
   }
 
   if(node !== scopeRoot && isTabNavigableElement(node)){
@@ -2415,7 +2479,7 @@ function getAllInputs(){
   const data = {};
   document.querySelectorAll("input, select").forEach(el=>{
     if(!el.id) return;
-    if(el.closest && (el.closest("#loanDetailModal") || el.closest("#incomeCurveModal") || el.closest("#educationDetailModal"))) return;
+    if(el.closest && (el.closest("#loanDetailModal") || el.closest("#incomeCurveModal") || el.closest("#pensionHelperModal") || el.closest("#educationDetailModal"))) return;
     if(el.type === "checkbox") data[el.id] = el.checked;
     else if(el.dataset.numericReady === "1") data[el.id] = sanitizeNumericText(el.value, true);
     else data[el.id] = el.value;
@@ -5293,7 +5357,14 @@ function getIncomeOwnerConfig(owner){
     bonusNormalId: `${prefix}_bonus_mode_normal`,
     bonusCustomId: `${prefix}_bonus_mode_custom`,
     curveJsonId: `${prefix}_income_curve_json`,
-    buttonId: `${prefix}_income_curve_btn`
+    buttonId: `${prefix}_income_curve_btn`,
+    pensionAgeInputId: `${prefix}_pension_age`,
+    pensionMonthInputId: `${prefix}_pension_month`,
+    pensionHelperButtonId: `${prefix}_pension_helper_btn`,
+    pensionInputModeId: `${prefix}_pension_input_mode`,
+    pensionHelperStartAgeId: `${prefix}_pension_helper_start_age`,
+    pensionHelperBasicAnnualId: `${prefix}_pension_helper_basic_annual`,
+    pensionHelperEmployeeAnnualId: `${prefix}_pension_helper_employee_annual`
   };
 }
 function getIncomeModes(owner){
@@ -5327,6 +5398,103 @@ function updateIncomeCurveControls(){
     if(bonusInput) bonusInput.disabled = false;
   });
 }
+let activePensionHelperOwner = null;
+let pensionHelperDraft = null;
+function getStoredPensionHelperForOwner(owner){
+  const c = getIncomeOwnerConfig(owner);
+  const mode = document.getElementById(c.pensionInputModeId)?.value || "direct";
+  return {
+    mode: mode === "nenkin_notice" ? "nenkin_notice" : "direct",
+    directStartAge: numInput(c.pensionAgeInputId, 65) || 65,
+    directMonth: numInput(c.pensionMonthInputId, 0),
+    helperStartAge: numInput(c.pensionHelperStartAgeId, numInput(c.pensionAgeInputId, 65) || 65) || (numInput(c.pensionAgeInputId, 65) || 65),
+    basicAnnual: numInput(c.pensionHelperBasicAnnualId, 0),
+    employeeAnnual: numInput(c.pensionHelperEmployeeAnnualId, 0)
+  };
+}
+function syncPensionHelperDraftFromModal(){
+  if(!activePensionHelperOwner) return;
+  pensionHelperDraft = pensionHelperDraft || getStoredPensionHelperForOwner(activePensionHelperOwner);
+  pensionHelperDraft.mode = document.getElementById("pensionHelperModeNotice")?.checked ? "nenkin_notice" : "direct";
+  pensionHelperDraft.directStartAge = numInput("pensionHelperDirectStartAge", 0);
+  pensionHelperDraft.directMonth = numInput("pensionHelperDirectMonth", 0);
+  pensionHelperDraft.helperStartAge = numInput("pensionHelperNoticeStartAge", 0);
+  pensionHelperDraft.basicAnnual = numInput("pensionHelperBasicAnnual", 0);
+  pensionHelperDraft.employeeAnnual = numInput("pensionHelperEmployeeAnnual", 0);
+}
+function updatePensionHelperModeUI(){
+  const mode = document.getElementById("pensionHelperModeNotice")?.checked ? "nenkin_notice" : "direct";
+  const directBlock = document.getElementById("pensionHelperDirectBlock");
+  const noticeBlock = document.getElementById("pensionHelperNoticeBlock");
+  if(directBlock) directBlock.style.display = mode === "direct" ? "" : "none";
+  if(noticeBlock) noticeBlock.style.display = mode === "nenkin_notice" ? "" : "none";
+}
+function renderPensionHelperComputed(){
+  syncPensionHelperDraftFromModal();
+  const annualTotal = (Number(pensionHelperDraft?.basicAnnual || 0) || 0) + (Number(pensionHelperDraft?.employeeAnnual || 0) || 0);
+  const monthlyTotal = annualTotal / 12;
+  const annualEl = document.getElementById("pensionHelperAnnualTotal");
+  const monthlyEl = document.getElementById("pensionHelperMonthlyTotal");
+  if(annualEl) annualEl.textContent = `${(Math.round(annualTotal * 10) / 10).toLocaleString("ja-JP", {maximumFractionDigits:1})} 万円 / 年`;
+  if(monthlyEl) monthlyEl.textContent = `${(Math.round(monthlyTotal * 10) / 10).toLocaleString("ja-JP", {maximumFractionDigits:1})} 万円 / 月`;
+  updatePensionHelperModeUI();
+}
+function renderPensionHelperModal(){
+  if(!activePensionHelperOwner) return;
+  const c = getIncomeOwnerConfig(activePensionHelperOwner);
+  pensionHelperDraft = pensionHelperDraft || getStoredPensionHelperForOwner(activePensionHelperOwner);
+  document.getElementById("pensionHelperTitle").textContent = `${c.label} 年金入力補助`;
+  document.getElementById("pensionHelperModeDirect").checked = pensionHelperDraft.mode !== "nenkin_notice";
+  document.getElementById("pensionHelperModeNotice").checked = pensionHelperDraft.mode === "nenkin_notice";
+  document.getElementById("pensionHelperDirectStartAge").value = pensionHelperDraft.directStartAge || "";
+  document.getElementById("pensionHelperDirectMonth").value = pensionHelperDraft.directMonth || pensionHelperDraft.directMonth === 0 ? pensionHelperDraft.directMonth : "";
+  document.getElementById("pensionHelperNoticeStartAge").value = pensionHelperDraft.helperStartAge || "";
+  document.getElementById("pensionHelperBasicAnnual").value = pensionHelperDraft.basicAnnual || pensionHelperDraft.basicAnnual === 0 ? pensionHelperDraft.basicAnnual : "";
+  document.getElementById("pensionHelperEmployeeAnnual").value = pensionHelperDraft.employeeAnnual || pensionHelperDraft.employeeAnnual === 0 ? pensionHelperDraft.employeeAnnual : "";
+  enhanceNumericInputs(document.getElementById("pensionHelperModal"));
+  formatAllNumericInputs(document.getElementById("pensionHelperModal"), true);
+  renderPensionHelperComputed();
+  applyTabOrder();
+}
+function openPensionHelperModal(owner){
+  activePensionHelperOwner = owner === "sp" ? "sp" : "self";
+  pensionHelperDraft = getStoredPensionHelperForOwner(activePensionHelperOwner);
+  document.getElementById("pensionHelperModal")?.classList.add("show");
+  document.getElementById("pensionHelperModal")?.setAttribute("aria-hidden", "false");
+  renderPensionHelperModal();
+}
+function closePensionHelperModal(){
+  activePensionHelperOwner = null;
+  pensionHelperDraft = null;
+  document.getElementById("pensionHelperModal")?.classList.remove("show");
+  document.getElementById("pensionHelperModal")?.setAttribute("aria-hidden", "true");
+  applyTabOrder();
+}
+function savePensionHelperModal(){
+  if(!activePensionHelperOwner) return;
+  syncPensionHelperDraftFromModal();
+  const c = getIncomeOwnerConfig(activePensionHelperOwner);
+  const mode = pensionHelperDraft.mode === "nenkin_notice" ? "nenkin_notice" : "direct";
+  const startAge = mode === "nenkin_notice" ? pensionHelperDraft.helperStartAge : pensionHelperDraft.directStartAge;
+  const annualTotal = (Number(pensionHelperDraft.basicAnnual || 0) || 0) + (Number(pensionHelperDraft.employeeAnnual || 0) || 0);
+  const monthValue = mode === "nenkin_notice" ? annualTotal / 12 : (Number(pensionHelperDraft.directMonth || 0) || 0);
+  const ageValue = Number(startAge || 0) || 0;
+  setNumericInputValue(c.pensionAgeInputId, ageValue);
+  setNumericInputValue(c.pensionMonthInputId, monthValue);
+  const modeEl = document.getElementById(c.pensionInputModeId);
+  const startEl = document.getElementById(c.pensionHelperStartAgeId);
+  const basicEl = document.getElementById(c.pensionHelperBasicAnnualId);
+  const employeeEl = document.getElementById(c.pensionHelperEmployeeAnnualId);
+  if(modeEl) modeEl.value = mode;
+  if(startEl) startEl.value = String(Number(pensionHelperDraft.helperStartAge || ageValue) || 0);
+  if(basicEl) basicEl.value = String(Number(pensionHelperDraft.basicAnnual || 0) || 0);
+  if(employeeEl) employeeEl.value = String(Number(pensionHelperDraft.employeeAnnual || 0) || 0);
+  syncCurrentScenarioFromDOM(false);
+  draw();
+  persistState();
+  closePensionHelperModal();
+}
+
 function buildDefaultIncomeCurveForOwner(owner){
   const c = getIncomeOwnerConfig(owner);
   const currentAge = numInput("age", 50) || 50;
@@ -5846,6 +6014,7 @@ document.addEventListener("focusout", commitMainInputChange, true);
     });
   });
   document.getElementById(c.buttonId)?.addEventListener("click", ()=>openIncomeCurveModal(owner));
+  document.getElementById(c.pensionHelperButtonId)?.addEventListener("click", ()=>openPensionHelperModal(owner));
 });
 document.getElementById("homeDetailOn")?.addEventListener("change", ()=>{
   const isOn = !!document.getElementById("homeDetailOn")?.checked;
@@ -6015,6 +6184,21 @@ document.getElementById("incomeCurveModal")?.addEventListener("input", (e)=>{
   if(!e.target.closest("#incomeCurveModal")) return;
   if(e.target.id === "incomeCurveSalaryGrowthOn" || e.target.id === "incomeCurveBonusLinkedOn") updateIncomeCurveAutoControlStates();
   if(activeIncomeCurveOwner) drawIncomeCurveChart();
+});
+
+document.getElementById("cancelPensionHelperBtn")?.addEventListener("click", closePensionHelperModal);
+document.getElementById("savePensionHelperBtn")?.addEventListener("click", savePensionHelperModal);
+document.querySelector("#pensionHelperModal .pension-helper-modal")?.addEventListener("click", (e)=>e.stopPropagation());
+["mousedown","mouseup","dblclick","selectstart"].forEach(evt=>{
+  document.querySelector("#pensionHelperModal .pension-helper-modal")?.addEventListener(evt, (e)=>e.stopPropagation());
+});
+let pensionHelperBackdropPointerDown = false;
+document.getElementById("pensionHelperModal")?.addEventListener("mousedown", (e)=>{ pensionHelperBackdropPointerDown = e.target === e.currentTarget; });
+document.getElementById("pensionHelperModal")?.addEventListener("mouseup", (e)=>{ if(pensionHelperBackdropPointerDown && e.target === e.currentTarget) closePensionHelperModal(); pensionHelperBackdropPointerDown = false; });
+document.getElementById("pensionHelperModal")?.addEventListener("input", (e)=>{
+  if(!e.target.closest("#pensionHelperModal")) return;
+  if(e.target.name === "pensionHelperMode") updatePensionHelperModeUI();
+  renderPensionHelperComputed();
 });
 
 window.addEventListener("load", ()=>{
