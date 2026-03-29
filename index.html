@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>資産寿命シミュレータ</title>
+<title>資産寿命シミュaレータ</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 <style>
@@ -22,7 +22,7 @@
     --pink:#db2777;
     --ink:#111827;
   }
-  *{box-sizing:border-box}
+  *{box-sizing:border-box}ac
   body{
     margin:0;
     font-family:Arial, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
@@ -1490,8 +1490,11 @@ const DEFAULT_STAGE_OPTIONS = {kind:"公立",elem:"公立",junior:"公立",high:
 const INCOME_COLORS = {self:"#2563eb",spouse:"#60a5fa",pension:"#0f766e",regular:"#16a34a",extra:"#8b5cf6",childAllowance:"#f59e0b",insurance:"#14b8a6",retirePay:"#ec4899"};
 const EXPENSE_COLORS = {life:"#ef4444",rent:"#fb7185",homeMaint:"#a16207",insurance:"#0891b2",education:"#f97316",loan:"#b91c1c",periodic:"#7c2d12",extra:"#dc2626"};
 const INVESTMENT_COLORS = ["#2563eb","#16a34a","#dc2626","#7c3aed","#d97706"];
+const DRAW_DEBOUNCE_MS = 150;
+const PERSIST_DEBOUNCE_MS = 300;
 
 let chart = null;
+let drawDebounceTimer = null;
 let scenarios = [];
 let currentTab = 0;
 let monteMode = false;
@@ -1778,6 +1781,7 @@ function duplicateDynamicRow(type, index){
   renderDynamicSections(next);
   setAllInputs(next);
   updatePeriodDisplays();
+  if(type === "child") updateChildAllowanceSummary();
   persistState();
 }
 function deleteDynamicRow(type, index){
@@ -1792,6 +1796,7 @@ function deleteDynamicRow(type, index){
     renderDynamicSections(next);
     setAllInputs(next);
     updatePeriodDisplays();
+    if(type === "child") updateChildAllowanceSummary();
     persistState();
     return;
   }
@@ -1808,6 +1813,7 @@ function deleteDynamicRow(type, index){
   renderDynamicSections(next);
   setAllInputs(next);
   updatePeriodDisplays();
+  if(type === "child") updateChildAllowanceSummary();
   persistState();
 }
 function renameDynamicRow(type, index){
@@ -2479,7 +2485,6 @@ function renderDynamicSections(data = {}){
   renderRangeRows("period","periodRows","定期支出","万円 / 年",1,30,data);
   renderPointRows("extra","extraRows","臨時支出","万円",55,400,data);
   buildEducationGrid(data);
-  updateChildAllowanceSummary(data);
   enhanceNumericInputs(document);
   applyTabOrder();
 }
@@ -2962,7 +2967,7 @@ function moveFocusByTabDirection(backward){
   focusElementForTab(ordered[idx]);
   return true;
 }
-let inputPersistTimer = null;
+let persistDebounceTimer = null;
 function getAllInputs(){
   const data = {};
   const currentAge = currentAgeValue();
@@ -2989,8 +2994,7 @@ function syncCurrentScenarioFromDOM(persistLocal = false){
   if(!scenarios.length || currentTab < 0 || !scenarios[currentTab]) return;
   scenarios[currentTab].data = migrateLegacyData(getAllInputs());
   if(persistLocal){
-    clearTimeout(inputPersistTimer);
-    inputPersistTimer = setTimeout(()=>{ saveToLocal(); }, 150);
+    persistState();
   }
 }
 function refreshRowLabelTexts(){
@@ -4362,7 +4366,7 @@ function saveEducationDetailModal(){
   if(hidden) hidden.value = JSON.stringify(detail);
   syncCurrentScenarioFromDOM(false);
   renderDynamicSections(migrateLegacyData(getAllInputs()));
-  draw();
+  requestDraw();
   persistState();
   closeEducationDetailModal();
 }
@@ -5105,6 +5109,34 @@ function eachDayInRange(startParts, endExclusiveParts, fn){
     cur = addDaysToParts(cur, 1);
   }
 }
+function maxDateParts(a, b){
+  if(!a) return b || null;
+  if(!b) return a || null;
+  return compareDateParts(a, b) >= 0 ? a : b;
+}
+function minDateParts(a, b){
+  if(!a) return b || null;
+  if(!b) return a || null;
+  return compareDateParts(a, b) <= 0 ? a : b;
+}
+function getOverlapDayCount(startParts, endExclusiveParts, rangeStartParts, rangeEndExclusiveParts){
+  const overlapStart = maxDateParts(startParts, rangeStartParts);
+  const overlapEnd = minDateParts(endExclusiveParts, rangeEndExclusiveParts);
+  if(!overlapStart || !overlapEnd || compareDateParts(overlapStart, overlapEnd) >= 0) return 0;
+  const startMs = Date.UTC(overlapStart.year, overlapStart.month - 1, overlapStart.day);
+  const endMs = Date.UTC(overlapEnd.year, overlapEnd.month - 1, overlapEnd.day);
+  return Math.max(0, Math.round((endMs - startMs) / 86400000));
+}
+function eachMonthChunkInRange(startParts, endExclusiveParts, fn){
+  if(!startParts || !endExclusiveParts || compareDateParts(startParts, endExclusiveParts) >= 0) return;
+  let monthStart = getMonthStartParts(startParts);
+  while(monthStart && compareDateParts(monthStart, endExclusiveParts) < 0){
+    const nextMonthStart = getNextMonthStartParts(monthStart);
+    const overlapDays = getOverlapDayCount(startParts, endExclusiveParts, monthStart, nextMonthStart);
+    if(overlapDays > 0) fn(monthStart, nextMonthStart, overlapDays);
+    monthStart = nextMonthStart;
+  }
+}
 function getChildAllowancePotentialRows(cfg){
   return (cfg.children || []).filter(child=>child && (child.birthDate || Number.isFinite(child.age)));
 }
@@ -5160,10 +5192,10 @@ function getChildAllowanceMonthlyAmountForDate(cfg, targetParts, targetChild){
 }
 function calcChildAllowanceAmountForChildPeriod(cfg, child, periodStartParts, periodEndExclusiveParts){
   let total = 0;
-  eachDayInRange(periodStartParts, periodEndExclusiveParts, dayParts=>{
-    const monthlyAmount = getChildAllowanceMonthlyAmountForDate(cfg, dayParts, child);
+  eachMonthChunkInRange(periodStartParts, periodEndExclusiveParts, (monthStartParts, _nextMonthStartParts, overlapDays)=>{
+    const monthlyAmount = getChildAllowanceMonthlyAmountForDate(cfg, monthStartParts, child);
     if(monthlyAmount <= 0) return;
-    total += monthlyAmount / getDaysInMonthFromParts(dayParts);
+    total += monthlyAmount * (overlapDays / getDaysInMonthFromParts(monthStartParts));
   });
   return total;
 }
@@ -6129,6 +6161,22 @@ function buildInvestmentDatasets(sim, color, overlay, labelPrefix=""){
   }
   return ds;
 }
+function requestDraw(options = {}){
+  const immediate = options && options.immediate === true;
+  if(drawDebounceTimer){
+    clearTimeout(drawDebounceTimer);
+    drawDebounceTimer = null;
+  }
+  if(immediate){
+    draw();
+    return;
+  }
+  drawDebounceTimer = setTimeout(()=>{
+    drawDebounceTimer = null;
+    draw();
+  }, DRAW_DEBOUNCE_MS);
+}
+
 function buildDatasetsByGraphType(sim, graphType, color, overlay, labelPrefix=""){
   if(graphType === "asset") return buildAssetDatasets(sim, color, overlay, labelPrefix);
   if(graphType === "cashflow") return buildCashflowDatasets(sim, color, overlay, labelPrefix);
@@ -6402,8 +6450,20 @@ function decodeData(str){
 function saveToURL(){
   history.replaceState(null, "", location.pathname + "?d=" + encodeData(getSaveData()));
 }
+function clearURLState(){
+  if(location.search){
+    history.replaceState(null, "", location.pathname);
+  }
+}
 function saveToLocal(){
   localStorage.setItem("asset_life_sim_state", JSON.stringify(getSaveData()));
+}
+function flushPersistState(){
+  if(persistDebounceTimer){
+    clearTimeout(persistDebounceTimer);
+    persistDebounceTimer = null;
+  }
+  saveToLocal();
 }
 function loadFromURL(){
   const d = new URLSearchParams(location.search).get("d");
@@ -6416,6 +6476,7 @@ function loadFromURL(){
     if(scenarios.length) setAllInputs(scenarios[currentTab].data);
     updatePeriodDisplays();
     renderTabs();
+    clearURLState();
     return true;
   }catch(e){
     console.error(e);
@@ -6439,19 +6500,34 @@ function loadFromLocal(){
     return false;
   }
 }
-function persistState(){
-  saveToLocal();
-  saveToURL();
+function persistState(options = {}){
+  const immediate = options && options.immediate === true;
+  if(persistDebounceTimer){
+    clearTimeout(persistDebounceTimer);
+    persistDebounceTimer = null;
+  }
+  if(immediate){
+    saveToLocal();
+    return;
+  }
+  persistDebounceTimer = setTimeout(()=>{
+    persistDebounceTimer = null;
+    saveToLocal();
+  }, PERSIST_DEBOUNCE_MS);
 }
 async function copyURL(){
   saveToURL();
+  const shareURL = location.href;
   try{
-    await navigator.clipboard.writeText(location.href);
+    await navigator.clipboard.writeText(shareURL);
     alert("URLをコピーしました。");
   }catch(e){
     alert("URLコピーに失敗しました。");
+  }finally{
+    clearURLState();
   }
 }
+window.addEventListener("beforeunload", ()=>{ flushPersistState(); });
 
 
 let incomeCurveChart = null;
@@ -6603,7 +6679,7 @@ function savePensionHelperModal(){
   if(basicEl) basicEl.value = String(Number(pensionHelperDraft.basicAnnual || 0) || 0);
   if(employeeEl) employeeEl.value = String(Number(pensionHelperDraft.employeeAnnual || 0) || 0);
   syncCurrentScenarioFromDOM(false);
-  draw();
+  requestDraw();
   persistState();
   closePensionHelperModal();
 }
@@ -6764,7 +6840,7 @@ function saveLoanDetailModal(){
   formatAllNumericInputs(document, true);
   updateLoanSummary();
   syncCurrentScenarioFromDOM(false);
-  draw();
+  requestDraw();
   persistState();
   closeLoanDetailModal();
 }
@@ -6930,7 +7006,7 @@ function saveIncomeCurveModal(){
   // 定額入力欄は定額用の値として保持し、カスタム保存時に上書きしない。
   syncCurrentScenarioFromDOM(true);
   updateIncomeCurveControls();
-  draw();
+  requestDraw();
   persistState();
   closeIncomeCurveModal();
 }
@@ -6984,13 +7060,13 @@ document.getElementById("runMonteBtn").addEventListener("click", ()=>{
   runMonte(); persistState();
 });
 document.getElementById("copyUrlBtn").addEventListener("click", copyURL);
-document.getElementById("graphType").addEventListener("change", ()=>{ draw(); persistState(); });
-document.getElementById("overlayToggle").addEventListener("change", ()=>{ monteMode ? runMonte() : draw(); persistState(); });
-document.getElementById("fixedScale").addEventListener("change", ()=>{ monteMode ? runMonte() : draw(); persistState(); });
-document.getElementById("fixedScaleMin").addEventListener("input", ()=>{ monteMode ? runMonte() : draw(); persistState(); });
-document.getElementById("fixedScaleMax").addEventListener("input", ()=>{ monteMode ? runMonte() : draw(); persistState(); });
-document.getElementById("xAxisMin").addEventListener("input", ()=>{ monteMode ? runMonte() : draw(); persistState(); });
-document.getElementById("xAxisMax").addEventListener("input", ()=>{ monteMode ? runMonte() : draw(); persistState(); });
+document.getElementById("graphType").addEventListener("change", ()=>{ requestDraw(); persistState(); });
+document.getElementById("overlayToggle").addEventListener("change", ()=>{ monteMode ? runMonte() : requestDraw(); persistState(); });
+document.getElementById("fixedScale").addEventListener("change", ()=>{ monteMode ? runMonte() : requestDraw(); persistState(); });
+document.getElementById("fixedScaleMin").addEventListener("input", ()=>{ monteMode ? runMonte() : requestDraw(); persistState(); });
+document.getElementById("fixedScaleMax").addEventListener("input", ()=>{ monteMode ? runMonte() : requestDraw(); persistState(); });
+document.getElementById("xAxisMin").addEventListener("input", ()=>{ monteMode ? runMonte() : requestDraw(); persistState(); });
+document.getElementById("xAxisMax").addEventListener("input", ()=>{ monteMode ? runMonte() : requestDraw(); persistState(); });
 
 document.addEventListener("mousedown", (e)=>{
   const rowLabel = e.target.closest("[data-row-menu]");
@@ -7064,8 +7140,8 @@ document.addEventListener("click", (e)=>{
     rerenderDynamicSection(type, ((dynamicCounts[type] ?? 0)) + 1);
     monteMode = false;
     if(scenarios.length && currentTab >= 0) scenarios[currentTab].data = getAllInputs();
-    updateChildAllowanceSummary();
-    draw();
+    if(type === "child") updateChildAllowanceSummary();
+    requestDraw();
     persistState();
   }
 });
@@ -7076,6 +7152,13 @@ window.addEventListener("scroll", ()=>{ if(activeNumericInput) positionNumericAs
 document.addEventListener("click", (e)=>{
   if(!isNumericLikeInput(e.target)) hideNumericAssist();
 });
+
+function shouldRefreshChildAllowanceSummaryForElement(el){
+  if(!el || !el.id) return false;
+  if(el.id === "baseDate" || el.id === "childAllowanceOn") return true;
+  if(/^child\d+_(enabled|birthDate|allowanceOn|school)$/.test(el.id)) return true;
+  return false;
+}
 
 document.addEventListener("input", (e)=>{
   const el = e.target;
@@ -7116,7 +7199,7 @@ document.addEventListener("input", (e)=>{
   }
   updatePeriodDisplays();
   syncCurrentScenarioFromDOM(true);
-  updateChildAllowanceSummary();
+  if(shouldRefreshChildAllowanceSummaryForElement(el)) updateChildAllowanceSummary();
   updateLoanSummary();
 });
 function commitMainInputChange(e){
@@ -7159,9 +7242,9 @@ function commitMainInputChange(e){
   monteMode = false;
   updatePeriodDisplays();
   syncCurrentScenarioFromDOM(false);
-  updateChildAllowanceSummary();
+  if(shouldRefreshChildAllowanceSummaryForElement(el)) updateChildAllowanceSummary();
   updateLoanSummary();
-  draw();
+  requestDraw();
   persistState();
 }
 document.addEventListener("change", commitMainInputChange);
@@ -7195,7 +7278,7 @@ document.addEventListener("focusout", commitMainInputChange, true);
       }
       updateIncomeCurveControls();
       syncCurrentScenarioFromDOM(true);
-      draw();
+      requestDraw();
       persistState();
     });
   });
@@ -7213,7 +7296,7 @@ document.getElementById("homeDetailOn")?.addEventListener("change", ()=>{
   updateHomeDetailUIState();
   updateLoanSummary();
   syncCurrentScenarioFromDOM(false);
-  draw();
+  requestDraw();
   persistState();
 });
 document.getElementById("homeDetailBtn")?.addEventListener("click", ()=>{
@@ -7285,7 +7368,7 @@ document.getElementById('eduBody')?.addEventListener('change', (e)=>{
   if(extraInput.value === '' || approxEqualNumber(currentVal, oldDefault)) setNumericInputValue(extraInput.id, newDefault);
   select.dataset.prevType = newType;
   syncCurrentScenarioFromDOM(false);
-  draw();
+  requestDraw();
   persistState();
 });
 document.getElementById('eduCopyBtn')?.addEventListener('click', openEducationCopyModal);
