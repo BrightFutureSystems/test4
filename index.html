@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>資産寿命シミュaレータ</title>
+<title>資産寿命シミュレータ</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 <style>
@@ -440,20 +440,25 @@
   .edu-detail-inline-note{color:#6b7280;font-size:.85rem;line-height:1.45;}
   .loan-detail-field-wide{grid-column:1 / -1;}
   #loanDetailMethodSelect{min-width:0;width:100%;}
-  .loan-prepay-table-wrap{overflow-x:visible;max-width:100%;}
-  .loan-prepay-table{width:100%;min-width:0;border-collapse:collapse;table-layout:fixed;}
+  .loan-prepay-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;}
+  .loan-prepay-table{width:100%;min-width:600px;border-collapse:collapse;table-layout:fixed;}
   .loan-prepay-table th,.loan-prepay-table td{border:1px solid var(--border);padding:5px 4px;text-align:center;vertical-align:middle;}
   .loan-prepay-table th{background:#fafafa;line-height:1.2;white-space:nowrap;}
-  .loan-prepay-table th:nth-child(1),.loan-prepay-table td:nth-child(1){width:20%;}
-  .loan-prepay-table th:nth-child(2),.loan-prepay-table td:nth-child(2){width:30%;}
-  .loan-prepay-table th:nth-child(3),.loan-prepay-table td:nth-child(3){width:34%;}
+  .loan-prepay-table th:nth-child(1),.loan-prepay-table td:nth-child(1){width:30%;}
+  .loan-prepay-table th:nth-child(2),.loan-prepay-table td:nth-child(2){width:24%;}
+  .loan-prepay-table th:nth-child(3),.loan-prepay-table td:nth-child(3){width:30%;}
   .loan-prepay-table th:nth-child(4),.loan-prepay-table td:nth-child(4){width:16%;}
   .loan-prepay-table .input-unit{max-width:none;width:100%;justify-content:flex-start;gap:2px;}
+  .loan-prepay-table .loan-year-month-wrap{display:inline-flex;align-items:center;justify-content:flex-start;gap:4px;white-space:nowrap;width:100%;}
+  .loan-prepay-table .loan-year-select{width:78px !important;min-width:78px !important;}
+  .loan-prepay-table .loan-month-select{width:52px !important;min-width:52px !important;}
   .loan-prepay-table .suffix{font-size:.8rem;white-space:nowrap;}
   .loan-prepay-table select,.loan-prepay-table input[type=number],.loan-prepay-table button{width:100%;min-width:0;max-width:100%;font-size:.92rem;}
   .loan-prepay-table button{white-space:nowrap;}
   @media (max-width:640px){
     .loan-prepay-table th,.loan-prepay-table td{padding:4px 2px;font-size:.82rem;}
+    .loan-prepay-table .loan-year-select{width:72px !important;min-width:72px !important;}
+    .loan-prepay-table .loan-month-select{width:48px !important;min-width:48px !important;}
     .loan-prepay-table .suffix{font-size:.72rem;}
     .loan-prepay-table select,.loan-prepay-table input[type=number],.loan-prepay-table button{font-size:.82rem;padding:4px 3px;}
   }
@@ -968,7 +973,7 @@
           <div class="loan-detail-section-title">繰上返済計画</div>
           <div class="loan-prepay-table-wrap">
             <table class="loan-prepay-table">
-              <thead><tr><th>実行年齢</th><th>金額</th><th>方式</th><th>削除</th></tr></thead>
+              <thead><tr><th>実行年月</th><th>金額</th><th>方式</th><th>削除</th></tr></thead>
               <tbody id="loanDetailPrepayRows"></tbody>
             </table>
           </div>
@@ -2724,6 +2729,46 @@ function buildRetireYearOptionsHtml(selectedYear, birthDateValue, baseDateValue)
   }
   return html;
 }
+function getLoanPrepayYearRangeParts(){
+  const birthValue = document.getElementById('selfBirthDate')?.value || '';
+  const baseDateValue = document.getElementById('baseDate')?.value || '';
+  return getRetireYearRangeParts(birthValue, baseDateValue, 0);
+}
+function buildLoanPrepayYearOptionsHtml(selectedYear){
+  const birthValue = document.getElementById('selfBirthDate')?.value || '';
+  const baseDateValue = document.getElementById('baseDate')?.value || '';
+  return buildRetireYearOptionsHtml(selectedYear, birthValue, baseDateValue);
+}
+function deriveLoanPrepayYearMonthFromAge(ageValue){
+  const birthValue = document.getElementById('selfBirthDate')?.value || '';
+  const baseDateValue = document.getElementById('baseDate')?.value || '';
+  const ym = deriveRetireYearMonthFromAge(ageValue, birthValue, baseDateValue);
+  return {
+    year: Number(ym?.year) || (parseDateInput(baseDateValue)?.year || new Date().getFullYear()),
+    month: Math.min(12, Math.max(1, Number(ym?.month) || 1))
+  };
+}
+function formatLoanYearMonthLabel(yearValue, monthValue){
+  const y = Math.round(Number(yearValue) || 0);
+  const m = Math.round(Number(monthValue) || 0);
+  if(y <= 0 || m <= 0) return '';
+  return `${y}年${m}月`;
+}
+function calcAgeAtYearMonth(birthDateValue, yearValue, monthValue){
+  const birthParts = parseDateInput(birthDateValue || '');
+  const targetParts = getRetireMonthEndParts(yearValue, monthValue);
+  const ageParts = calcAgeYearMonthsAtParts(birthParts, targetParts);
+  return ageParts ? ageParts.years : 0;
+}
+function compareLoanPlanYearMonth(a, b){
+  const ay = Number(a?.year) || 0;
+  const by = Number(b?.year) || 0;
+  if(ay !== by) return ay - by;
+  const am = Number(a?.month) || 0;
+  const bm = Number(b?.month) || 0;
+  if(am !== bm) return am - bm;
+  return (Number(a?.age) || 0) - (Number(b?.age) || 0);
+}
 function syncRetireYearSelectOptions(prefix, explicitData = null){
   const yearEl = document.getElementById(`${prefix}_retire_year`);
   const monthEl = document.getElementById(`${prefix}_retire_month`);
@@ -3047,12 +3092,24 @@ function parseLoanPrepayJson(value){
   }
 }
 function normalizeLoanPrepayPlans(plans){
-  return (Array.isArray(plans) ? plans : []).map((row, idx)=>({
-    id: row && row.id ? String(row.id) : `plan_${idx+1}`,
-    age: Math.max(0, Number(row?.age) || 0),
-    amount: Math.max(0, Number(row?.amount) || 0),
-    mode: row?.mode === "返済額軽減型" ? "返済額軽減型" : "期間短縮型"
-  })).filter(r=>r.age > 0 && r.amount > 0).sort((a,b)=>a.age - b.age);
+  const baseDateValue = document.getElementById('baseDate')?.value || '';
+  const baseYear = parseDateInput(baseDateValue)?.year || new Date().getFullYear();
+  return (Array.isArray(plans) ? plans : []).map((row, idx)=>{
+    const legacyAge = Math.max(0, Number(row?.age) || 0);
+    const derivedYm = deriveLoanPrepayYearMonthFromAge(legacyAge);
+    const year = Math.round(Number(row?.year) || 0) || derivedYm.year || baseYear;
+    const monthRaw = Math.round(Number(row?.month) || 0);
+    const month = monthRaw >= 1 && monthRaw <= 12 ? monthRaw : (derivedYm.month || 1);
+    const age = legacyAge > 0 ? legacyAge : calcAgeAtYearMonth(document.getElementById('selfBirthDate')?.value || '', year, month);
+    return {
+      id: row && row.id ? String(row.id) : `plan_${idx+1}`,
+      year,
+      month,
+      age: Math.max(0, Number(age) || 0),
+      amount: Math.max(0, Number(row?.amount) || 0),
+      mode: row?.mode === "返済額軽減型" ? "返済額軽減型" : "期間短縮型"
+    };
+  }).filter(r=>r.year > 0 && r.month >= 1 && r.month <= 12 && r.amount > 0).sort(compareLoanPlanYearMonth);
 }
 function calcLevelPayment(principal, monthlyRate, months){
   const p = Math.max(0, Number(principal) || 0);
@@ -3192,14 +3249,32 @@ function simulateLoanDetail(detail){
   let monthlyPrincipal = method === "元金均等返済" ? (remainMonths > 0 ? remainPrincipal / remainMonths : 0) : 0;
   const annualByAge = {};
   const monthlyAtAge = {};
+  const monthlySumsByAge = {};
+  const monthlyCountsByAge = {};
+  const prepayPlanMap = new Map();
+  plans.forEach(plan=>{
+    const key = `${Math.round(Number(plan.year) || 0)}-${Math.round(Number(plan.month) || 0)}`;
+    if(!prepayPlanMap.has(key)) prepayPlanMap.set(key, []);
+    prepayPlanMap.get(key).push(plan);
+  });
   let totalPaid = 0;
   let prepayTotal = 0;
   let monthIndex = 0;
-  let age = buyAge;
   let initialMonthly = 0;
+  const birthDateValue = document.getElementById('selfBirthDate')?.value || '';
+  const baseDateValue = document.getElementById('baseDate')?.value || '';
+  const buyYm = deriveRetireYearMonthFromAge(buyAge, birthDateValue, baseDateValue);
+  let currentYear = Math.round(Number(buyYm?.year) || 0);
+  let currentMonth = Math.round(Number(buyYm?.month) || 0);
+  if(currentYear <= 0 || currentMonth < 1 || currentMonth > 12){
+    const baseParts = parseDateInput(baseDateValue || '');
+    currentYear = baseParts?.year || new Date().getFullYear();
+    currentMonth = Math.min(12, Math.max(1, baseParts?.month || 1));
+  }
   while(remainPrincipal > 1e-8 && remainMonths > 0 && monthIndex < 1200){
-    const plansThisAge = plans.filter(p=>p.age === age);
-    plansThisAge.forEach(plan=>{
+    const age = calcAgeAtYearMonth(birthDateValue, currentYear, currentMonth) || Math.floor(buyAge + monthIndex / 12);
+    const plansThisMonth = prepayPlanMap.get(`${currentYear}-${currentMonth}`) || [];
+    plansThisMonth.forEach(plan=>{
       if(remainPrincipal <= 1e-8) return;
       const applied = Math.min(remainPrincipal, plan.amount);
       remainPrincipal -= applied;
@@ -3221,38 +3296,39 @@ function simulateLoanDetail(detail){
       }
     });
     if(remainPrincipal <= 1e-8 || remainMonths <= 0) break;
-    let yearPayment = annualByAge[age] || 0;
-    let yearMonthlyRepresentative = 0;
-    let monthsThisAge = 0;
-    for(let m=0; m<12 && remainPrincipal > 1e-8 && remainMonths > 0; m++){
-      const interest = remainPrincipal * monthlyRate;
-      let payment = 0;
-      let principalPart = 0;
-      if(method === "元利均等返済"){
-        payment = monthlyPayment;
-        principalPart = payment - interest;
-        if(principalPart <= 0){ principalPart = remainPrincipal; payment = remainPrincipal + interest; }
-        if(principalPart > remainPrincipal){ principalPart = remainPrincipal; payment = principalPart + interest; }
-      }else{
-        principalPart = Math.min(remainPrincipal, monthlyPrincipal);
-        payment = principalPart + interest;
-      }
-      remainPrincipal = Math.max(0, remainPrincipal - principalPart);
-      remainMonths = Math.max(0, remainMonths - 1);
-      yearPayment += payment;
-      totalPaid += payment;
-      yearMonthlyRepresentative += payment;
-      monthsThisAge += 1;
-      monthIndex += 1;
-      if(!initialMonthly) initialMonthly = payment;
-      if(remainPrincipal <= 1e-8) break;
+    const interest = remainPrincipal * monthlyRate;
+    let payment = 0;
+    let principalPart = 0;
+    if(method === "元利均等返済"){
+      payment = monthlyPayment;
+      principalPart = payment - interest;
+      if(principalPart <= 0){ principalPart = remainPrincipal; payment = remainPrincipal + interest; }
+      if(principalPart > remainPrincipal){ principalPart = remainPrincipal; payment = principalPart + interest; }
+    }else{
+      principalPart = Math.min(remainPrincipal, monthlyPrincipal);
+      payment = principalPart + interest;
     }
-    annualByAge[age] = yearPayment;
-    monthlyAtAge[age] = monthsThisAge > 0 ? yearMonthlyRepresentative / monthsThisAge : 0;
-    age += 1;
+    remainPrincipal = Math.max(0, remainPrincipal - principalPart);
+    remainMonths = Math.max(0, remainMonths - 1);
+    annualByAge[age] = (annualByAge[age] || 0) + payment;
+    monthlySumsByAge[age] = (monthlySumsByAge[age] || 0) + payment;
+    monthlyCountsByAge[age] = (monthlyCountsByAge[age] || 0) + 1;
+    totalPaid += payment;
+    monthIndex += 1;
+    if(!initialMonthly) initialMonthly = payment;
     if(remainPrincipal <= 1e-8) break;
     if(method === "元金均等返済" && remainMonths > 0) monthlyPrincipal = remainPrincipal / remainMonths;
+    currentMonth += 1;
+    if(currentMonth > 12){
+      currentMonth = 1;
+      currentYear += 1;
+    }
   }
+  Object.keys(monthlySumsByAge).forEach(ageKey=>{
+    const age = Number(ageKey) || 0;
+    const count = Number(monthlyCountsByAge[age] || 0);
+    monthlyAtAge[age] = count > 0 ? (monthlySumsByAge[age] / count) : 0;
+  });
   const activeAges = Object.keys(annualByAge).map(v=>+v).filter(v=>annualByAge[v] > 0).sort((a,b)=>a-b);
   const lastAge = activeAges.length ? activeAges[activeAges.length - 1] : buyAge;
   const currentAge = numInput("age", 0);
@@ -3290,7 +3366,7 @@ function getLoanPrepayImpact(detail, sim = null){
     reducedPaymentBefore: 0,
     reducedPaymentAfter: 0
   };
-  const reductionPlans = plans.filter(p=>p.mode === "返済額軽減型").sort((a,b)=>a.age-b.age);
+  const reductionPlans = plans.filter(p=>p.mode === "返済額軽減型").sort(compareLoanPlanYearMonth);
   const findMonthlyAtOrAfter = (monthlyMap, startAge, fallbackEndAge=0)=>{
     const ages = Object.keys(monthlyMap || {}).map(v=>+v).filter(v=>v >= startAge).sort((a,b)=>a-b);
     if(ages.length) return {age:ages[0], payment:Number(monthlyMap[ages[0]] || 0)};
@@ -6718,6 +6794,11 @@ function getStoredLoanDetail(){
 }
 function fillLoanDetailModalFromStored(){
   const stored = buildLoanDetailFromHiddenFields();
+  const prepayPlans = normalizeLoanPrepayPlans(stored.prepayPlans || []);
+  if(!prepayPlans.length){
+    const baseParts = parseDateInput(document.getElementById('baseDate')?.value || '') || {year:new Date().getFullYear(), month:1};
+    prepayPlans.push({id:`plan_${Date.now()}`, year:baseParts.year, month:baseParts.month, age:0, amount:0, mode:"期間短縮型"});
+  }
   loanDetailDraft = {
     buyAge: stored.buyAge || 40,
     down: stored.down || 0,
@@ -6725,20 +6806,31 @@ function fillLoanDetailModalFromStored(){
     ratePct: stored.ratePct || 0,
     baseYears: stored.baseYears || 35,
     method: stored.method || "元利均等返済",
-    prepayPlans: normalizeLoanPrepayPlans(stored.prepayPlans || [])
+    prepayPlans
   };
 }
 function renderLoanDetailPrepayRows(){
   const body = document.getElementById("loanDetailPrepayRows");
   if(!body) return;
   const sourceRows = Array.isArray(loanDetailDraft?.prepayPlans) ? loanDetailDraft.prepayPlans : [];
-  const rows = sourceRows.length ? sourceRows : [{id:`plan_${Date.now()}`, age:0, amount:0, mode:"期間短縮型"}];
-  body.innerHTML = rows.map((row, idx)=>`<tr data-loan-prepay-row-id="${attrValue(row.id || `plan_${idx+1}`)}">
-    <td><div class="input-unit"><input type="number" class="agebox" data-loan-prepay-field="age" data-loan-prepay-index="${idx}" value="${attrValue(row.age, 0)}"><span class="suffix">歳</span></div></td>
-    <td><div class="input-unit"><input type="number" class="moneybox" data-loan-prepay-field="amount" data-loan-prepay-index="${idx}" value="${attrValue(row.amount, 0)}" step="0.1"><span class="suffix">万円</span></div></td>
-    <td><select data-loan-prepay-field="mode" data-loan-prepay-index="${idx}"><option value="期間短縮型" ${row.mode === "期間短縮型" ? "selected" : ""}>期間短縮型</option><option value="返済額軽減型" ${row.mode === "返済額軽減型" ? "selected" : ""}>返済額軽減型</option></select></td>
+  const baseParts = parseDateInput(document.getElementById('baseDate')?.value || '') || {year:new Date().getFullYear(), month:1};
+  const rows = sourceRows.length ? sourceRows : [{id:`plan_${Date.now()}`, year:baseParts.year, month:baseParts.month, age:0, amount:0, mode:"期間短縮型"}];
+  body.innerHTML = rows.map((row, idx)=>{
+    const normalized = normalizeLoanPrepayPlans([row])[0] || {
+      id: row?.id || `plan_${idx+1}`,
+      year: baseParts.year,
+      month: baseParts.month,
+      age: 0,
+      amount: Math.max(0, Number(row?.amount) || 0),
+      mode: row?.mode === "返済額軽減型" ? "返済額軽減型" : "期間短縮型"
+    };
+    return `<tr data-loan-prepay-row-id="${attrValue(normalized.id || `plan_${idx+1}`)}">
+    <td><div class="loan-year-month-wrap"><select class="loan-year-select" data-loan-prepay-field="year" data-loan-prepay-index="${idx}">${buildLoanPrepayYearOptionsHtml(normalized.year)}</select><span class="suffix">年</span><select class="loan-month-select" data-loan-prepay-field="month" data-loan-prepay-index="${idx}">${buildMonthOptionsHtml(normalized.month)}</select><span class="suffix">月</span></div></td>
+    <td><div class="input-unit"><input type="number" class="moneybox" data-loan-prepay-field="amount" data-loan-prepay-index="${idx}" value="${attrValue(normalized.amount, 0)}" step="0.1"><span class="suffix">万円</span></div></td>
+    <td><select data-loan-prepay-field="mode" data-loan-prepay-index="${idx}"><option value="期間短縮型" ${normalized.mode === "期間短縮型" ? "selected" : ""}>期間短縮型</option><option value="返済額軽減型" ${normalized.mode === "返済額軽減型" ? "selected" : ""}>返済額軽減型</option></select></td>
     <td><button type="button" class="icon-btn" data-loan-prepay-delete="${idx}">x</button></td>
-  </tr>`).join("");
+  </tr>`;
+  }).join("");
   enhanceNumericInputs(body);
   formatAllNumericInputs(body, true);
 }
@@ -6753,14 +6845,18 @@ function syncLoanDetailDraftFromModal(){
   const rows = [];
   document.querySelectorAll("#loanDetailPrepayRows tr[data-loan-prepay-row-id]").forEach((tr, idx)=>{
     const rowId = tr.dataset.loanPrepayRowId || `plan_${idx+1}`;
+    const year = numValue(tr.querySelector('[data-loan-prepay-field="year"]')?.value, 0);
+    const month = numValue(tr.querySelector('[data-loan-prepay-field="month"]')?.value, 1);
     rows.push({
       id: rowId,
-      age: numValue(tr.querySelector('[data-loan-prepay-field="age"]')?.value, 0),
+      year,
+      month,
+      age: calcAgeAtYearMonth(document.getElementById('selfBirthDate')?.value || '', year, month),
       amount: numValue(tr.querySelector('[data-loan-prepay-field="amount"]')?.value, 0),
       mode: tr.querySelector('[data-loan-prepay-field="mode"]')?.value || "期間短縮型"
     });
   });
-  loanDetailDraft.prepayPlans = rows;
+  loanDetailDraft.prepayPlans = normalizeLoanPrepayPlans(rows);
 }
 function renderLoanDetailResult(){
   syncLoanDetailDraftFromModal();
@@ -7312,7 +7408,8 @@ document.getElementById("homeDetailBtn")?.addEventListener("click", ()=>{
 document.getElementById("loanDetailAddPrepayBtn")?.addEventListener("click", ()=>{
   if(!loanDetailDraft) fillLoanDetailModalFromStored();
   syncLoanDetailDraftFromModal();
-  loanDetailDraft.prepayPlans.push({id:`plan_${Date.now()}`, age:0, amount:0, mode:"期間短縮型"});
+  const baseParts = parseDateInput(document.getElementById('baseDate')?.value || '') || {year:new Date().getFullYear(), month:1};
+  loanDetailDraft.prepayPlans.push({id:`plan_${Date.now()}`, year:baseParts.year, month:baseParts.month, age:calcAgeAtYearMonth(document.getElementById('selfBirthDate')?.value || '', baseParts.year, baseParts.month), amount:0, mode:"期間短縮型"});
   renderLoanDetailModal();
 });
 document.getElementById("loanDetailPrepayRows")?.addEventListener("click", (e)=>{
@@ -7326,6 +7423,10 @@ document.getElementById("loanDetailPrepayRows")?.addEventListener("click", (e)=>
   }
 });
 document.getElementById("loanDetailModal")?.addEventListener("input", (e)=>{
+  if(!e.target.closest("#loanDetailModal")) return;
+  renderLoanDetailResult();
+});
+document.getElementById("loanDetailModal")?.addEventListener("change", (e)=>{
   if(!e.target.closest("#loanDetailModal")) return;
   renderLoanDetailResult();
 });
