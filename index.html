@@ -127,14 +127,14 @@
   .expense-range-table th:nth-child(1),.expense-range-table td:nth-child(1),
   .expense-point-table th:nth-child(1),.expense-point-table td:nth-child(1){width:132px;min-width:132px;}
   .reginc-table th:nth-child(2),.reginc-table td:nth-child(2),
-  .expense-range-table th:nth-child(2),.expense-range-table td:nth-child(2){width:154px;min-width:154px;}
+  .expense-range-table th:nth-child(2),.expense-range-table td:nth-child(2){width:232px;min-width:232px;}
   .reginc-table th:nth-child(3),.reginc-table td:nth-child(3),
   .expense-range-table th:nth-child(3),.expense-range-table td:nth-child(3){width:178px;min-width:178px;}
   .reginc-table th:nth-child(4),.reginc-table td:nth-child(4),
   .expense-range-table th:nth-child(4),.expense-range-table td:nth-child(4){width:94px;min-width:94px;}
   .inc-table{min-width:610px;table-layout:fixed;}
   .inc-table th:nth-child(2),.inc-table td:nth-child(2),
-  .expense-point-table th:nth-child(2),.expense-point-table td:nth-child(2){width:154px;min-width:154px;}
+  .expense-point-table th:nth-child(2),.expense-point-table td:nth-child(2){width:178px;min-width:178px;}
   .inc-table th:nth-child(3),.inc-table td:nth-child(3),
   .expense-point-table th:nth-child(3),.expense-point-table td:nth-child(3){width:178px;min-width:178px;}
   .inc-table th:nth-child(4),.inc-table td:nth-child(4),
@@ -305,12 +305,25 @@
   .graph-select{width:92px !important}
   .period-line{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;justify-content:center;width:100%;}
   .period-range{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;justify-content:center;width:100%;}
+.time-unit-select{width:64px !important;min-width:64px !important;}
+.time-point-wrap{display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;width:100%;}
   .period-prefix{display:inline-block;width:60px;text-align:right;color:#444;flex:0 0 60px;}
   td .input-unit select, td .input-unit input[type=number], td .input-unit input[type=text]{margin:0;}
   table td .input-unit, table td .period-line{padding-left:8px;}
   .basic-table td .input-unit, .income-table td .input-unit{padding-left:0;}
-  .basic-table input[type=number], .income-table input[type=number]{text-align:left;}
+  .basic-table input[type=number], .basic-table input[type=text], .income-table input[type=number]{text-align:left;}
   .basic-table .agebox, .basic-table .ratebox, .basic-table .moneybox{width:84px !important;}
+  .datebox{width:148px !important;min-width:148px !important;max-width:148px !important;}
+  .basic-inline-date-age{display:inline-flex;align-items:center;justify-content:flex-start;gap:16px;flex-wrap:nowrap;width:248px;margin:0 auto;}
+  .basic-inline-date-age input[type="date"]{width:148px;min-width:148px;max-width:148px;}
+  .basic-inline-date-age .readonly-age-inline{display:inline-flex;align-items:center;gap:2px;color:#111827;white-space:nowrap;}
+  .basic-inline-date-age .readonly-age-text{display:inline-block;min-width:28px;text-align:right;font-weight:600;color:#111827;}
+  .basic-date-only{display:inline-flex;align-items:center;justify-content:flex-start;width:248px;margin:0 auto;}
+  .basic-date-only input[type="date"]{width:148px;min-width:148px;max-width:148px;}
+  .basic-table .readonly-age-input{background:#f8fafc;color:#111827;}
+  .child-date-age-cell{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:nowrap;width:100%;}
+  .child-date-age-cell input[type="date"]{width:148px;min-width:148px;max-width:148px;}
+  .child-age-text{display:inline-block;min-width:24px;text-align:right;font-weight:600;color:#111827;white-space:nowrap;}
   .income-table .agebox, .income-table .moneybox{width:96px !important;}
   .basic-table td:nth-child(2) .input-unit{
     display:inline-flex;
@@ -318,6 +331,15 @@
     justify-content:flex-start;
     margin:0 auto;
   }
+  .basic-table td:nth-child(2) .basic-inline-date-age,
+  .basic-table td:nth-child(2) .basic-date-only{
+    width:248px;
+    max-width:100%;
+  }
+  .child-date-table th:nth-child(1), .child-date-table td:nth-child(1){width:116px;min-width:116px;}
+  .child-date-table th:nth-child(2), .child-date-table td:nth-child(2){width:64px;min-width:64px;}
+  .child-date-table th:nth-child(3), .child-date-table td:nth-child(3){width:170px;min-width:170px;}
+  .child-date-table th:nth-child(4), .child-date-table td:nth-child(4){width:78px;min-width:78px;}
   .income-table td:nth-child(2) .input-unit{
     display:inline-flex;
     width:190px;
@@ -493,6 +515,24 @@
     border-radius:10px;
     background:#fcfcfc;
   }
+  .edu-copy-row{display:flex;justify-content:flex-start;margin:-2px 0 10px;}
+  .edu-copy-modal{width:min(520px, calc(100vw - 20px));max-height:min(90vh, 720px);overflow:auto;}
+  .edu-copy-grid{display:flex;flex-direction:column;gap:12px;}
+  .edu-copy-fields{display:grid;grid-template-columns:1fr;gap:10px;}
+  .edu-copy-field{display:flex;flex-direction:column;gap:4px;min-width:0;}
+  .edu-copy-field > label{font-size:.92rem;color:#374151;}
+  .edu-copy-field select{width:100%;max-width:100%;min-width:0;}
+  .edu-copy-note{color:var(--muted);font-size:.92rem;line-height:1.55;}
+  .child-allowance-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:8px;}
+  .child-allowance-table{width:100%;min-width:720px;border-collapse:collapse;table-layout:fixed;}
+  .child-allowance-table th,.child-allowance-table td{border:1px solid var(--border);padding:6px;text-align:center;vertical-align:middle;white-space:nowrap;}
+  .child-allowance-table th{background:#fafafa;}
+  .child-allowance-table th:nth-child(1),.child-allowance-table td:nth-child(1){width:108px;min-width:108px;}
+  .child-allowance-table th:nth-child(2),.child-allowance-table td:nth-child(2){width:72px;min-width:72px;}
+  .child-allowance-table .summary-total-row th,.child-allowance-table .summary-total-row td{background:#f8fafc;font-weight:700;}
+  .child-allowance-table .summary-disabled-row{opacity:.55;}
+  .child-allowance-empty{padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fafafa;color:var(--muted);}
+  .child-allowance-note{margin-top:6px;color:var(--muted);font-size:12px;}
   .edu-wrap{
     overflow-x:auto;
   }
@@ -654,13 +694,15 @@
     .basic-table td:nth-child(2) .input-unit{width:170px;max-width:100%;justify-content:flex-start;gap:4px;margin:0 auto;}
     .basic-table .agebox,.basic-table .ratebox,.basic-table .moneybox{width:68px !important;}
     .basic-table select{max-width:100%;width:100%;}
-    .grid2 > div:last-child .basic-table th:nth-child(1), #childRows td:nth-child(1){width:26%;}
-    .grid2 > div:last-child .basic-table th:nth-child(2), #childRows td:nth-child(2){width:16%;}
-    .grid2 > div:last-child .basic-table th:nth-child(3), #childRows td:nth-child(3){width:29%;}
-    .grid2 > div:last-child .basic-table th:nth-child(4), #childRows td:nth-child(4){width:29%;}
-    #childRows td:nth-child(2){text-align:center;}
-    #childRows td:nth-child(3) .input-unit{width:auto;justify-content:center;gap:4px;padding-left:0;}
-    #childRows td:nth-child(3) input.agebox{width:56px !important;min-width:56px;}
+    .grid2 > div:last-child .basic-table th:nth-child(1), #childRows td:nth-child(1){width:22%;}
+    .grid2 > div:last-child .basic-table th:nth-child(2), #childRows td:nth-child(2){width:10%;}
+    .grid2 > div:last-child .basic-table th:nth-child(3), #childRows td:nth-child(3){width:30%;}
+    .grid2 > div:last-child .basic-table th:nth-child(4), #childRows td:nth-child(4){width:12%;}
+    .grid2 > div:last-child .basic-table th:nth-child(5), #childRows td:nth-child(5){width:26%;}
+    #childRows td:nth-child(2), #childRows td:nth-child(4){text-align:center;}
+    #childRows td:nth-child(3) .child-date-age-cell{justify-content:center;gap:4px;}
+    #childRows td:nth-child(3) input[type="date"]{min-width:0;width:100%;max-width:148px;}
+    #childRows td:nth-child(3) .child-age-text{font-size:12px;}
     #childRows td:nth-child(3) .suffix{min-width:auto;font-size:12px;}
     #childRows td:last-child select{
       width:100% !important;
@@ -1018,6 +1060,29 @@
     </div>
   </div>
 
+  <div id="educationCopyModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal-card edu-copy-modal" role="dialog" aria-modal="true" aria-labelledby="educationCopyTitle">
+      <div id="educationCopyTitle" class="modal-text" style="font-weight:bold;margin-bottom:10px;">教育費設定のコピー</div>
+      <div class="edu-copy-grid">
+        <div class="edu-copy-note">※ コピー元の教育費設定（簡単設定＋詳細設定）をコピー先へ上書きします。現在の学校・年齢・子どもの有無は変更しません。</div>
+        <div class="edu-copy-fields">
+          <div class="edu-copy-field">
+            <label for="eduCopyFrom">コピー元</label>
+            <select id="eduCopyFrom"></select>
+          </div>
+          <div class="edu-copy-field">
+            <label for="eduCopyTo">コピー先</label>
+            <select id="eduCopyTo"></select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions" style="margin-top:14px;">
+        <button type="button" id="cancelEducationCopyBtn">キャンセル</button>
+        <button type="button" id="confirmEducationCopyBtn">コピーする</button>
+      </div>
+    </div>
+  </div>
+
   <div id="deleteTabModal" class="modal-backdrop" aria-hidden="true">
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="deleteTabMessage">
       <div id="deleteTabMessage" class="modal-text"></div>
@@ -1059,21 +1124,23 @@
         <div>
           <table class="center-table basic-table">
             <tr><th>項目</th><th>入力</th></tr>
-            <tr><td>本人年齢</td><td><div class="input-unit center"><input id="age" type="number" class="agebox" value="50"><span class="suffix">歳</span></div></td></tr>
-            <tr><td>配偶者年齢</td><td><div class="input-unit center"><input id="spouseAge" type="number" class="agebox" value="48"><span class="suffix">歳</span></div></td></tr>
+            <tr><td>本人生年月日</td><td><div class="basic-inline-date-age"><input id="selfBirthDate" type="date" class="datebox" value="1976-03-29"><span class="readonly-age-inline">（<span id="selfAgeLabel" class="readonly-age-text">50</span><span class="suffix">歳）</span></span><input id="selfAgeDisplay" type="hidden" value="50"><input id="age" type="hidden" value="50"></div></td></tr>
+            <tr><td>配偶者生年月日</td><td><div class="basic-inline-date-age"><input id="spouseBirthDate" type="date" class="datebox" value="1978-03-29"><span class="readonly-age-inline">（<span id="spouseAgeLabel" class="readonly-age-text">48</span><span class="suffix">歳）</span></span><input id="spouseAgeDisplay" type="hidden" value="48"><input id="spouseAge" type="hidden" value="48"></div></td></tr>
             <tr><td>想定寿命</td><td><div class="input-unit center"><input id="lifeExpect" type="number" class="agebox" value="90"><span class="suffix">歳</span></div></td></tr>
             <tr><td>為替レート</td><td><div class="input-unit center"><input id="usdRate" type="number" class="agebox" value="150" step="0.1"><span class="suffix">円 / ドル</span></div></td></tr>
             <tr><td>インフレ率</td><td><div class="input-unit center"><input id="inflRate" type="number" class="ratebox" step="0.1" value="2.0"><span class="suffix">%</span></div></td></tr>
+            <tr><td>基準年月日</td><td><div class="basic-date-only"><input id="baseDate" type="date" class="datebox" value="2026-03-29"><input id="currentBaseYear" type="hidden" value="2026"></div></td></tr>
           </table>
         </div>
         <div>
-          <table class="center-table basic-table">
-            <tr><th>子</th><th>有無</th><th>年齢</th><th>学校</th></tr>
+          <table class="center-table basic-table child-date-table">
+            <tr><th>子</th><th>有無</th><th>生年月日</th><th>年齢</th><th>学校</th></tr>
             <tbody id="childRows"></tbody>
           </table>
           <div class="add-row-wrap"><button type="button" class="add-row-btn" data-add-row="child">＋</button></div>
         </div>
       </div>
+      <div class="help">基準年月日はシミュレーションの開始日です。本人・配偶者・子どもの年齢は、この日時点で自動計算されます。子どもの学校は、生年月日と基準年月日から自動選択されますが、必要に応じて手動で変更できます。為替レートはドル建資産・収入の円換算に、インフレ率は各項目でONにした将来金額の増減に使います。</div>
     </div>
 
     <div class="section">
@@ -1194,15 +1261,18 @@
       <div class="help">臨時収入には、相続・贈与・補助金・一時金など、単発で発生する収入を入力してください。退職金・DC受取は上の専用設定を使ってください。</div>
       <div class="table-scroll">
       <table class="center-table inc-table">
-        <tr><th>項目</th><th>年齢</th><th>金額</th><th>インフレ連動</th></tr>
+        <tr><th>項目</th><th>時点</th><th>金額</th><th>インフレ連動</th></tr>
         <tbody id="incRows"></tbody>
       </table>
       </div>
       <div class="add-row-wrap"><button type="button" class="add-row-btn" data-add-row="inc">＋</button></div>
 
+      <div class="subhead">児童手当</div>
       <div class="checkbox-row">
-        <label><input id="childAllowanceOn" type="checkbox" checked> 児童手当を含める</label>
+        <label><input id="childAllowanceOn" type="checkbox" checked> 計算に含める</label>
       </div>
+      <div class="help">本人年齢ごとの1年間に支給される、子ども別の児童手当年額を表示します。単位：万円 / 年</div>
+      <div id="childAllowanceSummaryWrap" class="child-allowance-wrap"></div>
     </div>
 
     <div class="section">
@@ -1304,6 +1374,7 @@
           <tbody id="eduBody"></tbody>
         </table>
       </div>
+      <div class="edu-copy-row"><button type="button" id="eduCopyBtn" class="add-row-btn">兄弟コピー</button></div>
       <div class="checkbox-row infl-box" style="margin:0 0 10px;">
         <label><input id="inflEdu" type="checkbox"> 教育費にインフレを反映</label>
       </div>
@@ -1335,7 +1406,7 @@
       <div class="help">毎年・数年ごとに見込む支出は「定期支出」、1回限りの大きな支出は「臨時支出」へ入力してください。</div>
       <div class="table-scroll">
       <table class="center-table expense-point-table">
-        <tr><th>項目</th><th>年齢</th><th>金額</th><th>インフレ連動</th></tr>
+        <tr><th>項目</th><th>時点</th><th>金額</th><th>インフレ連動</th></tr>
         <tbody id="extraRows"></tbody>
       </table>
       </div>
@@ -1371,6 +1442,7 @@ let currentTab = 0;
 let monteMode = false;
 let educationDetailDraft = null;
 let currentEducationDetailChildIndex = null;
+let educationCopyDraft = null;
 
 function defaultScenarioName(index){ return `条件${index+1}`; }
 function isDefaultScenarioName(name, index){ return String(name || "") === defaultScenarioName(index); }
@@ -1414,21 +1486,119 @@ function currentAgeValue(data){
   const raw = data && data.age != null ? +data.age : (+document.getElementById("age")?.value || 50);
   return Number.isFinite(raw) ? raw : 50;
 }
+function currentBaseYearValue(data){
+  const fallback = new Date().getFullYear();
+  if(data && data.baseDate){
+    const parsed = parseDateInput(data.baseDate);
+    if(parsed) return parsed.year;
+  }
+  const raw = data && data.currentBaseYear != null ? +data.currentBaseYear : (+document.getElementById("currentBaseYear")?.value || fallback);
+  return Number.isFinite(raw) && raw > 0 ? raw : fallback;
+}
+function getTimeModeValue(data, prefix, index){
+  const raw = String(data?.[`${prefix}${index}_timeUnit`] || "age");
+  return raw === "year" ? "year" : "age";
+}
+function ageToDisplayYear(ageValue, currentAge, baseYear){
+  const age = Number(ageValue || 0);
+  if(!age) return 0;
+  return Math.round(baseYear + (age - currentAge));
+}
+function displayYearToAge(yearValue, currentAge, baseYear){
+  const year = Number(yearValue || 0);
+  if(!year) return 0;
+  return Math.round(currentAge + (year - baseYear));
+}
+function convertStoredAgeToDisplayValue(ageValue, mode, currentAge, baseYear){
+  return mode === "year" ? ageToDisplayYear(ageValue, currentAge, baseYear) : Math.round(Number(ageValue || 0));
+}
+function convertDisplayValueToStoredAge(displayValue, mode, currentAge, baseYear){
+  return mode === "year" ? displayYearToAge(displayValue, currentAge, baseYear) : Math.round(Number(displayValue || 0));
+}
+function isTimeModePrefix(prefix){ return ["reginc","inc","homeMaint","period","extra"].includes(prefix); }
+function getTimeFieldMeta(id){
+  let m = String(id || "").match(/^(reginc|homeMaint|period)(\d+)_(fromAge|toAge)$/);
+  if(m) return {prefix:m[1], index:+m[2], field:m[3], kind:"range"};
+  m = String(id || "").match(/^(inc|extra)(\d+)_age$/);
+  if(m) return {prefix:m[1], index:+m[2], field:"age", kind:"point"};
+  return null;
+}
+function getTimeModeSelectId(prefix, index){ return `${prefix}${index}_timeUnit`; }
+function getTimeRowFieldIds(prefix, index){
+  if(prefix === "reginc" || prefix === "homeMaint" || prefix === "period") return [`${prefix}${index}_fromAge`, `${prefix}${index}_toAge`];
+  if(prefix === "inc" || prefix === "extra") return [`${prefix}${index}_age`];
+  return [];
+}
+let timeDisplayContext = {currentAge:50, baseYear:new Date().getFullYear()};
+function syncTimeDisplayContextFromDOM(){
+  timeDisplayContext = {currentAge:currentAgeValue(), baseYear:currentBaseYearValue()};
+}
+function setTimeFieldStoredAge(fieldId, storedAge){
+  const input = document.getElementById(fieldId);
+  if(!input) return;
+  input.dataset.storedAge = String(Math.round(Number(storedAge) || 0));
+}
+function getTimeFieldStoredAge(fieldId, mode, currentAge, baseYear){
+  const input = document.getElementById(fieldId);
+  if(!input) return 0;
+  const cached = sanitizeNumericText(input.dataset.storedAge || '', true);
+  if(cached !== ''){
+    const n = Number(cached);
+    if(Number.isFinite(n)) return Math.round(n);
+  }
+  const rawDisplay = numValue(input.value, 0);
+  const storedAge = convertDisplayValueToStoredAge(rawDisplay, mode, currentAge, baseYear);
+  setTimeFieldStoredAge(fieldId, storedAge);
+  return storedAge;
+}
+function syncTimeFieldStoredAge(fieldId, mode, currentAge, baseYear){
+  const input = document.getElementById(fieldId);
+  if(!input) return 0;
+  const storedAge = convertDisplayValueToStoredAge(numValue(input.value, 0), mode, currentAge, baseYear);
+  setTimeFieldStoredAge(fieldId, storedAge);
+  return storedAge;
+}
+function refreshTimeRowDisplay(prefix, index, fromMode, toMode, oldContext, newContext){
+  if(!isTimeModePrefix(prefix)) return;
+  const fieldIds = getTimeRowFieldIds(prefix, index);
+  fieldIds.forEach(fieldId=>{
+    const input = document.getElementById(fieldId);
+    if(!input) return;
+    const storedAge = getTimeFieldStoredAge(fieldId, fromMode, oldContext.currentAge, oldContext.baseYear);
+    const nextDisplay = convertStoredAgeToDisplayValue(storedAge, toMode, newContext.currentAge, newContext.baseYear);
+    input.value = String(nextDisplay || 0);
+    formatNumericInputDisplay(input, true);
+    setTimeFieldStoredAge(fieldId, storedAge);
+  });
+  const select = document.getElementById(getTimeModeSelectId(prefix, index));
+  if(select) select.dataset.prevValue = toMode;
+}
+function refreshAllTimeDisplays(oldContext = timeDisplayContext, newContext = timeDisplayContext){
+  ["reginc","inc","homeMaint","period","extra"].forEach(prefix=>{
+    const count = dynamicCounts[prefix] || 0;
+    for(let i=1;i<=count;i++){
+      const select = document.getElementById(getTimeModeSelectId(prefix, i));
+      const mode = select?.value === "year" ? "year" : "age";
+      refreshTimeRowDisplay(prefix, i, mode, mode, oldContext, newContext);
+    }
+  });
+  timeDisplayContext = {currentAge:newContext.currentAge, baseYear:newContext.baseYear};
+}
 const ROW_FIELD_MAP = {
-  child:["enabled","age","school","name","custom"],
+  child:["enabled","birthDate","age","ageDisplay","school","schoolManual","allowanceOn","name","custom"],
   dep:["amount","cur","rate","name","custom"],
   inv:["cost","amount","cur","rate","owner","accountType","idecoCategory","name","custom"],
   futureInv:["age","amount","cur","rate","owner","accountType","idecoCategory","name","custom"],
   sumInv:["fromAge","toAge","amount","cur","rate","owner","accountType","idecoCategory","name","custom"],
-  reginc:["fromAge","toAge","val","name","custom"],
-  inc:["age","val","name","custom"],
+  reginc:["fromAge","toAge","val","timeUnit","name","custom"],
+  inc:["age","val","timeUnit","name","custom"],
   insPay:["type","owner","insured","fromAge","toAge","val","unit","name","custom"],
   insRecv:["type","receiveType","receiver","fromAge","toAge","val","unit","name","custom"],
   rent:["fromAge","toAge","val","name","custom"],
-  homeMaint:["fromAge","toAge","val","name","custom"],
+  homeMaint:["fromAge","toAge","val","timeUnit","name","custom"],
   life:["fromAge","toAge","val","name","custom"],
-  period:["fromAge","toAge","val","name","custom"],
-  extra:["age","val","name","custom"]
+  period:["fromAge","toAge","val","timeUnit","name","custom"],
+  extra:["age","val","timeUnit","name","custom"]
 };
 const DEFAULT_ROW_LABEL_PREFIX = {child:"子",dep:"預金",inv:"運用",futureInv:"投資",sumInv:"積立",reginc:"定期収入",inc:"臨時収入",insPay:"保険料",insRecv:"保険受取",rent:"家賃",homeMaint:"持ち家維持費",life:"生活費",period:"定期支出",extra:"臨時支出"};
 const DEFAULT_ROW_COUNT = {child:1,dep:1,inv:1,futureInv:1,sumInv:1,reginc:1,inc:1,insPay:1,insRecv:1,rent:1,homeMaint:4,life:1,period:1,extra:1};
@@ -1637,15 +1807,15 @@ function inferCount(data, type){
     inv:/^inv(\d+)_(cost|amount|cur|rate|taxOn|owner|accountType|idecoCategory)$/,
     futureInv:/^futureInv(\d+)_(age|amount|cur|rate|owner|accountType|idecoCategory)$/,
     sumInv:/^sumInv(\d+)_(fromAge|toAge|amount|cur|rate|owner|accountType|idecoCategory)$/,
-    reginc:/^reginc(\d+)_(fromAge|toAge|age|val)$/,
-    inc:/^inc(\d+)_(age|val)$/,
+    reginc:/^reginc(\d+)_(fromAge|toAge|age|val|timeUnit)$/,
+    inc:/^inc(\d+)_(age|val|timeUnit)$/,
     insPay:/^insPay(\d+)_(type|owner|insured|fromAge|toAge|val|unit)$/,
     insRecv:/^insRecv(\d+)_(type|receiveType|receiver|fromAge|toAge|val|unit)$/,
     rent:/^rent(\d+)_(fromAge|toAge|age|val)$/,
     homeMaint:/^homeMaint(\d+)_(fromAge|toAge|age|val)$/,
     life:/^life(\d+)_(fromAge|toAge|age|val)$/,
-    period:/^period(\d+)_(fromAge|toAge|age|val)$/,
-    extra:/^extra(\d+)_(age|val)$/
+    period:/^period(\d+)_(fromAge|toAge|age|val|timeUnit)$/,
+    extra:/^extra(\d+)_(age|val|timeUnit)$/
   };
   let max = 0;
   Object.keys(data || {}).forEach(k=>{
@@ -1669,6 +1839,12 @@ function migrateLegacyRangeData(data, prefix){
 function migrateLegacyData(data){
   if(!data) return {};
   data = {...data};
+  if(!data.baseDate){
+    const baseYear = Number(data.currentBaseYear || new Date().getFullYear()) || new Date().getFullYear();
+    data.baseDate = formatDateParts(baseYear, 3, 29);
+  }
+  if(!data.selfBirthDate && data.age != null && data.age !== "") data.selfBirthDate = deriveBirthDateFromAge(data.age, data.baseDate);
+  if(!data.spouseBirthDate && data.spouseAge != null && data.spouseAge !== "") data.spouseBirthDate = deriveBirthDateFromAge(data.spouseAge, data.baseDate);
   ["reginc","rent","life","period","sumInv"].forEach(prefix=>migrateLegacyRangeData(data, prefix));
   const legacyTaxOn = data.taxOn == null ? true : (data.taxOn === true || String(data.taxOn) === "true" || String(data.taxOn) === "on");
   const invCount = inferCount(data, "inv");
@@ -1727,9 +1903,22 @@ function migrateLegacyData(data){
     if(data[`c${i}_grad_extra`] == null) data[`c${i}_grad_extra`] = 0;
     if(data[`c${i}_abroad_type`] == null) data[`c${i}_abroad_type`] = "なし";
     if(data[`c${i}_abroad_amount`] == null) data[`c${i}_abroad_amount`] = 0;
-    delete data[`c${i}_kind_type`];
-    delete data[`c${i}_kind_extra`];
+    if(!data[`child${i}_birthDate`] && data[`child${i}_age`] != null && data[`child${i}_age`] !== "") data[`child${i}_birthDate`] = deriveBirthDateFromAge(data[`child${i}_age`], data.baseDate);
+    const childAgeDisplay = data[`child${i}_birthDate`] ? calcAgeFromBirthDate(data[`child${i}_birthDate`], data.baseDate) : (data[`child${i}_age`] != null ? Number(data[`child${i}_age`]) || 0 : "");
+    data[`child${i}_ageDisplay`] = childAgeDisplay === null ? "" : childAgeDisplay;
+    if(data[`child${i}_age`] == null || data[`child${i}_age`] === "") data[`child${i}_age`] = childAgeDisplay === null ? "" : childAgeDisplay;
+    if(data[`child${i}_schoolManual`] == null) data[`child${i}_schoolManual`] = "false";
+    if(data[`child${i}_allowanceOn`] == null) data[`child${i}_allowanceOn`] = data[`child${i}_enabled`] === false || String(data[`child${i}_enabled`] || "") === "false" ? "false" : "true";
+    if((data[`child${i}_school`] == null || data[`child${i}_school`] === "") && data[`child${i}_birthDate`]){
+      data[`child${i}_school`] = calcSchoolOptionFromBirthDate(data[`child${i}_birthDate`], data.baseDate) || (i===1 ? "小4" : "年少未満");
+    }
   }
+  data.selfAgeDisplay = data.selfBirthDate ? (calcAgeFromBirthDate(data.selfBirthDate, data.baseDate) ?? "") : (data.age ?? "");
+  data.spouseAgeDisplay = data.spouseBirthDate ? (calcAgeFromBirthDate(data.spouseBirthDate, data.baseDate) ?? "") : (data.spouseAge ?? "");
+  if(data.selfAgeDisplay !== "") data.age = data.selfAgeDisplay;
+  if(data.spouseAgeDisplay !== "") data.spouseAge = data.spouseAgeDisplay;
+  const parsedBaseDate = parseDateInput(data.baseDate);
+  data.currentBaseYear = parsedBaseDate ? parsedBaseDate.year : (data.currentBaseYear || new Date().getFullYear());
   delete data.taxOn;
   return data;
 }
@@ -1744,8 +1933,11 @@ function renderChildRows(data = {}){
   let html = "";
   for(let i=1;i<=dynamicCounts.child;i++){
     const enabled = isCheckedAttr(data[`child${i}_enabled`], i===1);
-    const ageVal = attrValue(data[`child${i}_age`], i===1 ? 10 : 0);
-    html += `<tr>${buildRowLabelCell("child", i, data)}<td><input id="child${i}_enabled" type="checkbox" ${enabled}></td><td><div class="input-unit center"><input id="child${i}_age" type="number" class="agebox" value="${ageVal}"><span class="suffix">歳</span></div></td><td><select id="child${i}_school" class="wide-child-school"></select></td></tr>`;
+    const birthVal = attrValue(data[`child${i}_birthDate`], i===1 ? "2016-03-29" : "");
+    const ageVal = attrValue(data[`child${i}_ageDisplay`], i===1 ? 10 : "");
+    const hiddenAgeVal = attrValue(data[`child${i}_age`], i===1 ? 10 : 0);
+    const schoolManualVal = attrValue(data[`child${i}_schoolManual`], "false");
+    html += `<tr>${buildRowLabelCell("child", i, data)}<td><input id="child${i}_enabled" type="checkbox" ${enabled}></td><td><div class="child-date-age-cell"><input id="child${i}_birthDate" type="date" class="datebox" value="${birthVal}"></div></td><td><div class="input-unit center"><span id="child${i}_ageLabel" class="child-age-text">${escapeHtml(String(ageVal || ""))}</span><span class="suffix">歳</span><input id="child${i}_ageDisplay" type="hidden" value="${ageVal}"><input id="child${i}_age" type="hidden" value="${hiddenAgeVal}"><input id="child${i}_schoolManual" type="hidden" value="${schoolManualVal}"></div></td><td><select id="child${i}_school" class="wide-child-school"></select></td></tr>`;
   }
   body.innerHTML = html;
   for(let i=1;i<=dynamicCounts.child;i++) buildSchoolSelect(`child${i}_school`, data[`child${i}_school`] ?? (i===1 ? "小4" : "年少未満"));
@@ -1779,25 +1971,37 @@ function renderInvestmentRows(data = {}){
 function renderRangeRows(prefix, bodyId, label, suffix, step, defaultVal, data = {}, amountField = "val"){
   const body = document.getElementById(bodyId); if(!body) return;
   const currentAge = currentAgeValue(data);
+  const baseYear = currentBaseYearValue(data);
+  const useTimeMode = isTimeModePrefix(prefix);
   let html="";
   for(let i=1;i<=dynamicCounts[prefix];i++){
-    const fromVal = attrValue(data[`${prefix}${i}_fromAge`], currentAge);
-    const toVal = attrValue(data[`${prefix}${i}_toAge`], 120);
+    const timeMode = useTimeMode ? getTimeModeValue(data, prefix, i) : "age";
+    const fromStored = Number(data[`${prefix}${i}_fromAge`] ?? currentAge) || currentAge;
+    const toStored = Number(data[`${prefix}${i}_toAge`] ?? 120) || 120;
+    const fromVal = attrValue(convertStoredAgeToDisplayValue(fromStored, timeMode, currentAge, baseYear), currentAge);
+    const toVal = attrValue(convertStoredAgeToDisplayValue(toStored, timeMode, currentAge, baseYear), 120);
     const val = attrValue(data[`${prefix}${i}_${amountField}`], defaultVal);
     const inflOn = !!data[`${prefix}${i}_inflationOn`];
-    html += `<tr>${buildRowLabelCell(prefix, i, data)}<td><div class="period-range"><input id="${prefix}${i}_fromAge" type="number" class="agebox" value="${fromVal}"><span class="suffix">〜</span><input id="${prefix}${i}_toAge" type="number" class="agebox" value="${toVal}"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="${prefix}${i}_${amountField}" type="number" class="moneybox" value="${val}" step="${step}"><span class="suffix">${suffix}</span></div></td><td><label class="inline-check"><input id="${prefix}${i}_inflationOn" type="checkbox" ${inflOn ? "checked" : ""}></label></td></tr>`;
+    const timeModeSelect = useTimeMode ? `<select id="${prefix}${i}_timeUnit" class="time-unit-select" data-prev-value="${timeMode}"><option value="age" ${timeMode === "age" ? "selected" : ""}>歳</option><option value="year" ${timeMode === "year" ? "selected" : ""}>年</option></select>` : `<span class="suffix">歳</span>`;
+    html += `<tr>${buildRowLabelCell(prefix, i, data)}<td><div class="period-range"><input id="${prefix}${i}_fromAge" type="number" class="agebox" value="${fromVal}" data-stored-age="${fromStored}"><span class="suffix">〜</span><input id="${prefix}${i}_toAge" type="number" class="agebox" value="${toVal}" data-stored-age="${toStored}">${timeModeSelect}</div></td><td><div class="input-unit center"><input id="${prefix}${i}_${amountField}" type="number" class="moneybox" value="${val}" step="${step}"><span class="suffix">${suffix}</span></div></td><td><label class="inline-check"><input id="${prefix}${i}_inflationOn" type="checkbox" ${inflOn ? "checked" : ""}></label></td></tr>`;
     defaultVal = 0;
   }
   body.innerHTML = html;
 }
 function renderPointRows(prefix, bodyId, label, suffix, defaultAge, defaultVal, data = {}, amountField = "val"){
   const body = document.getElementById(bodyId); if(!body) return;
+  const currentAge = currentAgeValue(data);
+  const baseYear = currentBaseYearValue(data);
+  const useTimeMode = isTimeModePrefix(prefix);
   let html="";
   for(let i=1;i<=dynamicCounts[prefix];i++){
-    const ageVal = attrValue(data[`${prefix}${i}_age`], i===1 ? defaultAge : 0);
+    const timeMode = useTimeMode ? getTimeModeValue(data, prefix, i) : "age";
+    const storedAge = Number(data[`${prefix}${i}_age`] ?? (i===1 ? defaultAge : 0)) || (i===1 ? defaultAge : 0);
+    const ageVal = attrValue(convertStoredAgeToDisplayValue(storedAge, timeMode, currentAge, baseYear), i===1 ? defaultAge : 0);
     const val = attrValue(data[`${prefix}${i}_${amountField}`], i===1 ? defaultVal : 0);
     const inflOn = !!data[`${prefix}${i}_inflationOn`];
-    html += `<tr>${buildRowLabelCell(prefix, i, data)}<td><div class="input-unit center"><input id="${prefix}${i}_age" type="number" class="agebox" value="${ageVal}"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="${prefix}${i}_${amountField}" type="number" class="moneybox" value="${val}"><span class="suffix">${suffix}</span></div></td><td><label class="inline-check"><input id="${prefix}${i}_inflationOn" type="checkbox" ${inflOn ? "checked" : ""}></label></td></tr>`;
+    const timeModeSelect = useTimeMode ? `<select id="${prefix}${i}_timeUnit" class="time-unit-select" data-prev-value="${timeMode}"><option value="age" ${timeMode === "age" ? "selected" : ""}>歳</option><option value="year" ${timeMode === "year" ? "selected" : ""}>年</option></select>` : `<span class="suffix">歳</span>`;
+    html += `<tr>${buildRowLabelCell(prefix, i, data)}<td><div class="time-point-wrap"><input id="${prefix}${i}_age" type="number" class="agebox" value="${ageVal}" data-stored-age="${storedAge}">${timeModeSelect}</div></td><td><div class="input-unit center"><input id="${prefix}${i}_${amountField}" type="number" class="moneybox" value="${val}"><span class="suffix">${suffix}</span></div></td><td><label class="inline-check"><input id="${prefix}${i}_inflationOn" type="checkbox" ${inflOn ? "checked" : ""}></label></td></tr>`;
   }
   body.innerHTML = html;
 }
@@ -2202,6 +2406,7 @@ function renderDynamicSections(data = {}){
   renderRangeRows("period","periodRows","定期支出","万円 / 年",1,30,data);
   renderPointRows("extra","extraRows","臨時支出","万円",55,400,data);
   buildEducationGrid(data);
+  updateChildAllowanceSummary(data);
   enhanceNumericInputs(document);
   applyTabOrder();
 }
@@ -2213,6 +2418,8 @@ function rerenderDynamicSection(type, nextCount){
   updatePeriodDisplays();
 }
 renderDynamicSections();
+updateChildAllowanceSummary();
+syncTimeDisplayContextFromDOM();
 let activeNumericInput = null;
 let numericAssistEl = null;
 
@@ -2239,7 +2446,7 @@ function sanitizeNumericText(value, finalize = false){
   }
   return v;
 }
-function formatNumericText(value, finalize = false){
+function formatNumericText(value, finalize = false, options = {}){
   const v = sanitizeNumericText(value, finalize);
   if(v === "" || v === "-" || v === "." || v === "-.") return v;
   let sign = "";
@@ -2253,8 +2460,18 @@ function formatNumericText(value, finalize = false){
   const decPart = hasDot ? body.slice(body.indexOf(".") + 1) : "";
   if(intPart === "") intPart = "0";
   intPart = intPart.replace(/^0+(?=\d)/, "");
-  const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  const formattedInt = options.useGrouping === false ? intPart : intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   return sign + formattedInt + (hasDot ? "." + decPart : "");
+}
+function shouldUseGroupingForInput(el){
+  if(!el) return true;
+  if(el.dataset?.noGrouping === "1") return false;
+  const meta = getTimeFieldMeta(el.id);
+  if(meta){
+    const mode = document.getElementById(getTimeModeSelectId(meta.prefix, meta.index))?.value || "age";
+    if(mode === "year") return false;
+  }
+  return true;
 }
 function getNumericRawIndex(value, caret){
   return sanitizeNumericText(String(value ?? "").slice(0, caret ?? 0), false).length;
@@ -2271,7 +2488,7 @@ function formatNumericInputDisplay(el, finalize = false){
   const wasActive = document.activeElement === el;
   const start = typeof el.selectionStart === "number" ? el.selectionStart : String(el.value ?? "").length;
   const rawIndex = getNumericRawIndex(el.value, start);
-  const formatted = formatNumericText(el.value, finalize);
+  const formatted = formatNumericText(el.value, finalize, {useGrouping: shouldUseGroupingForInput(el)});
   el.value = formatted;
   if(wasActive && typeof el.setSelectionRange === "function"){
     const pos = getFormattedCaretPos(formatted, rawIndex);
@@ -2340,6 +2557,108 @@ function escapeHtml(s){
   return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
 }
 function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
+
+function pad2(n){ return String(Math.max(0, Number(n) || 0)).padStart(2, "0"); }
+function formatDateParts(year, month, day){
+  if(!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day)) return "";
+  return `${Math.round(year)}-${pad2(month)}-${pad2(day)}`;
+}
+function parseDateInput(value){
+  const m = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(!m) return null;
+  const year = Number(m[1]);
+  const month = Number(m[2]);
+  const day = Number(m[3]);
+  const dt = new Date(year, month - 1, day);
+  if(dt.getFullYear() !== year || dt.getMonth() !== month - 1 || dt.getDate() !== day) return null;
+  return {year, month, day};
+}
+function deriveBirthDateFromAge(age, baseDateValue){
+  const base = parseDateInput(baseDateValue);
+  const n = Math.max(0, Math.round(Number(age) || 0));
+  if(!base) return "";
+  return formatDateParts(base.year - n, base.month, base.day);
+}
+function calcAgeFromBirthDate(birthDateValue, baseDateValue){
+  const birth = parseDateInput(birthDateValue);
+  const base = parseDateInput(baseDateValue);
+  if(!birth || !base) return null;
+  let age = base.year - birth.year;
+  if(base.month < birth.month || (base.month === birth.month && base.day < birth.day)) age -= 1;
+  return Math.max(age, 0);
+}
+function getSchoolYearValue(baseDateValue){
+  const base = parseDateInput(baseDateValue);
+  if(!base) return null;
+  if(base.month > 4 || (base.month === 4 && base.day >= 1)) return base.year;
+  return base.year - 1;
+}
+function calcSchoolOptionFromBirthDate(birthDateValue, baseDateValue){
+  const birth = parseDateInput(birthDateValue);
+  const schoolYear = getSchoolYearValue(baseDateValue);
+  if(!birth || schoolYear == null) return "";
+  const firstGradeStartYear = birth.year + ((birth.month < 4 || (birth.month === 4 && birth.day <= 1)) ? 6 : 7);
+  const grade = schoolYear - firstGradeStartYear + 1;
+  if(grade >= 1 && grade <= 6) return `小${grade}`;
+  if(grade >= 7 && grade <= 9) return `中${grade - 6}`;
+  if(grade >= 10 && grade <= 12) return `高${grade - 9}`;
+  if(grade >= 13) return "卒業後";
+  const schoolStart = {year: schoolYear, month: 4, day: 1};
+  let ageOnSchoolStart = schoolStart.year - birth.year;
+  if(schoolStart.month < birth.month || (schoolStart.month === birth.month && schoolStart.day < birth.day)) ageOnSchoolStart -= 1;
+  if(ageOnSchoolStart <= 2) return "年少未満";
+  if(ageOnSchoolStart === 3) return "年少相当";
+  if(ageOnSchoolStart === 4) return "年中相当";
+  if(ageOnSchoolStart === 5) return "年長相当";
+  return "卒業後";
+}
+function syncBaseDateDerivedFields(){
+  const baseDate = document.getElementById("baseDate")?.value || "";
+  const parsed = parseDateInput(baseDate);
+  const currentBaseYearEl = document.getElementById("currentBaseYear");
+  if(currentBaseYearEl) currentBaseYearEl.value = parsed ? String(parsed.year) : "";
+}
+function syncPersonBirthDateFields(){
+  const baseDate = document.getElementById("baseDate")?.value || "";
+  [["selfBirthDate","selfAgeDisplay","selfAgeLabel","age"],["spouseBirthDate","spouseAgeDisplay","spouseAgeLabel","spouseAge"]].forEach(([birthId, displayId, labelId, hiddenId])=>{
+    const birthValue = document.getElementById(birthId)?.value || "";
+    const age = calcAgeFromBirthDate(birthValue, baseDate);
+    const displayEl = document.getElementById(displayId);
+    const labelEl = document.getElementById(labelId);
+    const hiddenEl = document.getElementById(hiddenId);
+    const nextValue = age == null ? "" : String(age);
+    if(displayEl) displayEl.value = nextValue;
+    if(labelEl) labelEl.textContent = nextValue;
+    if(hiddenEl) hiddenEl.value = nextValue;
+  });
+}
+function syncChildDerivedFields(index, options = {}){
+  const {forceSchoolAuto = false} = options;
+  const baseDate = document.getElementById("baseDate")?.value || "";
+  const birthEl = document.getElementById(`child${index}_birthDate`);
+  const displayEl = document.getElementById(`child${index}_ageDisplay`);
+  const labelEl = document.getElementById(`child${index}_ageLabel`);
+  const hiddenAgeEl = document.getElementById(`child${index}_age`);
+  const schoolEl = document.getElementById(`child${index}_school`);
+  const manualEl = document.getElementById(`child${index}_schoolManual`);
+  if(!birthEl) return;
+  const age = calcAgeFromBirthDate(birthEl.value, baseDate);
+  const nextValue = age == null ? "" : String(age);
+  if(displayEl) displayEl.value = nextValue;
+  if(labelEl) labelEl.textContent = nextValue;
+  if(hiddenAgeEl) hiddenAgeEl.value = nextValue;
+  const shouldAuto = forceSchoolAuto || !manualEl || String(manualEl.value || "") !== "true";
+  if(shouldAuto && schoolEl){
+    const option = calcSchoolOptionFromBirthDate(birthEl.value, baseDate);
+    if(option) schoolEl.value = option;
+    if(manualEl) manualEl.value = "false";
+  }
+}
+function syncAllBirthDateDerivedFields(options = {}){
+  syncBaseDateDerivedFields();
+  syncPersonBirthDateFields();
+  for(let i=1;i<=dynamicCounts.child;i++) syncChildDerivedFields(i, options);
+}
 function toManYen(amount, cur, usdRate){
   const n = numValue(amount, 0);
   return cur === "ドル" ? (n * usdRate / 10000) : n;
@@ -2369,7 +2688,7 @@ function isVisibleForTab(el){
 }
 function isInsideHiddenLayer(el){
   if(!el || !el.closest) return false;
-  return !!el.closest('#tabContextMenu:not(.show), #rowContextMenu:not(.show), #loanDetailModal:not(.show), #incomeCurveModal:not(.show), #pensionHelperModal:not(.show), #deleteRowModal:not(.show), #deleteTabModal:not(.show), [hidden], [aria-hidden="true"]');
+  return !!el.closest('#tabContextMenu:not(.show), #rowContextMenu:not(.show), #loanDetailModal:not(.show), #incomeCurveModal:not(.show), #pensionHelperModal:not(.show), #educationCopyModal:not(.show), #deleteRowModal:not(.show), #deleteTabModal:not(.show), [hidden], [aria-hidden="true"]');
 }
 function isTabNavigableElement(el){
   if(!el || !el.matches) return false;
@@ -2385,7 +2704,7 @@ function shouldSelectAllOnTabFocus(el){
   return el.matches('input[type="text"], input[type="search"], input[type="url"], input[type="tel"], input[type="email"], input[type="number"], input[data-numeric-ready="1"], textarea');
 }
 function getOpenModal(){
-  return document.querySelector('#loanDetailModal.show, #incomeCurveModal.show, #pensionHelperModal.show, #deleteRowModal.show, #deleteTabModal.show');
+  return document.querySelector('#loanDetailModal.show, #incomeCurveModal.show, #pensionHelperModal.show, #educationCopyModal.show, #deleteRowModal.show, #deleteTabModal.show');
 }
 function getTabScopeRoot(){
   return getOpenModal() || document.body;
@@ -2412,7 +2731,7 @@ function collectTableFocusables(table){
 function collectFocusableFlow(node, scopeRoot, out, seen){
   if(!node || node.nodeType !== 1 || seen.has(node)) return;
   if(node !== scopeRoot && node.matches){
-    if(node.matches('#tabContextMenu, #rowContextMenu, #loanDetailModal:not(.show), #incomeCurveModal:not(.show), #pensionHelperModal:not(.show), #deleteRowModal:not(.show), #deleteTabModal:not(.show), [hidden], [aria-hidden="true"]')) return;
+    if(node.matches('#tabContextMenu, #rowContextMenu, #loanDetailModal:not(.show), #incomeCurveModal:not(.show), #pensionHelperModal:not(.show), #educationCopyModal:not(.show), #deleteRowModal:not(.show), #deleteTabModal:not(.show), [hidden], [aria-hidden="true"]')) return;
   }
 
   if(node !== scopeRoot && isTabNavigableElement(node)){
@@ -2477,11 +2796,22 @@ function moveFocusByTabDirection(backward){
 let inputPersistTimer = null;
 function getAllInputs(){
   const data = {};
+  const currentAge = currentAgeValue();
+  const baseYear = currentBaseYearValue();
   document.querySelectorAll("input, select").forEach(el=>{
     if(!el.id) return;
     if(el.closest && (el.closest("#loanDetailModal") || el.closest("#incomeCurveModal") || el.closest("#pensionHelperModal") || el.closest("#educationDetailModal"))) return;
-    if(el.type === "checkbox") data[el.id] = el.checked;
-    else if(el.dataset.numericReady === "1") data[el.id] = sanitizeNumericText(el.value, true);
+    if(el.type === "checkbox"){
+      data[el.id] = el.checked;
+      return;
+    }
+    const timeMeta = getTimeFieldMeta(el.id);
+    if(timeMeta){
+      const mode = document.getElementById(getTimeModeSelectId(timeMeta.prefix, timeMeta.index))?.value === "year" ? "year" : "age";
+      data[el.id] = getTimeFieldStoredAge(el.id, mode, currentAge, baseYear);
+      return;
+    }
+    if(el.dataset.numericReady === "1") data[el.id] = sanitizeNumericText(el.value, true);
     else data[el.id] = el.value;
   });
   return data;
@@ -2512,9 +2842,13 @@ function setAllInputs(data){
     else el.value = val;
   });
   refreshRowLabelTexts();
+  syncAllBirthDateDerivedFields();
   enhanceNumericInputs(document);
   formatAllNumericInputs(document, true);
+  const nextContext = {currentAge: currentAgeValue(migrated), baseYear: currentBaseYearValue(migrated)};
+  refreshAllTimeDisplays(nextContext, nextContext);
   updateIncomeCurveControls();
+  updateChildAllowanceSummary(migrated);
   seedLoanDetailHiddenFromSimpleIfNeeded();
   if(document.getElementById("homeDetailOn")?.checked){
     syncSimpleLoanInputsFromStoredDetailFields();
@@ -3098,12 +3432,16 @@ function renderTabs(){
 }
 function rangeRows(prefix, amountField = "val"){
   const arr = [];
+  const currentAge = currentAgeValue();
+  const baseYear = currentBaseYearValue();
   for(let i=1;i<=dynamicCounts[prefix];i++){
+    const timeUnit = document.getElementById(`${prefix}${i}_timeUnit`)?.value || "age";
     arr.push({
       owner:"本人",
-      fromAge:numInput(`${prefix}${i}_fromAge`, 0),
-      toAge:numInput(`${prefix}${i}_toAge`, 0),
+      fromAge: convertDisplayValueToStoredAge(numInput(`${prefix}${i}_fromAge`, 0), timeUnit, currentAge, baseYear),
+      toAge: convertDisplayValueToStoredAge(numInput(`${prefix}${i}_toAge`, 0), timeUnit, currentAge, baseYear),
       [amountField]:numInput(`${prefix}${i}_${amountField}`, 0),
+      timeUnit,
       inflationOn:!!document.getElementById(`${prefix}${i}_inflationOn`)?.checked
     });
   }
@@ -3111,11 +3449,15 @@ function rangeRows(prefix, amountField = "val"){
 }
 function pointRows(prefix, amountField = "val"){
   const arr = [];
+  const currentAge = currentAgeValue();
+  const baseYear = currentBaseYearValue();
   for(let i=1;i<=dynamicCounts[prefix];i++){
+    const timeUnit = document.getElementById(`${prefix}${i}_timeUnit`)?.value || "age";
     arr.push({
       owner:"本人",
-      age:numInput(`${prefix}${i}_age`, 0),
+      age: convertDisplayValueToStoredAge(numInput(`${prefix}${i}_age`, 0), timeUnit, currentAge, baseYear),
       [amountField]:numInput(`${prefix}${i}_${amountField}`, 0),
+      timeUnit,
       inflationOn:!!document.getElementById(`${prefix}${i}_inflationOn`)?.checked
     });
   }
@@ -3124,6 +3466,8 @@ function pointRows(prefix, amountField = "val"){
 function getScenarioFromDOM(){
   const usdRate = numInput("usdRate", 150) || 150;
   const age = numInput("age", 50) || 50;
+  const baseDate = document.getElementById("baseDate")?.value || "";
+  const currentBaseYear = numInput("currentBaseYear", new Date().getFullYear()) || new Date().getFullYear();
 
   const children = [];
   for(let i=1;i<=dynamicCounts.child;i++){
@@ -3131,8 +3475,10 @@ function getScenarioFromDOM(){
     children.push({
       idx:i,
       name:document.getElementById(`child${i}_name`)?.value || `子${i}`,
+      birthDate:document.getElementById(`child${i}_birthDate`)?.value || "",
       age:numInput(`child${i}_age`, 0),
-      school:document.getElementById(`child${i}_school`).value
+      school:document.getElementById(`child${i}_school`).value,
+      allowanceOn:(()=>{ const el = document.getElementById(`child${i}_allowanceOn`); return el ? !!el.checked : true; })()
     });
   }
 
@@ -3182,8 +3528,12 @@ function getScenarioFromDOM(){
 
   return {
     age,
+    baseDate,
+    selfBirthDate:document.getElementById("selfBirthDate")?.value || "",
+    spouseBirthDate:document.getElementById("spouseBirthDate")?.value || "",
     spouseAge:numInput("spouseAge", age)||age,
     lifeExpect:numInput("lifeExpect", 90)||90,
+    currentBaseYear,
     usdRate,
     inflRate:(numInput("inflRate", 0)||0)/100,
     fixedScale:document.getElementById("fixedScale").checked,
@@ -3730,6 +4080,91 @@ function syncEducationDetailDraftFromModal(){
   });
   return educationDetailDraft;
 }
+function getEducationCopyCandidates(){
+  const data = migrateLegacyData(getAllInputs());
+  const items = [];
+  for(let i=1;i<=dynamicCounts.child;i++){
+    if(!document.getElementById(`child${i}_enabled`)?.checked) continue;
+    const label = getRowLabel(data, 'child', i);
+    const age = numInput(`child${i}_age`, 0);
+    items.push({index:i, label:`${label}（${age}歳）`});
+  }
+  return items;
+}
+function populateEducationCopyOptions(){
+  const fromSel = document.getElementById('eduCopyFrom');
+  const toSel = document.getElementById('eduCopyTo');
+  if(!fromSel || !toSel) return [];
+  const candidates = getEducationCopyCandidates();
+  fromSel.innerHTML = candidates.map(item=>`<option value="${item.index}">${escapeHtml(item.label)}</option>`).join('');
+  toSel.innerHTML = candidates.map(item=>`<option value="${item.index}">${escapeHtml(item.label)}</option>`).join('');
+  const fromIndex = educationCopyDraft?.fromIndex && candidates.some(item=>item.index === educationCopyDraft.fromIndex)
+    ? educationCopyDraft.fromIndex
+    : (candidates[0]?.index || 0);
+  let toIndex = educationCopyDraft?.toIndex && candidates.some(item=>item.index === educationCopyDraft.toIndex)
+    ? educationCopyDraft.toIndex
+    : (candidates.find(item=>item.index !== fromIndex)?.index || candidates[0]?.index || 0);
+  if(toIndex === fromIndex && candidates.length > 1) toIndex = candidates.find(item=>item.index !== fromIndex)?.index || toIndex;
+  fromSel.value = fromIndex ? String(fromIndex) : '';
+  toSel.value = toIndex ? String(toIndex) : '';
+  return candidates;
+}
+function syncEducationCopyDraftFromModal(){
+  educationCopyDraft = {
+    fromIndex: +(document.getElementById('eduCopyFrom')?.value || 0),
+    toIndex: +(document.getElementById('eduCopyTo')?.value || 0)
+  };
+  return educationCopyDraft;
+}
+function openEducationCopyModal(){
+  const candidates = populateEducationCopyOptions();
+  if(candidates.length < 2){
+    alert('兄弟コピーを使うには、有効な子どもが2人以上必要です。');
+    return;
+  }
+  syncEducationCopyDraftFromModal();
+  document.getElementById('educationCopyModal')?.classList.add('show');
+}
+function closeEducationCopyModal(){
+  educationCopyDraft = null;
+  document.getElementById('educationCopyModal')?.classList.remove('show');
+}
+const EDUCATION_SIMPLE_COPY_FIELDS = [
+  'preschool_type','preschool_extra','elem_type','elem_extra','junior_type','junior_extra',
+  'high_type','high_extra','uni_type','uni_extra','grad_type','grad_extra','abroad_type','abroad_amount'
+];
+function copyEducationSettings(fromIndex, toIndex){
+  if(!fromIndex || !toIndex || fromIndex === toIndex) return false;
+  const data = migrateLegacyData(getAllInputs());
+  EDUCATION_SIMPLE_COPY_FIELDS.forEach(suffix=>{
+    data[`c${toIndex}_${suffix}`] = data[`c${fromIndex}_${suffix}`] ?? '';
+  });
+  const fromDetail = getEducationDetailForChildFromData(data, fromIndex);
+  data[`c${toIndex}_detail_json`] = JSON.stringify(deepClone(fromDetail));
+  setAllInputs(data);
+  syncCurrentScenarioFromDOM(false);
+  draw();
+  persistState();
+  return true;
+}
+function confirmEducationCopy(){
+  const draft = syncEducationCopyDraftFromModal();
+  const candidates = getEducationCopyCandidates();
+  const fromItem = candidates.find(item=>item.index === draft.fromIndex);
+  const toItem = candidates.find(item=>item.index === draft.toIndex);
+  if(!fromItem || !toItem){
+    alert('コピー元とコピー先を選択してください。');
+    return;
+  }
+  if(fromItem.index === toItem.index){
+    alert('コピー元とコピー先は別の子を選択してください。');
+    return;
+  }
+  const ok = confirm(`「${toItem.label}」の教育費設定を、「${fromItem.label}」の内容で上書きします。現在の学校は変更しません。実行しますか？`);
+  if(!ok) return;
+  if(copyEducationSettings(fromItem.index, toItem.index)) closeEducationCopyModal();
+}
+
 function openEducationDetailModal(childIndex){
   currentEducationDetailChildIndex = childIndex;
   const data = migrateLegacyData(getAllInputs());
@@ -4149,15 +4584,205 @@ function processReceiptIncomeForYear(cfg, age, investments, receiptState){
   total += processDcReceiptForYear(cfg, age, "配偶者", "企業型DC", investments, receiptState);
   return total;
 }
-function getChildAllowanceForYear(cfg, yearIndex){
-  if(!cfg.childAllowanceOn) return 0;
+function toUtcDateFromParts(parts){
+  if(!parts) return null;
+  return new Date(Date.UTC(parts.year, parts.month - 1, parts.day));
+}
+function toDatePartsFromUtc(date){
+  return {year:date.getUTCFullYear(), month:date.getUTCMonth() + 1, day:date.getUTCDate()};
+}
+function addDaysToParts(parts, days){
+  const dt = toUtcDateFromParts(parts);
+  if(!dt) return null;
+  dt.setUTCDate(dt.getUTCDate() + Number(days || 0));
+  return toDatePartsFromUtc(dt);
+}
+function addYearsToParts(parts, years){
+  const dt = toUtcDateFromParts(parts);
+  if(!dt) return null;
+  dt.setUTCFullYear(dt.getUTCFullYear() + Number(years || 0));
+  return toDatePartsFromUtc(dt);
+}
+function compareDateParts(a, b){
+  if(!a && !b) return 0;
+  if(!a) return -1;
+  if(!b) return 1;
+  if(a.year !== b.year) return a.year - b.year;
+  if(a.month !== b.month) return a.month - b.month;
+  return a.day - b.day;
+}
+function datePartsMin(a, b){ return compareDateParts(a, b) <= 0 ? a : b; }
+function datePartsMax(a, b){ return compareDateParts(a, b) >= 0 ? a : b; }
+function getFiscalYearForDateParts(parts){
+  if(!parts) return null;
+  return (parts.month > 4 || (parts.month === 4 && parts.day >= 1)) ? parts.year : parts.year - 1;
+}
+function getFiscalYearEndExclusiveForDateParts(parts){
+  const fy = getFiscalYearForDateParts(parts);
+  if(fy == null) return null;
+  return {year:fy + 1, month:4, day:1};
+}
+function getDaysInMonthFromParts(parts){
+  if(!parts) return 30;
+  return new Date(Date.UTC(parts.year, parts.month, 0)).getUTCDate();
+}
+function getMonthStartParts(parts){
+  return parts ? {year:parts.year, month:parts.month, day:1} : null;
+}
+function getNextMonthStartParts(parts){
+  if(!parts) return null;
+  return parts.month === 12 ? {year:parts.year + 1, month:1, day:1} : {year:parts.year, month:parts.month + 1, day:1};
+}
+function eachDayInRange(startParts, endExclusiveParts, fn){
+  let cur = startParts;
+  while(compareDateParts(cur, endExclusiveParts) < 0){
+    fn(cur);
+    cur = addDaysToParts(cur, 1);
+  }
+}
+function getChildAllowancePotentialRows(cfg){
+  return (cfg.children || []).filter(child=>child && (child.birthDate || Number.isFinite(child.age)));
+}
+function getChildAllowanceAllowanceEndExclusive(child){
+  const birth = parseDateInput(child?.birthDate || "");
+  if(birth) return getFiscalYearEndExclusiveForDateParts(addYearsToParts(birth, 18));
+  const base = parseDateInput(child?.baseDate || "") || parseDateInput(child?.cfgBaseDate || "");
+  if(base){
+    return addYearsToParts(base, Math.max(0, 18 - (Number(child?.age) || 0)) + 1);
+  }
+  return null;
+}
+function getChildAllowanceCountEndExclusive(child, baseDateParts){
+  const birth = parseDateInput(child?.birthDate || "");
+  if(birth) return getFiscalYearEndExclusiveForDateParts(addYearsToParts(birth, 22));
+  if(baseDateParts){
+    return addYearsToParts(baseDateParts, Math.max(0, 22 - (Number(child?.age) || 0)) + 1);
+  }
+  return null;
+}
+function getChildAllowanceMonthlyAmountForDate(cfg, targetParts, targetChild){
+  if(!cfg || !targetParts || !targetChild) return 0;
+  const baseDateParts = parseDateInput(cfg.baseDate || "");
+  const potentialChildren = getChildAllowancePotentialRows(cfg).map(child=>{
+    const birth = parseDateInput(child.birthDate || "");
+    const countEndExclusive = getChildAllowanceCountEndExclusive(child, baseDateParts);
+    const allowanceEndExclusive = getChildAllowanceAllowanceEndExclusive(child);
+    return {...child, _birth:birth, _countEndExclusive:countEndExclusive, _allowanceEndExclusive:allowanceEndExclusive};
+  });
+  const counted = potentialChildren.filter(child=>{
+    if(child._birth && compareDateParts(targetParts, child._birth) < 0) return false;
+    if(child._countEndExclusive && compareDateParts(targetParts, child._countEndExclusive) >= 0) return false;
+    return true;
+  }).sort((a,b)=>{
+    const ba = a._birth || {year:9999, month:12, day:31};
+    const bb = b._birth || {year:9999, month:12, day:31};
+    const c = compareDateParts(ba, bb);
+    if(c !== 0) return c;
+    return (a.idx || 0) - (b.idx || 0);
+  });
+  const rank = counted.findIndex(child=>child.idx === targetChild.idx) + 1;
+  if(rank <= 0) return 0;
+  const targetBirth = parseDateInput(targetChild.birthDate || "");
+  if(targetBirth && compareDateParts(targetParts, targetBirth) < 0) return 0;
+  const allowanceEndExclusive = getChildAllowanceAllowanceEndExclusive(targetChild);
+  if(allowanceEndExclusive && compareDateParts(targetParts, allowanceEndExclusive) >= 0) return 0;
+  let age = Number(targetChild.age || 0);
+  if(targetBirth) age = calcAgeFromBirthDate(targetChild.birthDate, formatDateParts(targetParts.year, targetParts.month, targetParts.day));
+  if(!Number.isFinite(age) || age < 0) return 0;
+  if(rank >= 3) return 3;
+  if(age < 3) return 1.5;
+  return 1;
+}
+function calcChildAllowanceAmountForChildPeriod(cfg, child, periodStartParts, periodEndExclusiveParts){
   let total = 0;
-  cfg.children.forEach(child=>{
-    const childAge = child.age + yearIndex;
-    if(childAge >= 0 && childAge < 3) total += 18;
-    else if(childAge >= 3 && childAge < 15) total += 12;
+  eachDayInRange(periodStartParts, periodEndExclusiveParts, dayParts=>{
+    const monthlyAmount = getChildAllowanceMonthlyAmountForDate(cfg, dayParts, child);
+    if(monthlyAmount <= 0) return;
+    total += monthlyAmount / getDaysInMonthFromParts(dayParts);
   });
   return total;
+}
+function getChildAllowanceCache(cfg){
+  if(cfg._childAllowanceCache) return cfg._childAllowanceCache;
+  const baseParts = parseDateInput(cfg.baseDate || "");
+  const children = getChildAllowancePotentialRows(cfg);
+  const rowMap = {};
+  let maxCols = 1;
+  children.forEach(child=>{
+    rowMap[child.idx] = [];
+    const endExclusive = getChildAllowanceAllowanceEndExclusive(child);
+    if(!baseParts || !endExclusive) return;
+    let cols = 0;
+    while(cols < 40){
+      const periodStart = addYearsToParts(baseParts, cols);
+      if(compareDateParts(periodStart, endExclusive) >= 0) break;
+      cols += 1;
+    }
+    maxCols = Math.max(maxCols, cols || 1);
+  });
+  const yearTotals = Array.from({length:maxCols}, ()=>0);
+  const potentialTotals = Array.from({length:maxCols}, ()=>0);
+  for(let yearIndex=0; yearIndex<maxCols; yearIndex++){
+    const periodStart = baseParts ? addYearsToParts(baseParts, yearIndex) : null;
+    const periodEndExclusive = baseParts ? addYearsToParts(baseParts, yearIndex + 1) : null;
+    children.forEach(child=>{
+      let amount = 0;
+      if(periodStart && periodEndExclusive){
+        amount = calcChildAllowanceAmountForChildPeriod(cfg, child, periodStart, periodEndExclusive);
+      }else{
+        const childAge = Number(child.age || 0) + yearIndex;
+        if(childAge >= 0 && childAge < 3) amount = 18;
+        else if(childAge >= 3 && childAge < 18) amount = 12;
+      }
+      rowMap[child.idx][yearIndex] = amount;
+      potentialTotals[yearIndex] += amount;
+      if(child.allowanceOn) yearTotals[yearIndex] += amount;
+    });
+  }
+  cfg._childAllowanceCache = {rows:rowMap, totals:yearTotals, potentialTotals, maxCols};
+  return cfg._childAllowanceCache;
+}
+function getChildAllowanceForYear(cfg, yearIndex){
+  const cache = getChildAllowanceCache(cfg);
+  if(!cfg.childAllowanceOn) return 0;
+  return cache.totals[yearIndex] || 0;
+}
+
+function formatAllowanceSummaryCell(value){
+  const n = Math.round((Number(value) || 0) * 10) / 10;
+  if(Math.abs(n) < 0.05) return "-";
+  return n.toLocaleString("ja-JP", {maximumFractionDigits:1, minimumFractionDigits: n % 1 ? 1 : 0});
+}
+function updateChildAllowanceSummary(data = null){
+  const wrap = document.getElementById("childAllowanceSummaryWrap");
+  if(!wrap) return;
+  const cfg = getScenarioFromDOM();
+  const children = getChildAllowancePotentialRows(cfg);
+  if(!children.length){
+    wrap.innerHTML = '<div class="child-allowance-empty">子どもを追加すると、児童手当サマリーを表示します。</div>';
+    return;
+  }
+  const cache = getChildAllowanceCache(cfg);
+  const currentAge = Number(cfg.age || 0);
+  const globalOn = !!cfg.childAllowanceOn;
+  let html = '<div class="table-scroll"><table class="center-table child-allowance-table"><thead><tr><th>子</th><th>含める</th>';
+  for(let yearIndex=0; yearIndex<cache.maxCols; yearIndex++) html += `<th>${escapeHtml(String(currentAge + yearIndex))}歳</th>`;
+  html += '<th>合計</th></tr></thead><tbody>';
+  children.forEach(child=>{
+    const row = cache.rows[child.idx] || [];
+    const rowTotal = row.reduce((sum, v)=>sum + (Number(v) || 0), 0);
+    html += `<tr class="${child.allowanceOn ? '' : 'summary-disabled-row'}"><td>${escapeHtml(child.name || `子${child.idx}`)}</td><td><label class="inline-check"><input id="child${child.idx}_allowanceOn" type="checkbox" ${child.allowanceOn ? 'checked' : ''}></label></td>`;
+    for(let yearIndex=0; yearIndex<cache.maxCols; yearIndex++) html += `<td>${formatAllowanceSummaryCell(row[yearIndex] || 0)}</td>`;
+    html += `<td>${formatAllowanceSummaryCell(rowTotal)}</td></tr>`;
+  });
+  const totals = globalOn ? cache.totals : cache.totals.map(()=>0);
+  const grandTotal = totals.reduce((sum, v)=>sum + (Number(v) || 0), 0);
+  html += '<tr class="summary-total-row"><td>合計</td><td></td>';
+  for(let yearIndex=0; yearIndex<cache.maxCols; yearIndex++) html += `<td>${formatAllowanceSummaryCell(totals[yearIndex] || 0)}</td>`;
+  html += `<td>${formatAllowanceSummaryCell(grandTotal)}</td></tr>`;
+  html += '</tbody></table></div>';
+  if(!globalOn) html += '<div class="child-allowance-note">※ 現在は「計算に含める」がOFFのため、表は参考表示です。計算には反映していません。</div>';
+  wrap.innerHTML = html;
 }
 
 function parseIncomeCurveJson(raw){
@@ -5951,6 +6576,7 @@ document.addEventListener("click", (e)=>{
     rerenderDynamicSection(type, ((dynamicCounts[type] ?? 0)) + 1);
     monteMode = false;
     if(scenarios.length && currentTab >= 0) scenarios[currentTab].data = getAllInputs();
+    updateChildAllowanceSummary();
     draw();
     persistState();
   }
@@ -5968,10 +6594,41 @@ document.addEventListener("input", (e)=>{
   if(!(el.matches("input") || el.matches("select"))) return;
   if(["graphType","overlayToggle","fixedScale","fixedScaleMin","fixedScaleMax","xAxisMin","xAxisMax"].includes(el.id)) return;
   if(el.closest && el.closest("#loanDetailModal")) return;
-  // 入力中は再描画せず、現在値だけは常にシナリオへ退避しておく。
-  // これにより後段の再描画で動的行がデフォルトへ戻る事故を防ぐ。
+  if(/^(reginc|inc|homeMaint|period|extra)\d+_timeUnit$/.test(el.id)){
+    const match = el.id.match(/^(reginc|inc|homeMaint|period|extra)(\d+)_timeUnit$/);
+    if(match){
+      const fromMode = el.dataset.prevValue === "year" ? "year" : "age";
+      const toMode = el.value === "year" ? "year" : "age";
+      refreshTimeRowDisplay(match[1], Number(match[2]), fromMode, toMode, timeDisplayContext, timeDisplayContext);
+    }
+  }
+  const timeMeta = getTimeFieldMeta(el.id);
+  if(timeMeta){
+    const mode = document.getElementById(getTimeModeSelectId(timeMeta.prefix, timeMeta.index))?.value === "year" ? "year" : "age";
+    syncTimeFieldStoredAge(el.id, mode, currentAgeValue(), currentBaseYearValue());
+  }
+  if(el.id === "baseDate" || el.id === "selfBirthDate" || el.id === "spouseBirthDate" || /^child\d+_birthDate$/.test(el.id)){
+    if(el.id === "baseDate"){
+      syncAllBirthDateDerivedFields({forceSchoolAuto:true});
+    }else if(/^child\d+_birthDate$/.test(el.id)){
+      const m = el.id.match(/^child(\d+)_birthDate$/);
+      if(m) syncChildDerivedFields(Number(m[1]), {forceSchoolAuto:true});
+    }else{
+      syncPersonBirthDateFields();
+    }
+  }
+  if(/^child\d+_school$/.test(el.id)){
+    const m = el.id.match(/^child(\d+)_school$/);
+    const manualEl = document.getElementById(`child${m?.[1]}_schoolManual`);
+    if(manualEl) manualEl.value = "true";
+  }
+  if(el.id === "age" || el.id === "currentBaseYear" || el.id === "baseDate"){
+    const nextContext = {currentAge: currentAgeValue(), baseYear: currentBaseYearValue()};
+    refreshAllTimeDisplays(timeDisplayContext, nextContext);
+  }
   updatePeriodDisplays();
   syncCurrentScenarioFromDOM(true);
+  updateChildAllowanceSummary();
   updateLoanSummary();
 });
 function commitMainInputChange(e){
@@ -5979,9 +6636,42 @@ function commitMainInputChange(e){
   if(!(el.matches("input") || el.matches("select"))) return;
   if(["graphType","overlayToggle","fixedScale","fixedScaleMin","fixedScaleMax","xAxisMin","xAxisMax"].includes(el.id)) return;
   if(el.closest && el.closest("#loanDetailModal")) return;
+  if(/^(reginc|inc|homeMaint|period|extra)\d+_timeUnit$/.test(el.id)){
+    const match = el.id.match(/^(reginc|inc|homeMaint|period|extra)(\d+)_timeUnit$/);
+    if(match){
+      const fromMode = el.dataset.prevValue === "year" ? "year" : "age";
+      const toMode = el.value === "year" ? "year" : "age";
+      refreshTimeRowDisplay(match[1], Number(match[2]), fromMode, toMode, timeDisplayContext, timeDisplayContext);
+    }
+  }
+  const timeMeta = getTimeFieldMeta(el.id);
+  if(timeMeta){
+    const mode = document.getElementById(getTimeModeSelectId(timeMeta.prefix, timeMeta.index))?.value === "year" ? "year" : "age";
+    syncTimeFieldStoredAge(el.id, mode, currentAgeValue(), currentBaseYearValue());
+  }
+  if(el.id === "baseDate" || el.id === "selfBirthDate" || el.id === "spouseBirthDate" || /^child\d+_birthDate$/.test(el.id)){
+    if(el.id === "baseDate"){
+      syncAllBirthDateDerivedFields({forceSchoolAuto:true});
+    }else if(/^child\d+_birthDate$/.test(el.id)){
+      const m = el.id.match(/^child(\d+)_birthDate$/);
+      if(m) syncChildDerivedFields(Number(m[1]), {forceSchoolAuto:true});
+    }else{
+      syncPersonBirthDateFields();
+    }
+  }
+  if(/^child\d+_school$/.test(el.id)){
+    const m = el.id.match(/^child(\d+)_school$/);
+    const manualEl = document.getElementById(`child${m?.[1]}_schoolManual`);
+    if(manualEl) manualEl.value = "true";
+  }
+  if(el.id === "age" || el.id === "currentBaseYear" || el.id === "baseDate"){
+    const nextContext = {currentAge: currentAgeValue(), baseYear: currentBaseYearValue()};
+    refreshAllTimeDisplays(timeDisplayContext, nextContext);
+  }
   monteMode = false;
   updatePeriodDisplays();
   syncCurrentScenarioFromDOM(false);
+  updateChildAllowanceSummary();
   updateLoanSummary();
   draw();
   persistState();
@@ -6102,6 +6792,22 @@ document.getElementById('eduBody')?.addEventListener('change', (e)=>{
   draw();
   persistState();
 });
+document.getElementById('eduCopyBtn')?.addEventListener('click', openEducationCopyModal);
+document.getElementById('cancelEducationCopyBtn')?.addEventListener('click', closeEducationCopyModal);
+document.getElementById('confirmEducationCopyBtn')?.addEventListener('click', confirmEducationCopy);
+document.getElementById('eduCopyFrom')?.addEventListener('change', ()=>{
+  syncEducationCopyDraftFromModal();
+  const fromSel = document.getElementById('eduCopyFrom');
+  const toSel = document.getElementById('eduCopyTo');
+  if(fromSel && toSel && fromSel.value === toSel.value){
+    const candidates = getEducationCopyCandidates();
+    const alt = candidates.find(item=>String(item.index) !== String(fromSel.value));
+    if(alt) toSel.value = String(alt.index);
+  }
+});
+document.getElementById('educationCopyModal')?.addEventListener('click', (e)=>{
+  if(e.target === e.currentTarget) closeEducationCopyModal();
+});
 document.getElementById('cancelEducationDetailBtn')?.addEventListener('click', closeEducationDetailModal);
 document.getElementById('saveEducationDetailBtn')?.addEventListener('click', saveEducationDetailModal);
 document.getElementById('eduDetailPreschoolBody')?.addEventListener('change', (e)=>{
@@ -6211,6 +6917,7 @@ window.addEventListener("load", ()=>{
   normalizeScenarioNames();
   if(!scenarios.length) addTab();
   renderTabs();
+  syncAllBirthDateDerivedFields();
   updatePeriodDisplays();
   enhanceNumericInputs(document);
   formatAllNumericInputs(document, true);
