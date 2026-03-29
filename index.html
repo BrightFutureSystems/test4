@@ -318,6 +318,7 @@
   .basic-inline-date-age > *{flex:0 0 auto;}
   .basic-inline-date-age input[type="date"]{width:148px;min-width:148px;max-width:148px;}
   .basic-inline-date-age .readonly-age-inline{display:inline-flex;align-items:center;gap:0;color:#111827;white-space:nowrap;}
+  .child-inline-date-age{width:248px;max-width:100%;}
   .basic-inline-date-age .readonly-age-text{display:inline-block;min-width:0;text-align:left;font-weight:600;color:#111827;}
   .basic-inline-date-age .readonly-age-inline .suffix{min-width:0 !important;width:auto !important;text-align:left;}
   .basic-inline-date-age .readonly-age-inline .age-paren{display:inline-block;line-height:1;}
@@ -327,15 +328,10 @@
   .retire-inline .retire-month-select{width:62px !important;min-width:62px !important;}
   .retire-inline .readonly-retire-age-inline{display:inline-flex;align-items:center;gap:2px;color:#111827;white-space:nowrap;}
   .retire-inline .readonly-retire-age-text{display:inline-block;min-width:62px;text-align:left;font-weight:600;color:#111827;}
-  .child-date-table td:nth-child(4) .suffix{min-width:0 !important;width:auto !important;text-align:left;}
-  .child-date-table td:nth-child(4) .child-age-text{min-width:0;}
-  .basic-date-only{display:inline-flex;align-items:center;justify-content:flex-start;width:248px;margin:0 auto;}
+    .basic-date-only{display:inline-flex;align-items:center;justify-content:flex-start;width:248px;margin:0 auto;}
   .basic-date-only input[type="date"]{width:148px;min-width:148px;max-width:148px;}
   .basic-table .readonly-age-input{background:#f8fafc;color:#111827;}
-  .child-date-age-cell{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:nowrap;width:100%;}
-  .child-date-age-cell input[type="date"]{width:148px;min-width:148px;max-width:148px;}
-  .child-age-text{display:inline-block;min-width:24px;text-align:center;font-weight:600;color:#111827;white-space:nowrap;}
-  .income-table .agebox, .income-table .moneybox{width:96px !important;}
+    .income-table .agebox, .income-table .moneybox{width:96px !important;}
   .basic-table td:nth-child(2) .input-unit{
     display:inline-flex;
     width:170px;
@@ -349,10 +345,9 @@
   }
   .child-date-table th:nth-child(1), .child-date-table td:nth-child(1){width:116px;min-width:116px;}
   .child-date-table th:nth-child(2), .child-date-table td:nth-child(2){width:64px;min-width:64px;}
-  .child-date-table th:nth-child(3), .child-date-table td:nth-child(3){width:170px;min-width:170px;}
-  .child-date-table th:nth-child(4), .child-date-table td:nth-child(4){width:78px;min-width:78px;}
-  .child-date-table td:nth-child(4){text-align:center;}
-  .child-date-table td:nth-child(4) .input-unit{justify-content:center;padding-left:0;}
+  .child-date-table th:nth-child(3), .child-date-table td:nth-child(3){width:252px;min-width:252px;}
+  .child-date-table th:nth-child(4), .child-date-table td:nth-child(4){width:144px;min-width:144px;}
+  .child-date-table td:nth-child(3){text-align:center;}
   .income-table td:nth-child(2) .input-unit{
     display:inline-flex;
     width:190px;
@@ -395,6 +390,7 @@
   .loan-detail-field > label{font-size:.92rem;color:#374151;}
   .loan-detail-field .input-unit{max-width:none;width:100%;justify-content:flex-start;}
   .loan-detail-field select,.loan-detail-field input[type=number],.loan-detail-field input[type=text]{width:100%;max-width:100%;min-width:0;}
+  .loan-detail-buy-field{grid-column:1 / -1;}
 
   .edu-detail-modal{width:min(980px, calc(100vw - 20px));max-height:min(92vh, 960px);overflow:auto;}
   .edu-detail-grid{display:flex;flex-direction:column;gap:12px;}
@@ -452,6 +448,11 @@
   .loan-prepay-table .loan-year-month-wrap{display:inline-flex;align-items:center;justify-content:flex-start;gap:4px;white-space:nowrap;width:100%;}
   .loan-prepay-table .loan-year-select{width:78px !important;min-width:78px !important;}
   .loan-prepay-table .loan-month-select{width:52px !important;min-width:52px !important;}
+  .loan-buy-inline{display:inline-flex;align-items:center;justify-content:center;gap:4px;flex-wrap:nowrap;width:100%;}
+  .loan-buy-year-select{width:78px !important;min-width:78px !important;}
+  .loan-buy-month-select{width:52px !important;min-width:52px !important;}
+  .loan-buy-age-inline{display:inline-flex;align-items:center;gap:2px;color:#111827;white-space:nowrap;}
+  .loan-buy-age-text{display:inline-block;min-width:62px;text-align:left;font-weight:600;color:#111827;}
   .loan-prepay-table .suffix{font-size:.8rem;white-space:nowrap;}
   .loan-prepay-table select,.loan-prepay-table input[type=number],.loan-prepay-table button{width:100%;min-width:0;max-width:100%;font-size:.92rem;}
   .loan-prepay-table button{white-space:nowrap;}
@@ -459,6 +460,9 @@
     .loan-prepay-table th,.loan-prepay-table td{padding:4px 2px;font-size:.82rem;}
     .loan-prepay-table .loan-year-select{width:72px !important;min-width:72px !important;}
     .loan-prepay-table .loan-month-select{width:48px !important;min-width:48px !important;}
+    .loan-buy-year-select{width:72px !important;min-width:72px !important;}
+    .loan-buy-month-select{width:48px !important;min-width:48px !important;}
+    .loan-buy-age-inline,.loan-buy-age-text{font-size:12px;}
     .loan-prepay-table .suffix{font-size:.72rem;}
     .loan-prepay-table select,.loan-prepay-table input[type=number],.loan-prepay-table button{font-size:.82rem;padding:4px 3px;}
   }
@@ -706,6 +710,7 @@
     .basic-date-only input[type="date"],
     .child-date-age-cell input[type="date"]{width:108px;min-width:108px;max-width:108px;}
     .basic-inline-date-age .readonly-age-inline{margin-left:auto;min-width:auto;justify-content:flex-end;transform:none;font-size:12px;gap:1px;flex:0 0 auto;}
+    .child-inline-date-age{max-width:204px;}
     .retire-inline{width:100%;max-width:248px;gap:3px;justify-content:flex-start;transform:translateX(-12px);}
     .retire-inline .retire-year-select{width:80px !important;min-width:80px !important;}
     .retire-inline .retire-month-select{width:58px !important;min-width:58px !important;}
@@ -714,13 +719,11 @@
     .basic-inline-date-age .readonly-age-text{min-width:0;text-align:left;font-size:12px;}
     .basic-inline-date-age .readonly-age-inline .suffix{font-size:12px;}
     .basic-inline-date-age .age-paren{font-size:12px;}
-    .child-date-table{min-width:560px;}
+    .child-date-table{min-width:600px;}
     .child-date-table th:nth-child(1), .child-date-table td:nth-child(1){width:128px;min-width:128px;}
     .child-date-table th:nth-child(2), .child-date-table td:nth-child(2){width:64px;min-width:64px;}
-    .child-date-table th:nth-child(3), .child-date-table td:nth-child(3){width:140px;min-width:140px;}
-    .child-date-table th:nth-child(4), .child-date-table td:nth-child(4){width:82px;min-width:82px;}
-    .child-date-table th:nth-child(5), .child-date-table td:nth-child(5){width:144px;min-width:144px;}
-    .child-age-text{min-width:24px;font-size:12px;text-align:center;}
+    .child-date-table th:nth-child(3), .child-date-table td:nth-child(3){width:220px;min-width:220px;}
+    .child-date-table th:nth-child(4), .child-date-table td:nth-child(4){width:144px;min-width:144px;}
     .child-allowance-table{min-width:max-content;}
     .child-allowance-table th,.child-allowance-table td{min-width:64px;padding:6px 8px;font-size:12px;}
     .child-allowance-table th:nth-child(1),.child-allowance-table td:nth-child(1){min-width:96px;}
@@ -754,16 +757,13 @@
     .basic-table select{max-width:100%;width:100%;}
     .grid2 > div:last-child .basic-table th:nth-child(1), #childRows td:nth-child(1){width:128px;min-width:128px;}
     .grid2 > div:last-child .basic-table th:nth-child(2), #childRows td:nth-child(2){width:64px;min-width:64px;}
-    .grid2 > div:last-child .basic-table th:nth-child(3), #childRows td:nth-child(3){width:152px;min-width:152px;}
-    .grid2 > div:last-child .basic-table th:nth-child(4), #childRows td:nth-child(4){width:72px;min-width:72px;}
-    .grid2 > div:last-child .basic-table th:nth-child(5), #childRows td:nth-child(5){width:144px;min-width:144px;}
-    #childRows td:nth-child(2), #childRows td:nth-child(4){text-align:center;}
-    #childRows td:nth-child(3) .child-date-age-cell{justify-content:center;gap:4px;}
-    #childRows td:nth-child(3) input[type="date"]{min-width:0;width:100%;max-width:148px;}
-    #childRows td:nth-child(4) .input-unit{justify-content:center !important;padding-left:0 !important;gap:4px;}
-    #childRows td:nth-child(4) .child-age-text{font-size:12px;text-align:center;}
-    #childRows td:nth-child(4) .suffix{min-width:0 !important;width:auto !important;font-size:12px;text-align:left;}
-    #childRows td:nth-child(3) .suffix{min-width:auto;font-size:12px;}
+    .grid2 > div:last-child .basic-table th:nth-child(3), #childRows td:nth-child(3){width:220px;min-width:220px;}
+    .grid2 > div:last-child .basic-table th:nth-child(4), #childRows td:nth-child(4){width:144px;min-width:144px;}
+    #childRows td:nth-child(2), #childRows td:nth-child(3){text-align:center;}
+    #childRows td:nth-child(3) .basic-inline-date-age{justify-content:center;gap:4px;max-width:204px;}
+    #childRows td:nth-child(3) input[type="date"]{min-width:0;width:108px;max-width:108px;}
+    #childRows td:nth-child(3) .readonly-age-inline{font-size:12px;}
+    #childRows td:nth-child(3) .readonly-age-text{font-size:12px;}
     #childRows td:last-child select{
       width:100% !important;
       min-width:0 !important;
@@ -961,7 +961,7 @@
         <div class="loan-detail-section">
           <div class="loan-detail-section-title">基本条件</div>
           <div class="loan-detail-fields">
-            <div class="loan-detail-field"><label for="loanDetailAge">購入年齢</label><div class="input-unit"><input id="loanDetailAge" type="number" class="agebox" value="40"><span class="suffix">歳</span></div></div>
+            <div class="loan-detail-field loan-detail-buy-field"><label for="loanDetailBuyYear">購入年月</label><div class="loan-buy-inline"><select id="loanDetailBuyYear" class="loan-buy-year-select"></select><span class="suffix">年</span><select id="loanDetailBuyMonth" class="loan-buy-month-select"></select><span class="suffix">月</span><span class="loan-buy-age-inline">(<span id="loanDetailBuyAgeLabel" class="loan-buy-age-text">40歳0ヶ月</span>)</span><input id="loanDetailAge" type="hidden" value="40"></div></div>
             <div class="loan-detail-field"><label for="loanDetailDown">頭金</label><div class="input-unit"><input id="loanDetailDown" type="number" class="moneybox" value="1000" step="0.1"><span class="suffix">万円</span></div></div>
             <div class="loan-detail-field"><label for="loanDetailLoanAmount">ローン額</label><div class="input-unit"><input id="loanDetailLoanAmountInput" type="number" class="moneybox" value="5000" step="0.1"><span class="suffix">万円</span></div></div>
             <div class="loan-detail-field"><label for="loanDetailRate">金利</label><div class="input-unit"><input id="loanDetailRateInput" type="number" class="ratebox" value="1.2" step="0.01"><span class="suffix">%</span></div></div>
@@ -1184,8 +1184,8 @@
         <div>
           <table class="center-table basic-table">
             <tr><th>項目</th><th>入力</th></tr>
-            <tr><td>本人生年月日</td><td><div class="basic-inline-date-age"><input id="selfBirthDate" type="date" class="datebox" value="1976-03-29"><span class="readonly-age-inline"><span class="age-paren">(</span><span id="selfAgeLabel" class="readonly-age-text">50</span><span class="suffix">歳</span><span class="age-paren">)</span></span><input id="selfAgeDisplay" type="hidden" value="50"><input id="age" type="hidden" value="50"></div></td></tr>
-            <tr><td>配偶者生年月日</td><td><div class="basic-inline-date-age"><input id="spouseBirthDate" type="date" class="datebox" value="1978-03-29"><span class="readonly-age-inline"><span class="age-paren">(</span><span id="spouseAgeLabel" class="readonly-age-text">48</span><span class="suffix">歳</span><span class="age-paren">)</span></span><input id="spouseAgeDisplay" type="hidden" value="48"><input id="spouseAge" type="hidden" value="48"></div></td></tr>
+            <tr><td>本人生年月日</td><td><div class="basic-inline-date-age"><input id="selfBirthDate" type="date" class="datebox" value="1976-03-29"><span class="readonly-age-inline">(<span id="selfAgeLabel" class="readonly-age-text">50歳0ヶ月</span>)</span><input id="selfAgeDisplay" type="hidden" value="50歳0ヶ月"><input id="age" type="hidden" value="50"></div></td></tr>
+            <tr><td>配偶者生年月日</td><td><div class="basic-inline-date-age"><input id="spouseBirthDate" type="date" class="datebox" value="1978-03-29"><span class="readonly-age-inline">(<span id="spouseAgeLabel" class="readonly-age-text">48歳0ヶ月</span>)</span><input id="spouseAgeDisplay" type="hidden" value="48歳0ヶ月"><input id="spouseAge" type="hidden" value="48"></div></td></tr>
             <tr><td>想定寿命</td><td><div class="input-unit center"><input id="lifeExpect" type="number" class="agebox" value="90"><span class="suffix">歳</span></div></td></tr>
             <tr><td>為替レート</td><td><div class="input-unit center"><input id="usdRate" type="number" class="agebox" value="150" step="0.1"><span class="suffix">円 / ドル</span></div></td></tr>
             <tr><td>インフレ率</td><td><div class="input-unit center"><input id="inflRate" type="number" class="ratebox" step="0.1" value="2.0"><span class="suffix">%</span></div></td></tr>
@@ -1194,7 +1194,7 @@
         </div>
         <div>
           <table class="center-table basic-table child-date-table">
-            <tr><th>子</th><th>有無</th><th>生年月日</th><th>年齢</th><th>学校</th></tr>
+            <tr><th>子</th><th>有無</th><th>生年月日</th><th>学校</th></tr>
             <tbody id="childRows"></tbody>
           </table>
           <div class="add-row-wrap"><button type="button" class="add-row-btn" data-add-row="child">＋</button></div>
@@ -1375,9 +1375,9 @@
       <div class="subhead">住宅ローン</div>
       <div class="loan-wrap">
       <table class="center-table loan-table">
-        <tr><th>購入年齢</th><th>頭金</th><th>返済額</th><th>返済年数</th></tr>
+        <tr><th>購入年月</th><th>頭金</th><th>返済額</th><th>返済年数</th></tr>
         <tr>
-          <td><div class="input-unit center"><input id="homeAge" type="number" class="agebox" value="40"><span class="suffix">歳</span></div></td>
+          <td><div class="loan-buy-inline"><select id="homeBuyYear" class="loan-buy-year-select"></select><span class="suffix">年</span><select id="homeBuyMonth" class="loan-buy-month-select"></select><span class="suffix">月</span><span class="loan-buy-age-inline">(<span id="homeBuyAgeLabel" class="loan-buy-age-text">40歳0ヶ月</span>)</span><input id="homeAge" type="hidden" value="40"></div></td>
           <td><div class="input-unit center"><input id="homeDown" type="number" class="moneybox" value="1000"><span class="suffix">万円</span></div></td>
           <td><div class="input-unit center"><input id="homePayMonth" type="number" class="moneybox" value="10" step="0.1"><span class="suffix">万円 / 月</span></div></td>
           <td><div class="input-unit center"><input id="homeYears" type="number" class="agebox" value="30"><span class="suffix">年</span></div></td>
@@ -1395,6 +1395,8 @@
       </div>
       <div id="loanSummary" class="loan-summary" aria-live="polite"></div>
       <input id="homeDetailBuyAge" type="hidden" value="40">
+      <input id="homeDetailBuyYear" type="hidden" value="">
+      <input id="homeDetailBuyMonth" type="hidden" value="1">
       <input id="homeDetailDown" type="hidden" value="1000">
       <input id="homeDetailLoanAmount" type="hidden" value="5000">
       <input id="homeDetailRate" type="hidden" value="1.2">
@@ -1946,6 +1948,18 @@ function migrateLegacyData(data){
   });
   if(data.homeDetailOn == null) data.homeDetailOn = false;
   if(data.homeDetailBuyAge == null || data.homeDetailBuyAge === "") data.homeDetailBuyAge = data.homeAge || 40;
+  if((data.homeBuyYear == null || data.homeBuyYear === "") || (data.homeBuyMonth == null || data.homeBuyMonth === "")){
+    const homeBuyYm = deriveRetireYearMonthFromAge(data.homeAge || data.homeDetailBuyAge || 40, data.selfBirthDate || '', data.baseDate || '');
+    if(data.homeBuyYear == null || data.homeBuyYear === "") data.homeBuyYear = homeBuyYm.year || '';
+    if(data.homeBuyMonth == null || data.homeBuyMonth === "") data.homeBuyMonth = homeBuyYm.month || 1;
+  }
+  if((data.homeDetailBuyYear == null || data.homeDetailBuyYear === "") || (data.homeDetailBuyMonth == null || data.homeDetailBuyMonth === "")){
+    const homeDetailBuyYm = deriveRetireYearMonthFromAge(data.homeDetailBuyAge || data.homeAge || 40, data.selfBirthDate || '', data.baseDate || '');
+    if(data.homeDetailBuyYear == null || data.homeDetailBuyYear === "") data.homeDetailBuyYear = homeDetailBuyYm.year || '';
+    if(data.homeDetailBuyMonth == null || data.homeDetailBuyMonth === "") data.homeDetailBuyMonth = homeDetailBuyYm.month || 1;
+  }
+  data.homeAge = calcAgeAtYearMonth(data.selfBirthDate || '', data.homeBuyYear || 0, data.homeBuyMonth || 1) || (data.homeAge || 40);
+  data.homeDetailBuyAge = calcAgeAtYearMonth(data.selfBirthDate || '', data.homeDetailBuyYear || data.homeBuyYear || 0, data.homeDetailBuyMonth || data.homeBuyMonth || 1) || (data.homeDetailBuyAge || data.homeAge || 40);
   if(data.homeDetailDown == null || data.homeDetailDown === "") data.homeDetailDown = data.homeDown || 0;
   if(data.homeDetailLoanAmount == null || data.homeDetailLoanAmount === "") data.homeDetailLoanAmount = 5000;
   if(data.homeDetailRate == null || data.homeDetailRate === "") data.homeDetailRate = 1.2;
@@ -2014,14 +2028,16 @@ function syncDynamicCountsFromData(data){
 function renderChildRows(data = {}){
   const body = document.getElementById("childRows");
   if(!body) return;
+  const baseDate = data.baseDate || document.getElementById("baseDate")?.value || "";
   let html = "";
   for(let i=1;i<=dynamicCounts.child;i++){
     const enabled = isCheckedAttr(data[`child${i}_enabled`], i===1);
-    const birthVal = attrValue(data[`child${i}_birthDate`], i===1 ? "2016-03-29" : "");
-    const ageVal = attrValue(data[`child${i}_ageDisplay`], i===1 ? 10 : "");
+    const birthRaw = data[`child${i}_birthDate`] ?? (i===1 ? "2016-03-29" : "");
+    const birthVal = attrValue(birthRaw, i===1 ? "2016-03-29" : "");
+    const ageLabel = calcAgeLabelFromBirthDate(birthRaw, baseDate) || String(data[`child${i}_ageDisplay`] || "");
     const hiddenAgeVal = attrValue(data[`child${i}_age`], i===1 ? 10 : 0);
     const schoolManualVal = attrValue(data[`child${i}_schoolManual`], "false");
-    html += `<tr>${buildRowLabelCell("child", i, data)}<td><input id="child${i}_enabled" type="checkbox" ${enabled}></td><td><div class="child-date-age-cell"><input id="child${i}_birthDate" type="date" class="datebox" value="${birthVal}"></div></td><td><div class="input-unit center"><span id="child${i}_ageLabel" class="child-age-text">${escapeHtml(String(ageVal || ""))}</span><span class="suffix">歳</span><input id="child${i}_ageDisplay" type="hidden" value="${ageVal}"><input id="child${i}_age" type="hidden" value="${hiddenAgeVal}"><input id="child${i}_schoolManual" type="hidden" value="${schoolManualVal}"></div></td><td><select id="child${i}_school" class="wide-child-school"></select></td></tr>`;
+    html += `<tr>${buildRowLabelCell("child", i, data)}<td><input id="child${i}_enabled" type="checkbox" ${enabled}></td><td><div class="basic-inline-date-age child-inline-date-age"><input id="child${i}_birthDate" type="date" class="datebox" value="${birthVal}"><span class="readonly-age-inline">(<span id="child${i}_ageLabel" class="readonly-age-text">${escapeHtml(String(ageLabel || ""))}</span>)</span><input id="child${i}_ageDisplay" type="hidden" value="${attrValue(ageLabel, "")}"><input id="child${i}_age" type="hidden" value="${hiddenAgeVal}"><input id="child${i}_schoolManual" type="hidden" value="${schoolManualVal}"></div></td><td><select id="child${i}_school" class="wide-child-school"></select></td></tr>`;
   }
   body.innerHTML = html;
   for(let i=1;i<=dynamicCounts.child;i++) buildSchoolSelect(`child${i}_school`, data[`child${i}_school`] ?? (i===1 ? "小4" : "年少未満"));
@@ -2699,6 +2715,10 @@ function formatAgeYearMonthsLabel(parts){
   if(!parts) return '';
   return `${parts.years}歳${parts.months}ヶ月`;
 }
+function calcAgeLabelFromBirthDate(birthDateValue, targetDateValue){
+  const parts = calcAgeYearMonthsAtParts(parseDateInput(birthDateValue || ""), parseDateInput(targetDateValue || ""));
+  return parts ? formatAgeYearMonthsLabel(parts) : "";
+}
 function deriveRetireYearMonthFromAge(ageValue, birthDateValue, baseDateValue){
   const age = Math.max(0, Number(ageValue) || 0);
   const birth = parseDateInput(birthDateValue || '');
@@ -2738,6 +2758,100 @@ function buildLoanPrepayYearOptionsHtml(selectedYear){
   const birthValue = document.getElementById('selfBirthDate')?.value || '';
   const baseDateValue = document.getElementById('baseDate')?.value || '';
   return buildRetireYearOptionsHtml(selectedYear, birthValue, baseDateValue);
+}
+function getLoanBuyYearRangeParts(){
+  const birthValue = document.getElementById('selfBirthDate')?.value || '';
+  const baseDateValue = document.getElementById('baseDate')?.value || '';
+  return getRetireYearRangeParts(birthValue, baseDateValue, 0);
+}
+function buildLoanBuyYearOptionsHtml(selectedYear){
+  const birthValue = document.getElementById('selfBirthDate')?.value || '';
+  const baseDateValue = document.getElementById('baseDate')?.value || '';
+  return buildRetireYearOptionsHtml(selectedYear, birthValue, baseDateValue);
+}
+function deriveLoanBuyYearMonthFromAge(ageValue){
+  const birthValue = document.getElementById('selfBirthDate')?.value || '';
+  const baseDateValue = document.getElementById('baseDate')?.value || '';
+  const ym = deriveRetireYearMonthFromAge(ageValue, birthValue, baseDateValue);
+  return {
+    year: Number(ym?.year) || (parseDateInput(baseDateValue)?.year || new Date().getFullYear()),
+    month: Math.min(12, Math.max(1, Number(ym?.month) || 1))
+  };
+}
+function syncLoanBuyYearSelectOptions(explicitData = null){
+  const yearEl = document.getElementById('homeBuyYear');
+  const monthEl = document.getElementById('homeBuyMonth');
+  if(!yearEl) return;
+  const birthValue = explicitData ? (explicitData.selfBirthDate || '') : (document.getElementById('selfBirthDate')?.value || '');
+  const baseDateValue = explicitData ? (explicitData.baseDate || '') : (document.getElementById('baseDate')?.value || '');
+  const fallbackAge = explicitData ? Number(explicitData.homeAge || explicitData.homeDetailBuyAge || 40) : Number(document.getElementById('homeAge')?.value || document.getElementById('homeDetailBuyAge')?.value || 40);
+  const fallbackYm = deriveRetireYearMonthFromAge(fallbackAge, birthValue, baseDateValue);
+  let selectedYear = explicitData ? Number(explicitData.homeBuyYear || yearEl.value || 0) : Number(yearEl.value || 0);
+  let selectedMonth = explicitData ? Number(explicitData.homeBuyMonth || monthEl?.value || 0) : Number(monthEl?.value || 0);
+  if(!selectedYear) selectedYear = Number(fallbackYm.year || 0);
+  if(monthEl && !selectedMonth){
+    selectedMonth = Number(fallbackYm.month || 1);
+    monthEl.value = String(selectedMonth);
+  }
+  const range = getRetireYearRangeParts(birthValue, baseDateValue, selectedYear);
+  const clampedYear = Math.min(range.maxYear, Math.max(range.minYear, Math.round(Number(selectedYear) || range.minYear)));
+  yearEl.innerHTML = buildRetireYearOptionsHtml(clampedYear, birthValue, baseDateValue);
+  yearEl.value = String(clampedYear);
+  if(monthEl) monthEl.innerHTML = buildMonthOptionsHtml(selectedMonth || 1);
+}
+function syncLoanBuyFieldsFromYearMonth(){
+  const birthValue = document.getElementById('selfBirthDate')?.value || '';
+  const yearEl = document.getElementById('homeBuyYear');
+  const monthEl = document.getElementById('homeBuyMonth');
+  const hiddenAgeEl = document.getElementById('homeAge');
+  const labelEl = document.getElementById('homeBuyAgeLabel');
+  const targetParts = getRetireMonthEndParts(yearEl?.value, monthEl?.value);
+  const ageParts = calcAgeYearMonthsAtParts(parseDateInput(birthValue), targetParts);
+  if(hiddenAgeEl) hiddenAgeEl.value = ageParts ? String(ageParts.years + ageParts.months / 12) : '';
+  if(labelEl) labelEl.textContent = ageParts ? formatAgeYearMonthsLabel(ageParts) : '';
+}
+function getStoredLoanDetailBuyYearMonth(){
+  const hiddenYear = Number(document.getElementById('homeDetailBuyYear')?.value || 0);
+  const hiddenMonth = Number(document.getElementById('homeDetailBuyMonth')?.value || 0);
+  if(hiddenYear > 0 && hiddenMonth >= 1 && hiddenMonth <= 12) return {year:hiddenYear, month:hiddenMonth};
+  return getSimpleLoanBuyYearMonth();
+}
+function getSimpleLoanBuyYearMonth(){
+  const year = Number(document.getElementById('homeBuyYear')?.value || 0);
+  const month = Number(document.getElementById('homeBuyMonth')?.value || 0);
+  if(year > 0 && month >= 1 && month <= 12) return {year, month};
+  return deriveLoanBuyYearMonthFromAge(numInput('homeAge', 0) || 40);
+}
+function syncLoanDetailBuyFieldsFromYearMonth(){
+  const birthValue = document.getElementById('selfBirthDate')?.value || '';
+  const yearEl = document.getElementById('loanDetailBuyYear');
+  const monthEl = document.getElementById('loanDetailBuyMonth');
+  const hiddenAgeEl = document.getElementById('loanDetailAge');
+  const labelEl = document.getElementById('loanDetailBuyAgeLabel');
+  const targetParts = getRetireMonthEndParts(yearEl?.value, monthEl?.value);
+  const ageParts = calcAgeYearMonthsAtParts(parseDateInput(birthValue), targetParts);
+  if(hiddenAgeEl) hiddenAgeEl.value = ageParts ? String(ageParts.years + ageParts.months / 12) : '';
+  if(labelEl) labelEl.textContent = ageParts ? formatAgeYearMonthsLabel(ageParts) : '';
+}
+function syncLoanDetailBuyYearSelectOptions(selectedYear = null, selectedMonth = null){
+  const yearEl = document.getElementById('loanDetailBuyYear');
+  const monthEl = document.getElementById('loanDetailBuyMonth');
+  if(!yearEl) return;
+  const birthValue = document.getElementById('selfBirthDate')?.value || '';
+  const baseDateValue = document.getElementById('baseDate')?.value || '';
+  let year = Number(selectedYear || yearEl.value || 0);
+  let month = Number(selectedMonth || monthEl?.value || 0);
+  if(!year || !month){
+    const fallback = deriveLoanBuyYearMonthFromAge(numInput('loanDetailAge', 0) || 40);
+    if(!year) year = fallback.year;
+    if(!month) month = fallback.month;
+  }
+  yearEl.innerHTML = buildRetireYearOptionsHtml(year, birthValue, baseDateValue);
+  yearEl.value = String(Number(yearEl.value || year));
+  if(monthEl){
+    monthEl.innerHTML = buildMonthOptionsHtml(month || 1);
+    monthEl.value = String(month || 1);
+  }
 }
 function deriveLoanPrepayYearMonthFromAge(ageValue){
   const birthValue = document.getElementById('selfBirthDate')?.value || '';
@@ -2835,21 +2949,25 @@ function syncBaseDateDerivedFields(){
 }
 function syncPersonBirthDateFields(){
   const baseDate = document.getElementById("baseDate")?.value || "";
+  const baseParts = parseDateInput(baseDate);
   [["selfBirthDate","selfAgeDisplay","selfAgeLabel","age"],["spouseBirthDate","spouseAgeDisplay","spouseAgeLabel","spouseAge"]].forEach(([birthId, displayId, labelId, hiddenId])=>{
     const birthValue = document.getElementById(birthId)?.value || "";
     const age = calcAgeFromBirthDate(birthValue, baseDate);
+    const ageParts = calcAgeYearMonthsAtParts(parseDateInput(birthValue), baseParts);
     const displayEl = document.getElementById(displayId);
     const labelEl = document.getElementById(labelId);
     const hiddenEl = document.getElementById(hiddenId);
-    const nextValue = age == null ? "" : String(age);
-    if(displayEl) displayEl.value = nextValue;
-    if(labelEl) labelEl.textContent = nextValue;
-    if(hiddenEl) hiddenEl.value = nextValue;
+    const labelValue = ageParts ? formatAgeYearMonthsLabel(ageParts) : "";
+    const hiddenValue = age == null ? "" : String(age);
+    if(displayEl) displayEl.value = labelValue;
+    if(labelEl) labelEl.textContent = labelValue;
+    if(hiddenEl) hiddenEl.value = hiddenValue;
   });
 }
 function syncChildDerivedFields(index, options = {}){
   const {forceSchoolAuto = false} = options;
   const baseDate = document.getElementById("baseDate")?.value || "";
+  const baseParts = parseDateInput(baseDate);
   const birthEl = document.getElementById(`child${index}_birthDate`);
   const displayEl = document.getElementById(`child${index}_ageDisplay`);
   const labelEl = document.getElementById(`child${index}_ageLabel`);
@@ -2858,10 +2976,12 @@ function syncChildDerivedFields(index, options = {}){
   const manualEl = document.getElementById(`child${index}_schoolManual`);
   if(!birthEl) return;
   const age = calcAgeFromBirthDate(birthEl.value, baseDate);
-  const nextValue = age == null ? "" : String(age);
-  if(displayEl) displayEl.value = nextValue;
-  if(labelEl) labelEl.textContent = nextValue;
-  if(hiddenAgeEl) hiddenAgeEl.value = nextValue;
+  const ageParts = calcAgeYearMonthsAtParts(parseDateInput(birthEl.value), baseParts);
+  const labelValue = ageParts ? formatAgeYearMonthsLabel(ageParts) : "";
+  const hiddenValue = age == null ? "" : String(age);
+  if(displayEl) displayEl.value = labelValue;
+  if(labelEl) labelEl.textContent = labelValue;
+  if(hiddenAgeEl) hiddenAgeEl.value = hiddenValue;
   const shouldAuto = forceSchoolAuto || !manualEl || String(manualEl.value || "") !== "true";
   if(shouldAuto && schoolEl){
     const option = calcSchoolOptionFromBirthDate(birthEl.value, baseDate);
@@ -2876,6 +2996,12 @@ function syncAllBirthDateDerivedFields(options = {}){
   syncRetireYearSelectOptions("sp");
   syncRetireFieldsForPrefix("self");
   syncRetireFieldsForPrefix("sp");
+  syncLoanBuyYearSelectOptions();
+  syncLoanBuyFieldsFromYearMonth();
+  if(document.getElementById('loanDetailModal')?.classList.contains('show')){
+    syncLoanDetailBuyYearSelectOptions();
+    syncLoanDetailBuyFieldsFromYearMonth();
+  }
   for(let i=1;i<=dynamicCounts.child;i++) syncChildDerivedFields(i, options);
 }
 function toManYen(amount, cur, usdRate){
@@ -3055,6 +3181,7 @@ function setAllInputs(data){
   renderDynamicSections(migrated);
   syncRetireYearSelectOptions("self", migrated);
   syncRetireYearSelectOptions("sp", migrated);
+  syncLoanBuyYearSelectOptions(migrated);
   Object.entries(migrated || {}).forEach(([id,val])=>{
     const el = document.getElementById(id);
     if(!el) return;
@@ -3063,6 +3190,7 @@ function setAllInputs(data){
   });
   refreshRowLabelTexts();
   syncAllBirthDateDerivedFields();
+  syncLoanBuyFieldsFromYearMonth();
   enhanceNumericInputs(document);
   formatAllNumericInputs(document, true);
   const nextContext = {currentAge: currentAgeValue(migrated), baseYear: currentBaseYearValue(migrated)};
@@ -3130,7 +3258,8 @@ function calcMonthsForLevelPayment(principal, monthlyRate, payment){
 function getStoredLoanDetailBuyAge(){
   const hidden = document.getElementById("homeDetailBuyAge");
   if(hidden && hidden.value !== "") return Number(hidden.value) || 0;
-  return numInput("homeAge", 0);
+  const storedYm = getStoredLoanDetailBuyYearMonth();
+  return calcAgeAtYearMonth(document.getElementById('selfBirthDate')?.value || '', storedYm.year, storedYm.month) || numInput("homeAge", 0);
 }
 function getStoredLoanDetailDown(){
   const hidden = document.getElementById("homeDetailDown");
@@ -3139,18 +3268,25 @@ function getStoredLoanDetailDown(){
 }
 function hasStoredLoanDetailValues(){
   const ageHidden = document.getElementById("homeDetailBuyAge")?.value ?? "";
+  const yearHidden = document.getElementById("homeDetailBuyYear")?.value ?? "";
+  const monthHidden = document.getElementById("homeDetailBuyMonth")?.value ?? "";
   const downHidden = document.getElementById("homeDetailDown")?.value ?? "";
   const loanHidden = document.getElementById("homeDetailLoanAmount")?.value ?? "";
   const rateHidden = document.getElementById("homeDetailRate")?.value ?? "";
   const yearsHidden = document.getElementById("homeDetailBaseYears")?.value ?? "";
   const prepayHidden = document.getElementById("homeDetailPrepayJson")?.value ?? "";
-  return [ageHidden, downHidden, loanHidden, rateHidden, yearsHidden].some(v => String(v).trim() !== "") || String(prepayHidden).trim() !== "" && String(prepayHidden).trim() !== "[]";
+  return [ageHidden, yearHidden, monthHidden, downHidden, loanHidden, rateHidden, yearsHidden].some(v => String(v).trim() !== "") || String(prepayHidden).trim() !== "" && String(prepayHidden).trim() !== "[]";
 }
 function initializeLoanDetailStoredFromSimple(){
   const ageHidden = document.getElementById("homeDetailBuyAge");
+  const yearHidden = document.getElementById("homeDetailBuyYear");
+  const monthHidden = document.getElementById("homeDetailBuyMonth");
   const downHidden = document.getElementById("homeDetailDown");
   const yearsHidden = document.getElementById("homeDetailBaseYears");
-  if(ageHidden) ageHidden.value = String(numInput("homeAge", 0) || 0);
+  const simpleYm = getSimpleLoanBuyYearMonth();
+  if(ageHidden) ageHidden.value = String(calcAgeAtYearMonth(document.getElementById('selfBirthDate')?.value || '', simpleYm.year, simpleYm.month) || numInput("homeAge", 0) || 0);
+  if(yearHidden) yearHidden.value = String(simpleYm.year || '');
+  if(monthHidden) monthHidden.value = String(simpleYm.month || 1);
   if(downHidden) downHidden.value = String(numInput("homeDown", 0) || 0);
   if(yearsHidden && String(yearsHidden.value || "").trim() === "") yearsHidden.value = String(numInput("homeYears", 0) || 0);
 }
@@ -3172,9 +3308,12 @@ function setNumericInputValue(id, value){
   formatNumericInputDisplay(el, true);
 }
 function buildLoanDetailFromHiddenFields(){
+  const buyYm = getStoredLoanDetailBuyYearMonth();
   return {
     enabled: !!document.getElementById("homeDetailOn")?.checked,
-    buyAge: getHiddenNumericValue("homeDetailBuyAge", 0),
+    buyAge: getHiddenNumericValue("homeDetailBuyAge", calcAgeAtYearMonth(document.getElementById('selfBirthDate')?.value || '', buyYm.year, buyYm.month) || 0),
+    buyYear: buyYm.year,
+    buyMonth: buyYm.month,
     down: getHiddenNumericValue("homeDetailDown", 0),
     loanAmount: getHiddenNumericValue("homeDetailLoanAmount", 0),
     ratePct: getHiddenNumericValue("homeDetailRate", 0),
@@ -3186,6 +3325,8 @@ function buildLoanDetailFromHiddenFields(){
 function captureSimpleLoanInputs(){
   return {
     homeAge: document.getElementById("homeAge")?.value ?? "",
+    homeBuyYear: document.getElementById("homeBuyYear")?.value ?? "",
+    homeBuyMonth: document.getElementById("homeBuyMonth")?.value ?? "",
     homeDown: document.getElementById("homeDown")?.value ?? "",
     homePayMonth: document.getElementById("homePayMonth")?.value ?? "",
     homeYears: document.getElementById("homeYears")?.value ?? ""
@@ -3193,7 +3334,7 @@ function captureSimpleLoanInputs(){
 }
 function restoreSimpleLoanInputs(snapshot){
   if(!snapshot) return;
-  ["homeAge","homeDown","homePayMonth","homeYears"].forEach(id=>{
+  ["homeAge","homeBuyYear","homeBuyMonth","homeDown","homePayMonth","homeYears"].forEach(id=>{
     const el = document.getElementById(id);
     if(!el) return;
     if(Object.prototype.hasOwnProperty.call(snapshot, id)){
@@ -3204,14 +3345,23 @@ function restoreSimpleLoanInputs(snapshot){
 }
 function seedLoanDetailHiddenFromSimpleIfNeeded(force = false){
   const ageHidden = document.getElementById("homeDetailBuyAge");
+  const yearHidden = document.getElementById("homeDetailBuyYear");
+  const monthHidden = document.getElementById("homeDetailBuyMonth");
   const downHidden = document.getElementById("homeDetailDown");
-  if(ageHidden && (force || ageHidden.value === "")) ageHidden.value = String(numInput("homeAge", 0) || 0);
+  const simpleYm = getSimpleLoanBuyYearMonth();
+  const simpleAge = calcAgeAtYearMonth(document.getElementById('selfBirthDate')?.value || '', simpleYm.year, simpleYm.month) || numInput("homeAge", 0) || 0;
+  if(ageHidden && (force || ageHidden.value === "")) ageHidden.value = String(simpleAge);
+  if(yearHidden && (force || yearHidden.value === "")) yearHidden.value = String(simpleYm.year || '');
+  if(monthHidden && (force || monthHidden.value === "")) monthHidden.value = String(simpleYm.month || 1);
   if(downHidden && (force || downHidden.value === "")) downHidden.value = String(numInput("homeDown", 0) || 0);
 }
 function buildLoanDetailFromDOM(){
+  const buyYm = getStoredLoanDetailBuyYearMonth();
   return {
     enabled: !!document.getElementById("homeDetailOn")?.checked,
     buyAge: getStoredLoanDetailBuyAge(),
+    buyYear: buyYm.year,
+    buyMonth: buyYm.month,
     down: getStoredLoanDetailDown(),
     loanAmount: numInput("homeDetailLoanAmount", 0),
     ratePct: numInput("homeDetailRate", 0),
@@ -3221,9 +3371,14 @@ function buildLoanDetailFromDOM(){
   };
 }
 function buildLoanDetailFromConfig(home){
+  const buyYm = home?.detail?.buyYear && home?.detail?.buyMonth
+    ? {year:Number(home.detail.buyYear)||0, month:Number(home.detail.buyMonth)||1}
+    : deriveLoanBuyYearMonthFromAge(Number(home?.detail?.buyAge ?? home?.age) || 0);
   return {
     enabled: !!home?.detail?.enabled,
     buyAge: Number(home?.detail?.buyAge ?? home?.age) || 0,
+    buyYear: buyYm.year,
+    buyMonth: buyYm.month,
     down: Number(home?.detail?.down ?? home?.down) || 0,
     loanAmount: Number(home?.detail?.loanAmount) || 0,
     ratePct: Number(home?.detail?.ratePct) || 0,
@@ -3263,7 +3418,11 @@ function simulateLoanDetail(detail){
   let initialMonthly = 0;
   const birthDateValue = document.getElementById('selfBirthDate')?.value || '';
   const baseDateValue = document.getElementById('baseDate')?.value || '';
-  const buyYm = deriveRetireYearMonthFromAge(buyAge, birthDateValue, baseDateValue);
+  const fallbackBuyYm = deriveRetireYearMonthFromAge(buyAge, birthDateValue, baseDateValue);
+  const buyYm = {
+    year: Math.round(Number(detail?.buyYear) || Number(fallbackBuyYm?.year) || 0),
+    month: Math.min(12, Math.max(1, Math.round(Number(detail?.buyMonth) || Number(fallbackBuyYm?.month) || 1)))
+  };
   let currentYear = Math.round(Number(buyYm?.year) || 0);
   let currentMonth = Math.round(Number(buyYm?.month) || 0);
   if(currentYear <= 0 || currentMonth < 1 || currentMonth > 12){
@@ -3336,6 +3495,8 @@ function simulateLoanDetail(detail){
     ? monthlyAtAge[currentAge]
     : (activeAges.length ? (monthlyAtAge[activeAges[0]] || 0) : 0);
   const endAge = activeAges.length ? lastAge + 1 : buyAge;
+  const endYear = currentYear;
+  const endMonth = currentMonth;
   return {
     valid:true,
     annualByAge,
@@ -3346,6 +3507,8 @@ function simulateLoanDetail(detail){
     totalPaid,
     prepayTotal,
     endAge,
+    endYear,
+    endMonth,
     actualYears:activeAges.length,
     remainYearsFromCurrent: currentAge > 0 ? Math.max(0, endAge - Math.max(currentAge, buyAge)) : Math.max(0, endAge - buyAge)
   };
@@ -3414,7 +3577,12 @@ function syncSimpleLoanInputsFromStoredDetailFields(){
   const ok = syncSimpleLoanInputsFromDetail(detail);
   const currentAge = numInput("age", 0);
   const sim = simulateLoanDetail(detail);
-  setNumericInputValue("homeAge", Number(detail.buyAge) || 0);
+  const buyYear = Number(detail.buyYear) || deriveLoanBuyYearMonthFromAge(Number(detail.buyAge) || 0).year;
+  const buyMonth = Number(detail.buyMonth) || deriveLoanBuyYearMonthFromAge(Number(detail.buyAge) || 0).month;
+  syncLoanBuyYearSelectOptions({selfBirthDate:document.getElementById('selfBirthDate')?.value || '', baseDate:document.getElementById('baseDate')?.value || '', homeBuyYear:buyYear, homeBuyMonth:buyMonth, homeAge:detail.buyAge});
+  document.getElementById('homeBuyYear').value = String(buyYear || '');
+  document.getElementById('homeBuyMonth').value = String(buyMonth || 1);
+  syncLoanBuyFieldsFromYearMonth();
   setNumericInputValue("homeDown", Number(detail.down) || 0);
   setNumericInputValue("homePayMonth", Number(sim.valid ? getLoanDisplayPayment(sim, currentAge, detail.buyAge) : 0) || 0);
   setNumericInputValue("homeYears", Number(sim.valid ? (sim.actualYears || detail.baseYears) : detail.baseYears) || 0);
@@ -3425,17 +3593,26 @@ function syncSimpleLoanInputsFromDetail(detailOverride = null){
   if(!detail?.enabled) return false;
   const sim = simulateLoanDetail(detail);
   const currentAge = numInput("age", 0);
+  const buyYearValue = Number(detail.buyYear) || deriveLoanBuyYearMonthFromAge(Number(detail.buyAge) || 0).year;
+  const buyMonthValue = Number(detail.buyMonth) || deriveLoanBuyYearMonthFromAge(Number(detail.buyAge) || 0).month;
   const ageValue = Math.round((Number(detail.buyAge) || 0) * 10) / 10;
   const downValue = Math.round((Number(detail.down) || 0) * 10) / 10;
   const baseYearsValue = Math.round((Number(sim.valid ? (sim.actualYears || detail.baseYears) : detail.baseYears) || 0) * 10) / 10;
   const payValue = Math.round((Number(sim.valid ? getLoanDisplayPayment(sim, currentAge, detail.buyAge) : 0) || 0) * 10) / 10;
-  setNumericInputValue("homeAge", ageValue);
+  syncLoanBuyYearSelectOptions({selfBirthDate:document.getElementById('selfBirthDate')?.value || '', baseDate:document.getElementById('baseDate')?.value || '', homeBuyYear:buyYearValue, homeBuyMonth:buyMonthValue, homeAge:ageValue});
+  document.getElementById('homeBuyYear').value = String(buyYearValue || '');
+  document.getElementById('homeBuyMonth').value = String(buyMonthValue || 1);
+  syncLoanBuyFieldsFromYearMonth();
   setNumericInputValue("homeDown", downValue);
   setNumericInputValue("homePayMonth", payValue);
   setNumericInputValue("homeYears", baseYearsValue);
   const hiddenAge = document.getElementById("homeDetailBuyAge");
+  const hiddenYear = document.getElementById("homeDetailBuyYear");
+  const hiddenMonth = document.getElementById("homeDetailBuyMonth");
   const hiddenDown = document.getElementById("homeDetailDown");
   if(hiddenAge) hiddenAge.value = String(ageValue);
+  if(hiddenYear) hiddenYear.value = String(buyYearValue || '');
+  if(hiddenMonth) hiddenMonth.value = String(buyMonthValue || 1);
   if(hiddenDown) hiddenDown.value = String(downValue);
   return !!sim.valid;
 }
@@ -3444,7 +3621,7 @@ function updateHomeDetailUIState(){
   const on = !!document.getElementById("homeDetailOn")?.checked;
   const btn = document.getElementById("homeDetailBtn");
   if(btn) btn.disabled = !on;
-  ["homeAge","homeDown","homePayMonth","homeYears"].forEach(id=>{
+  ["homeBuyYear","homeBuyMonth","homeDown","homePayMonth","homeYears"].forEach(id=>{
     const el = document.getElementById(id);
     if(!el) return;
     el.disabled = on;
@@ -3502,7 +3679,7 @@ function updateLoanSummary(){
     box.innerHTML = buildLoanSummaryHtml(items);
     return;
   }
-  const buyAge = numInput("homeAge", 0);
+  const buyAge = calcAgeAtYearMonth(document.getElementById('selfBirthDate')?.value || '', document.getElementById('homeBuyYear')?.value, document.getElementById('homeBuyMonth')?.value) || numInput("homeAge", 0);
   const down = numInput("homeDown", 0);
   const payMonth = numInput("homePayMonth", 0);
   const years = numInput("homeYears", 0);
@@ -3910,12 +4087,16 @@ function getScenarioFromDOM(){
     extraRows:pointRows("extra"),
     home:{
       age:(!!document.getElementById("homeDetailOn")?.checked ? getStoredLoanDetailBuyAge() : numInput("homeAge", 0)),
+      buyYear:(!!document.getElementById("homeDetailOn")?.checked ? getStoredLoanDetailBuyYearMonth().year : Number(document.getElementById("homeBuyYear")?.value || 0)),
+      buyMonth:(!!document.getElementById("homeDetailOn")?.checked ? getStoredLoanDetailBuyYearMonth().month : Number(document.getElementById("homeBuyMonth")?.value || 1)),
       down:(!!document.getElementById("homeDetailOn")?.checked ? getStoredLoanDetailDown() : numInput("homeDown", 0)),
       payMonth:numInput("homePayMonth", 0),
       years:numInput("homeYears", 0),
       detail:{
         enabled: !!document.getElementById("homeDetailOn")?.checked,
         buyAge:getStoredLoanDetailBuyAge(),
+        buyYear:getStoredLoanDetailBuyYearMonth().year,
+        buyMonth:getStoredLoanDetailBuyYearMonth().month,
         down:getStoredLoanDetailDown(),
         loanAmount:numInput("homeDetailLoanAmount", 0),
         ratePct:numInput("homeDetailRate", 0),
@@ -6801,6 +6982,8 @@ function fillLoanDetailModalFromStored(){
   }
   loanDetailDraft = {
     buyAge: stored.buyAge || 40,
+    buyYear: stored.buyYear || deriveLoanBuyYearMonthFromAge(stored.buyAge || 40).year,
+    buyMonth: stored.buyMonth || deriveLoanBuyYearMonthFromAge(stored.buyAge || 40).month,
     down: stored.down || 0,
     loanAmount: stored.loanAmount || 0,
     ratePct: stored.ratePct || 0,
@@ -6816,11 +6999,11 @@ function renderLoanDetailPrepayRows(){
   const baseParts = parseDateInput(document.getElementById('baseDate')?.value || '') || {year:new Date().getFullYear(), month:1};
   const rows = sourceRows.length ? sourceRows : [{id:`plan_${Date.now()}`, year:baseParts.year, month:baseParts.month, age:0, amount:0, mode:"期間短縮型"}];
   body.innerHTML = rows.map((row, idx)=>{
-    const normalized = normalizeLoanPrepayPlans([row])[0] || {
+    const normalized = {
       id: row?.id || `plan_${idx+1}`,
-      year: baseParts.year,
-      month: baseParts.month,
-      age: 0,
+      year: Math.round(Number(row?.year) || 0) || baseParts.year,
+      month: Math.min(12, Math.max(1, Math.round(Number(row?.month) || 0) || baseParts.month)),
+      age: Number(row?.age) || calcAgeAtYearMonth(document.getElementById('selfBirthDate')?.value || '', row?.year, row?.month) || 0,
       amount: Math.max(0, Number(row?.amount) || 0),
       mode: row?.mode === "返済額軽減型" ? "返済額軽減型" : "期間短縮型"
     };
@@ -6834,9 +7017,12 @@ function renderLoanDetailPrepayRows(){
   enhanceNumericInputs(body);
   formatAllNumericInputs(body, true);
 }
-function syncLoanDetailDraftFromModal(){
+function syncLoanDetailDraftFromModal(preserveEmpty = false){
   if(!loanDetailDraft) fillLoanDetailModalFromStored();
+  syncLoanDetailBuyFieldsFromYearMonth();
   loanDetailDraft.buyAge = numInput("loanDetailAge", 0);
+  loanDetailDraft.buyYear = numValue(document.getElementById("loanDetailBuyYear")?.value, 0);
+  loanDetailDraft.buyMonth = numValue(document.getElementById("loanDetailBuyMonth")?.value, 1);
   loanDetailDraft.down = numInput("loanDetailDown", 0);
   loanDetailDraft.loanAmount = numInput("loanDetailLoanAmountInput", 0);
   loanDetailDraft.ratePct = numInput("loanDetailRateInput", 0);
@@ -6856,13 +7042,13 @@ function syncLoanDetailDraftFromModal(){
       mode: tr.querySelector('[data-loan-prepay-field="mode"]')?.value || "期間短縮型"
     });
   });
-  loanDetailDraft.prepayPlans = normalizeLoanPrepayPlans(rows);
+  loanDetailDraft.prepayPlans = preserveEmpty ? rows.filter(row => row.year > 0 && row.month >= 1 && row.month <= 12) : normalizeLoanPrepayPlans(rows);
 }
 function renderLoanDetailResult(){
-  syncLoanDetailDraftFromModal();
+  syncLoanDetailDraftFromModal(true);
   const box = document.getElementById("loanDetailResult");
   if(!box) return;
-  const sim = simulateLoanDetail(loanDetailDraft);
+  const sim = simulateLoanDetail({...loanDetailDraft, prepayPlans: normalizeLoanPrepayPlans(loanDetailDraft?.prepayPlans || [])});
   if(!sim.valid){
     box.innerHTML = `購入年齢・ローン額・金利・返済期間を入力すると試算結果を表示します。`;
     return;
@@ -6870,7 +7056,7 @@ function renderLoanDetailResult(){
   const initialMonthly = sim.initialMonthly || 0;
   const lines = [
     `<div><strong>初期返済見込み：</strong>約${formatLoanSummaryAmount(initialMonthly)} / 月</div>`,
-    `<div><strong>完済予定：</strong>${sim.endAge}歳</div>`,
+    `<div><strong>完済予定：</strong>${sim.endYear ? `${sim.endYear}年${sim.endMonth}月` : `${sim.endAge}歳`}</div>`,
     `<div><strong>総返済額目安：</strong>${formatLoanSummaryAmount(sim.totalPaid)}</div>`
   ];
   if(sim.prepayTotal > 0) lines.push(`<div><strong>繰上返済合計：</strong>${formatLoanSummaryAmount(sim.prepayTotal)}</div>`);
@@ -6882,7 +7068,10 @@ function renderLoanDetailResult(){
 }
 function renderLoanDetailModal(){
   if(!loanDetailDraft) fillLoanDetailModalFromStored();
-  document.getElementById("loanDetailAge").value = loanDetailDraft.buyAge || "";
+  syncLoanDetailBuyYearSelectOptions(loanDetailDraft.buyYear, loanDetailDraft.buyMonth);
+  document.getElementById("loanDetailBuyYear").value = String(loanDetailDraft.buyYear || "");
+  document.getElementById("loanDetailBuyMonth").value = String(loanDetailDraft.buyMonth || 1);
+  syncLoanDetailBuyFieldsFromYearMonth();
   document.getElementById("loanDetailDown").value = loanDetailDraft.down || loanDetailDraft.down === 0 ? loanDetailDraft.down : "";
   document.getElementById("loanDetailLoanAmountInput").value = loanDetailDraft.loanAmount || loanDetailDraft.loanAmount === 0 ? loanDetailDraft.loanAmount : "";
   document.getElementById("loanDetailRateInput").value = loanDetailDraft.ratePct || loanDetailDraft.ratePct === 0 ? loanDetailDraft.ratePct : "";
@@ -6914,9 +7103,14 @@ function saveLoanDetailModal(){
   syncLoanDetailDraftFromModal();
   const sim = simulateLoanDetail(loanDetailDraft);
   if(!sim.valid) return;
-  setNumericInputValue("homeAge", loanDetailDraft.buyAge || 0);
+  syncLoanBuyYearSelectOptions({selfBirthDate:document.getElementById('selfBirthDate')?.value || '', baseDate:document.getElementById('baseDate')?.value || '', homeBuyYear:loanDetailDraft.buyYear, homeBuyMonth:loanDetailDraft.buyMonth, homeAge:loanDetailDraft.buyAge});
+  document.getElementById('homeBuyYear').value = String(loanDetailDraft.buyYear || '');
+  document.getElementById('homeBuyMonth').value = String(loanDetailDraft.buyMonth || 1);
+  syncLoanBuyFieldsFromYearMonth();
   setNumericInputValue("homeDown", loanDetailDraft.down || 0);
   document.getElementById("homeDetailBuyAge").value = loanDetailDraft.buyAge || 0;
+  document.getElementById("homeDetailBuyYear").value = loanDetailDraft.buyYear || '';
+  document.getElementById("homeDetailBuyMonth").value = loanDetailDraft.buyMonth || 1;
   document.getElementById("homeDetailDown").value = loanDetailDraft.down || 0;
   document.getElementById("homeDetailLoanAmount").value = loanDetailDraft.loanAmount || 0;
   document.getElementById("homeDetailRate").value = loanDetailDraft.ratePct || 0;
@@ -6926,6 +7120,8 @@ function saveLoanDetailModal(){
   syncSimpleLoanInputsFromDetail({
     enabled:true,
     buyAge:loanDetailDraft.buyAge,
+    buyYear:loanDetailDraft.buyYear,
+    buyMonth:loanDetailDraft.buyMonth,
     down:loanDetailDraft.down,
     loanAmount:loanDetailDraft.loanAmount,
     ratePct:loanDetailDraft.ratePct,
@@ -7386,7 +7582,11 @@ document.getElementById("homeDetailOn")?.addEventListener("change", ()=>{
   if(isOn){
     if(!hasStoredLoanDetailValues()) initializeLoanDetailStoredFromSimple();
     syncSimpleLoanInputsFromStoredDetailFields();
-    setNumericInputValue("homeAge", getHiddenNumericValue("homeDetailBuyAge", numInput("homeAge", 0)));
+    const storedYm = getStoredLoanDetailBuyYearMonth();
+    syncLoanBuyYearSelectOptions({selfBirthDate:document.getElementById('selfBirthDate')?.value || '', baseDate:document.getElementById('baseDate')?.value || '', homeBuyYear:storedYm.year, homeBuyMonth:storedYm.month, homeAge:getHiddenNumericValue("homeDetailBuyAge", numInput("homeAge", 0))});
+    document.getElementById('homeBuyYear').value = String(storedYm.year || '');
+    document.getElementById('homeBuyMonth').value = String(storedYm.month || 1);
+    syncLoanBuyFieldsFromYearMonth();
     setNumericInputValue("homeDown", getHiddenNumericValue("homeDetailDown", numInput("homeDown", 0)));
   }
   updateHomeDetailUIState();
@@ -7399,15 +7599,34 @@ document.getElementById("homeDetailBtn")?.addEventListener("click", ()=>{
   if(document.getElementById("homeDetailBtn")?.disabled) return;
   openLoanDetailModal();
 });
-["homeAge","homeDown"].forEach(id=>{
+["homeBuyYear","homeBuyMonth","homeDown"].forEach(id=>{
   document.getElementById(id)?.addEventListener("input", ()=>{
     if(document.getElementById("homeDetailOn")?.checked) return;
+    syncLoanBuyFieldsFromYearMonth();
     seedLoanDetailHiddenFromSimpleIfNeeded(true);
   });
 });
+document.getElementById("homeBuyYear")?.addEventListener("change", ()=>{
+  if(document.getElementById("homeDetailOn")?.checked) return;
+  syncLoanBuyFieldsFromYearMonth();
+  seedLoanDetailHiddenFromSimpleIfNeeded(true);
+  updateLoanSummary();
+  syncCurrentScenarioFromDOM(false);
+  requestDraw();
+  persistState();
+});
+document.getElementById("homeBuyMonth")?.addEventListener("change", ()=>{
+  if(document.getElementById("homeDetailOn")?.checked) return;
+  syncLoanBuyFieldsFromYearMonth();
+  seedLoanDetailHiddenFromSimpleIfNeeded(true);
+  updateLoanSummary();
+  syncCurrentScenarioFromDOM(false);
+  requestDraw();
+  persistState();
+});
 document.getElementById("loanDetailAddPrepayBtn")?.addEventListener("click", ()=>{
   if(!loanDetailDraft) fillLoanDetailModalFromStored();
-  syncLoanDetailDraftFromModal();
+  syncLoanDetailDraftFromModal(true);
   const baseParts = parseDateInput(document.getElementById('baseDate')?.value || '') || {year:new Date().getFullYear(), month:1};
   loanDetailDraft.prepayPlans.push({id:`plan_${Date.now()}`, year:baseParts.year, month:baseParts.month, age:calcAgeAtYearMonth(document.getElementById('selfBirthDate')?.value || '', baseParts.year, baseParts.month), amount:0, mode:"期間短縮型"});
   renderLoanDetailModal();
@@ -7415,7 +7634,7 @@ document.getElementById("loanDetailAddPrepayBtn")?.addEventListener("click", ()=
 document.getElementById("loanDetailPrepayRows")?.addEventListener("click", (e)=>{
   const btn = e.target.closest("[data-loan-prepay-delete]");
   if(!btn || !loanDetailDraft) return;
-  syncLoanDetailDraftFromModal();
+  syncLoanDetailDraftFromModal(true);
   const idx = +(btn.dataset.loanPrepayDelete || -1);
   if(idx >= 0){
     loanDetailDraft.prepayPlans.splice(idx, 1);
@@ -7424,10 +7643,12 @@ document.getElementById("loanDetailPrepayRows")?.addEventListener("click", (e)=>
 });
 document.getElementById("loanDetailModal")?.addEventListener("input", (e)=>{
   if(!e.target.closest("#loanDetailModal")) return;
+  if(e.target.id === 'loanDetailBuyYear' || e.target.id === 'loanDetailBuyMonth') syncLoanDetailBuyFieldsFromYearMonth();
   renderLoanDetailResult();
 });
 document.getElementById("loanDetailModal")?.addEventListener("change", (e)=>{
   if(!e.target.closest("#loanDetailModal")) return;
+  if(e.target.id === 'loanDetailBuyYear' || e.target.id === 'loanDetailBuyMonth') syncLoanDetailBuyFieldsFromYearMonth();
   renderLoanDetailResult();
 });
 document.getElementById("cancelLoanDetailBtn")?.addEventListener("click", closeLoanDetailModal);
