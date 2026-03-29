@@ -143,7 +143,7 @@
   .expense-point-table{min-width:610px;table-layout:fixed;}
   .insurance-pay-table{min-width:1160px;table-layout:fixed;}
   .insurance-pay-table th:nth-child(1),.insurance-pay-table td:nth-child(1){width:132px;min-width:132px;}
-  .insurance-pay-table th:nth-child(2),.insurance-pay-table td:nth-child(2){width:138px;min-width:138px;}
+  .insurance-pay-table th:nth-child(2),.insurance-pay-table td:nth-child(2){width:190px;min-width:190px;}
   .insurance-pay-table th:nth-child(3),.insurance-pay-table td:nth-child(3){width:96px;min-width:96px;}
   .insurance-pay-table th:nth-child(4),.insurance-pay-table td:nth-child(4){width:96px;min-width:96px;}
   .insurance-pay-table th:nth-child(5),.insurance-pay-table td:nth-child(5){width:154px;min-width:154px;}
@@ -152,7 +152,7 @@
   .insurance-pay-table th:nth-child(8),.insurance-pay-table td:nth-child(8){width:94px;min-width:94px;}
   .insurance-recv-table{min-width:1290px;table-layout:fixed;}
   .insurance-recv-table th:nth-child(1),.insurance-recv-table td:nth-child(1){width:128px;min-width:128px;}
-  .insurance-recv-table th:nth-child(2),.insurance-recv-table td:nth-child(2){width:182px;min-width:182px;}
+  .insurance-recv-table th:nth-child(2),.insurance-recv-table td:nth-child(2){width:196px;min-width:196px;}
   .insurance-recv-table th:nth-child(3),.insurance-recv-table td:nth-child(3){width:110px;min-width:110px;}
   .insurance-recv-table th:nth-child(4),.insurance-recv-table td:nth-child(4){width:90px;min-width:90px;}
   .insurance-recv-table th:nth-child(5),.insurance-recv-table td:nth-child(5){width:144px;min-width:144px;}
@@ -315,15 +315,20 @@
   .basic-table .agebox, .basic-table .ratebox, .basic-table .moneybox{width:84px !important;}
   .datebox{width:148px !important;min-width:148px !important;max-width:148px !important;}
   .basic-inline-date-age{display:inline-flex;align-items:center;justify-content:flex-start;gap:16px;flex-wrap:nowrap;width:248px;margin:0 auto;}
+  .basic-inline-date-age > *{flex:0 0 auto;}
   .basic-inline-date-age input[type="date"]{width:148px;min-width:148px;max-width:148px;}
   .basic-inline-date-age .readonly-age-inline{display:inline-flex;align-items:center;gap:2px;color:#111827;white-space:nowrap;}
   .basic-inline-date-age .readonly-age-text{display:inline-block;min-width:28px;text-align:right;font-weight:600;color:#111827;}
+  .basic-inline-date-age .readonly-age-inline .suffix{min-width:0 !important;width:auto !important;text-align:left;}
+  .basic-inline-date-age .readonly-age-inline .age-paren{display:inline-block;line-height:1;}
+  .child-date-table td:nth-child(4) .suffix{min-width:0 !important;width:auto !important;text-align:left;}
+  .child-date-table td:nth-child(4) .child-age-text{min-width:0;}
   .basic-date-only{display:inline-flex;align-items:center;justify-content:flex-start;width:248px;margin:0 auto;}
   .basic-date-only input[type="date"]{width:148px;min-width:148px;max-width:148px;}
   .basic-table .readonly-age-input{background:#f8fafc;color:#111827;}
   .child-date-age-cell{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:nowrap;width:100%;}
   .child-date-age-cell input[type="date"]{width:148px;min-width:148px;max-width:148px;}
-  .child-age-text{display:inline-block;min-width:24px;text-align:right;font-weight:600;color:#111827;white-space:nowrap;}
+  .child-age-text{display:inline-block;min-width:24px;text-align:center;font-weight:600;color:#111827;white-space:nowrap;}
   .income-table .agebox, .income-table .moneybox{width:96px !important;}
   .basic-table td:nth-child(2) .input-unit{
     display:inline-flex;
@@ -340,6 +345,8 @@
   .child-date-table th:nth-child(2), .child-date-table td:nth-child(2){width:64px;min-width:64px;}
   .child-date-table th:nth-child(3), .child-date-table td:nth-child(3){width:170px;min-width:170px;}
   .child-date-table th:nth-child(4), .child-date-table td:nth-child(4){width:78px;min-width:78px;}
+  .child-date-table td:nth-child(4){text-align:center;}
+  .child-date-table td:nth-child(4) .input-unit{justify-content:center;padding-left:0;}
   .income-table td:nth-child(2) .input-unit{
     display:inline-flex;
     width:190px;
@@ -682,26 +689,28 @@
       padding-bottom:8px;
     }
     .grid2 > div:last-child{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-    .datebox{width:132px !important;min-width:132px !important;max-width:132px !important;}
-    .basic-inline-date-age{width:100%;max-width:248px;gap:8px;justify-content:flex-start;}
+    .datebox{width:108px !important;min-width:108px !important;max-width:108px !important;}
+    .basic-inline-date-age{width:100%;max-width:204px;gap:4px;justify-content:flex-start;}
     .basic-inline-date-age input[type="date"],
     .basic-date-only input[type="date"],
-    .child-date-age-cell input[type="date"]{width:132px;min-width:132px;max-width:132px;}
-    .basic-inline-date-age .readonly-age-inline{margin-left:auto;min-width:58px;justify-content:flex-end;}
-    .basic-inline-date-age .readonly-age-text{min-width:22px;font-size:12px;}
+    .child-date-age-cell input[type="date"]{width:108px;min-width:108px;max-width:108px;}
+    .basic-inline-date-age .readonly-age-inline{margin-left:auto;min-width:auto;justify-content:flex-end;transform:none;font-size:12px;gap:1px;flex:0 0 auto;}
+    .basic-inline-date-age .readonly-age-text{min-width:0;font-size:12px;}
+    .basic-inline-date-age .readonly-age-inline .suffix{font-size:12px;}
+    .basic-inline-date-age .age-paren{font-size:12px;}
     .child-date-table{min-width:560px;}
     .child-date-table th:nth-child(1), .child-date-table td:nth-child(1){width:128px;min-width:128px;}
     .child-date-table th:nth-child(2), .child-date-table td:nth-child(2){width:64px;min-width:64px;}
-    .child-date-table th:nth-child(3), .child-date-table td:nth-child(3){width:152px;min-width:152px;}
-    .child-date-table th:nth-child(4), .child-date-table td:nth-child(4){width:72px;min-width:72px;}
+    .child-date-table th:nth-child(3), .child-date-table td:nth-child(3){width:140px;min-width:140px;}
+    .child-date-table th:nth-child(4), .child-date-table td:nth-child(4){width:82px;min-width:82px;}
     .child-date-table th:nth-child(5), .child-date-table td:nth-child(5){width:144px;min-width:144px;}
-    .child-age-text{min-width:18px;font-size:12px;}
+    .child-age-text{min-width:24px;font-size:12px;text-align:center;}
     .child-allowance-table{min-width:max-content;}
     .child-allowance-table th,.child-allowance-table td{min-width:64px;padding:6px 8px;font-size:12px;}
     .child-allowance-table th:nth-child(1),.child-allowance-table td:nth-child(1){min-width:96px;}
     .child-allowance-table th:nth-child(2),.child-allowance-table td:nth-child(2){min-width:72px;}
     .insurance-pay-table,
-    .insurance-recv-table{min-width:1240px;}
+    .insurance-recv-table{min-width:1320px;}
     .insurance-pay-table td > select,
     .insurance-pay-table td > input[type=number],
     .insurance-pay-table td > input[type=text],
@@ -735,7 +744,9 @@
     #childRows td:nth-child(2), #childRows td:nth-child(4){text-align:center;}
     #childRows td:nth-child(3) .child-date-age-cell{justify-content:center;gap:4px;}
     #childRows td:nth-child(3) input[type="date"]{min-width:0;width:100%;max-width:148px;}
-    #childRows td:nth-child(3) .child-age-text{font-size:12px;}
+    #childRows td:nth-child(4) .input-unit{justify-content:center !important;padding-left:0 !important;gap:4px;}
+    #childRows td:nth-child(4) .child-age-text{font-size:12px;text-align:center;}
+    #childRows td:nth-child(4) .suffix{min-width:0 !important;width:auto !important;font-size:12px;text-align:left;}
     #childRows td:nth-child(3) .suffix{min-width:auto;font-size:12px;}
     #childRows td:last-child select{
       width:100% !important;
@@ -1157,8 +1168,8 @@
         <div>
           <table class="center-table basic-table">
             <tr><th>項目</th><th>入力</th></tr>
-            <tr><td>本人生年月日</td><td><div class="basic-inline-date-age"><input id="selfBirthDate" type="date" class="datebox" value="1976-03-29"><span class="readonly-age-inline">（<span id="selfAgeLabel" class="readonly-age-text">50</span><span class="suffix">歳）</span></span><input id="selfAgeDisplay" type="hidden" value="50"><input id="age" type="hidden" value="50"></div></td></tr>
-            <tr><td>配偶者生年月日</td><td><div class="basic-inline-date-age"><input id="spouseBirthDate" type="date" class="datebox" value="1978-03-29"><span class="readonly-age-inline">（<span id="spouseAgeLabel" class="readonly-age-text">48</span><span class="suffix">歳）</span></span><input id="spouseAgeDisplay" type="hidden" value="48"><input id="spouseAge" type="hidden" value="48"></div></td></tr>
+            <tr><td>本人生年月日</td><td><div class="basic-inline-date-age"><input id="selfBirthDate" type="date" class="datebox" value="1976-03-29"><span class="readonly-age-inline"><span class="age-paren">(</span><span id="selfAgeLabel" class="readonly-age-text">50</span><span class="suffix">歳</span><span class="age-paren">)</span></span><input id="selfAgeDisplay" type="hidden" value="50"><input id="age" type="hidden" value="50"></div></td></tr>
+            <tr><td>配偶者生年月日</td><td><div class="basic-inline-date-age"><input id="spouseBirthDate" type="date" class="datebox" value="1978-03-29"><span class="readonly-age-inline"><span class="age-paren">(</span><span id="spouseAgeLabel" class="readonly-age-text">48</span><span class="suffix">歳</span><span class="age-paren">)</span></span><input id="spouseAgeDisplay" type="hidden" value="48"><input id="spouseAge" type="hidden" value="48"></div></td></tr>
             <tr><td>想定寿命</td><td><div class="input-unit center"><input id="lifeExpect" type="number" class="agebox" value="90"><span class="suffix">歳</span></div></td></tr>
             <tr><td>為替レート</td><td><div class="input-unit center"><input id="usdRate" type="number" class="agebox" value="150" step="0.1"><span class="suffix">円 / ドル</span></div></td></tr>
             <tr><td>インフレ率</td><td><div class="input-unit center"><input id="inflRate" type="number" class="ratebox" step="0.1" value="2.0"><span class="suffix">%</span></div></td></tr>
