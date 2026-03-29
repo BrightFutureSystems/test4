@@ -315,10 +315,11 @@
   .basic-table .agebox, .basic-table .ratebox, .basic-table .moneybox{width:84px !important;}
   .datebox{width:148px !important;min-width:148px !important;max-width:148px !important;}
   .basic-inline-date-age{display:inline-flex;align-items:center;justify-content:flex-start;gap:6px;flex-wrap:nowrap;width:248px;margin:0 auto;}
+  .basic-inline-date-age .readonly-age-inline{flex:0 0 auto;}
   .basic-inline-date-age > *{flex:0 0 auto;}
   .basic-inline-date-age input[type="date"]{width:148px;min-width:148px;max-width:148px;}
   .basic-inline-date-age .readonly-age-inline{display:inline-flex;align-items:center;gap:0;color:#111827;white-space:nowrap;}
-  .child-inline-date-age{width:248px;max-width:100%;}
+  .child-inline-date-age{width:252px;max-width:100%;}
   .basic-inline-date-age .readonly-age-text{display:inline-block;min-width:0;text-align:left;font-weight:600;color:#111827;}
   .basic-inline-date-age .readonly-age-inline .suffix{min-width:0 !important;width:auto !important;text-align:left;}
   .basic-inline-date-age .readonly-age-inline .age-paren{display:inline-block;line-height:1;}
@@ -343,10 +344,10 @@
     width:248px;
     max-width:100%;
   }
-  .child-date-table th:nth-child(1), .child-date-table td:nth-child(1){width:116px;min-width:116px;}
-  .child-date-table th:nth-child(2), .child-date-table td:nth-child(2){width:64px;min-width:64px;}
+  .child-date-table th:nth-child(1), .child-date-table td:nth-child(1){width:84px;min-width:84px;}
+  .child-date-table th:nth-child(2), .child-date-table td:nth-child(2){width:36px;min-width:36px;}
   .child-date-table th:nth-child(3), .child-date-table td:nth-child(3){width:252px;min-width:252px;}
-  .child-date-table th:nth-child(4), .child-date-table td:nth-child(4){width:144px;min-width:144px;}
+  .child-date-table th:nth-child(4), .child-date-table td:nth-child(4){width:104px;min-width:104px;}
   .child-date-table td:nth-child(3){text-align:center;}
   .income-table td:nth-child(2) .input-unit{
     display:inline-flex;
@@ -448,7 +449,7 @@
   .loan-prepay-table .loan-year-month-wrap{display:inline-flex;align-items:center;justify-content:flex-start;gap:4px;white-space:nowrap;width:100%;}
   .loan-prepay-table .loan-year-select{width:78px !important;min-width:78px !important;}
   .loan-prepay-table .loan-month-select{width:52px !important;min-width:52px !important;}
-  .loan-buy-inline{display:inline-flex;align-items:center;justify-content:center;gap:4px;flex-wrap:nowrap;width:100%;}
+  .loan-buy-inline{display:inline-flex;align-items:center;justify-content:flex-start;gap:4px;flex-wrap:nowrap;width:100%;}
   .loan-buy-year-select{width:78px !important;min-width:78px !important;}
   .loan-buy-month-select{width:52px !important;min-width:52px !important;}
   .loan-buy-age-inline{display:inline-flex;align-items:center;gap:2px;color:#111827;white-space:nowrap;}
@@ -705,25 +706,25 @@
     }
     .grid2 > div:last-child{overflow-x:auto;-webkit-overflow-scrolling:touch;}
     .datebox{width:108px !important;min-width:108px !important;max-width:108px !important;}
-    .basic-inline-date-age{width:100%;max-width:204px;gap:4px;justify-content:flex-start;}
+    .basic-inline-date-age{width:100%;max-width:204px;gap:4px;justify-content:flex-start;flex-wrap:wrap;align-items:flex-start;}
     .basic-inline-date-age input[type="date"],
     .basic-date-only input[type="date"],
-    .child-date-age-cell input[type="date"]{width:108px;min-width:108px;max-width:108px;}
-    .basic-inline-date-age .readonly-age-inline{margin-left:auto;min-width:auto;justify-content:flex-end;transform:none;font-size:12px;gap:1px;flex:0 0 auto;}
-    .child-inline-date-age{max-width:204px;}
-    .retire-inline{width:100%;max-width:248px;gap:3px;justify-content:flex-start;transform:translateX(-12px);}
-    .retire-inline .retire-year-select{width:80px !important;min-width:80px !important;}
-    .retire-inline .retire-month-select{width:58px !important;min-width:58px !important;}
-    .retire-inline .readonly-retire-age-inline{margin-left:auto;font-size:12px;}
-    .retire-inline .readonly-retire-age-text{min-width:58px;font-size:12px;}
+    .child-date-age-cell input[type="date"]{width:82px;min-width:82px;max-width:82px;}
+    .basic-inline-date-age .readonly-age-inline{margin-left:0;min-width:auto;justify-content:flex-start;transform:none;font-size:12px;gap:1px;flex:0 0 100%;width:100%;}
+    .child-inline-date-age{max-width:108px;width:108px;}
+    .retire-inline{width:100%;max-width:220px;gap:3px;justify-content:flex-start;transform:none;flex-wrap:wrap;align-items:flex-start;}
+    .retire-inline .retire-year-select{width:74px !important;min-width:74px !important;}
+    .retire-inline .retire-month-select{width:52px !important;min-width:52px !important;}
+    .retire-inline .readonly-retire-age-inline{margin-left:0;font-size:12px;flex:0 0 100%;width:100%;justify-content:flex-start;}
+    .retire-inline .readonly-retire-age-text{min-width:0;font-size:12px;}
     .basic-inline-date-age .readonly-age-text{min-width:0;text-align:left;font-size:12px;}
     .basic-inline-date-age .readonly-age-inline .suffix{font-size:12px;}
     .basic-inline-date-age .age-paren{font-size:12px;}
-    .child-date-table{min-width:600px;}
-    .child-date-table th:nth-child(1), .child-date-table td:nth-child(1){width:128px;min-width:128px;}
-    .child-date-table th:nth-child(2), .child-date-table td:nth-child(2){width:64px;min-width:64px;}
-    .child-date-table th:nth-child(3), .child-date-table td:nth-child(3){width:220px;min-width:220px;}
-    .child-date-table th:nth-child(4), .child-date-table td:nth-child(4){width:144px;min-width:144px;}
+    .child-date-table{min-width:262px;}
+    .child-date-table th:nth-child(1), .child-date-table td:nth-child(1){width:38px;min-width:38px;}
+    .child-date-table th:nth-child(2), .child-date-table td:nth-child(2){width:36px;min-width:36px;}
+    .child-date-table th:nth-child(3), .child-date-table td:nth-child(3){width:78px;min-width:78px;}
+    .child-date-table th:nth-child(4), .child-date-table td:nth-child(4){width:54px;min-width:54px;}
     .child-allowance-table{min-width:max-content;}
     .child-allowance-table th,.child-allowance-table td{min-width:64px;padding:6px 8px;font-size:12px;}
     .child-allowance-table th:nth-child(1),.child-allowance-table td:nth-child(1){min-width:96px;}
@@ -755,14 +756,15 @@
     .basic-table td:nth-child(2) .input-unit{width:170px;max-width:100%;justify-content:flex-start;gap:4px;margin:0 auto;}
     .basic-table .agebox,.basic-table .ratebox,.basic-table .moneybox{width:68px !important;}
     .basic-table select{max-width:100%;width:100%;}
-    .grid2 > div:last-child .basic-table th:nth-child(1), #childRows td:nth-child(1){width:128px;min-width:128px;}
-    .grid2 > div:last-child .basic-table th:nth-child(2), #childRows td:nth-child(2){width:64px;min-width:64px;}
+    .grid2 > div:last-child .basic-table th:nth-child(1), #childRows td:nth-child(1){width:82px;min-width:82px;}
+    .grid2 > div:last-child .basic-table th:nth-child(2), #childRows td:nth-child(2){width:54px;min-width:54px;}
     .grid2 > div:last-child .basic-table th:nth-child(3), #childRows td:nth-child(3){width:220px;min-width:220px;}
-    .grid2 > div:last-child .basic-table th:nth-child(4), #childRows td:nth-child(4){width:144px;min-width:144px;}
+    .grid2 > div:last-child .basic-table th:nth-child(4), #childRows td:nth-child(4){width:108px;min-width:108px;}
     #childRows td:nth-child(2), #childRows td:nth-child(3){text-align:center;}
-    #childRows td:nth-child(3) .basic-inline-date-age{justify-content:center;gap:4px;max-width:204px;}
-    #childRows td:nth-child(3) input[type="date"]{min-width:0;width:108px;max-width:108px;}
-    #childRows td:nth-child(3) .readonly-age-inline{font-size:12px;}
+    #childRows td:nth-child(3) .basic-inline-date-age{justify-content:flex-start;gap:4px;max-width:108px;width:108px;}
+    #childRows td:nth-child(3) .basic-inline-date-age input[type="date"]{width:82px;min-width:82px;max-width:82px;}
+    #childRows td:nth-child(3) input[type="date"]{min-width:0;width:96px;max-width:96px;}
+    #childRows td:nth-child(3) .readonly-age-inline{font-size:12px;width:100%;margin-left:0;justify-content:flex-start;}
     #childRows td:nth-child(3) .readonly-age-text{font-size:12px;}
     #childRows td:last-child select{
       width:100% !important;
@@ -1580,9 +1582,9 @@ function convertStoredAgeToDisplayValue(ageValue, mode, currentAge, baseYear){
 function convertDisplayValueToStoredAge(displayValue, mode, currentAge, baseYear){
   return mode === "year" ? displayYearToAge(displayValue, currentAge, baseYear) : Math.round(Number(displayValue || 0));
 }
-function isTimeModePrefix(prefix){ return ["reginc","inc","homeMaint","period","extra"].includes(prefix); }
+function isTimeModePrefix(prefix){ return ["reginc","inc","rent","homeMaint","life","period","extra"].includes(prefix); }
 function getTimeFieldMeta(id){
-  let m = String(id || "").match(/^(reginc|homeMaint|period)(\d+)_(fromAge|toAge)$/);
+  let m = String(id || "").match(/^(reginc|rent|homeMaint|life|period)(\d+)_(fromAge|toAge)$/);
   if(m) return {prefix:m[1], index:+m[2], field:m[3], kind:"range"};
   m = String(id || "").match(/^(inc|extra)(\d+)_age$/);
   if(m) return {prefix:m[1], index:+m[2], field:"age", kind:"point"};
@@ -1590,7 +1592,7 @@ function getTimeFieldMeta(id){
 }
 function getTimeModeSelectId(prefix, index){ return `${prefix}${index}_timeUnit`; }
 function getTimeRowFieldIds(prefix, index){
-  if(prefix === "reginc" || prefix === "homeMaint" || prefix === "period") return [`${prefix}${index}_fromAge`, `${prefix}${index}_toAge`];
+  if(prefix === "reginc" || prefix === "rent" || prefix === "homeMaint" || prefix === "life" || prefix === "period") return [`${prefix}${index}_fromAge`, `${prefix}${index}_toAge`];
   if(prefix === "inc" || prefix === "extra") return [`${prefix}${index}_age`];
   return [];
 }
@@ -1639,7 +1641,7 @@ function refreshTimeRowDisplay(prefix, index, fromMode, toMode, oldContext, newC
   if(select) select.dataset.prevValue = toMode;
 }
 function refreshAllTimeDisplays(oldContext = timeDisplayContext, newContext = timeDisplayContext){
-  ["reginc","inc","homeMaint","period","extra"].forEach(prefix=>{
+  ["reginc","inc","rent","homeMaint","life","period","extra"].forEach(prefix=>{
     const count = dynamicCounts[prefix] || 0;
     for(let i=1;i<=count;i++){
       const select = document.getElementById(getTimeModeSelectId(prefix, i));
@@ -1659,9 +1661,9 @@ const ROW_FIELD_MAP = {
   inc:["age","val","timeUnit","name","custom"],
   insPay:["type","owner","insured","fromAge","toAge","val","unit","name","custom"],
   insRecv:["type","receiveType","receiver","fromAge","toAge","val","unit","name","custom"],
-  rent:["fromAge","toAge","val","name","custom"],
+  rent:["fromAge","toAge","val","timeUnit","name","custom"],
   homeMaint:["fromAge","toAge","val","timeUnit","name","custom"],
-  life:["fromAge","toAge","val","name","custom"],
+  life:["fromAge","toAge","val","timeUnit","name","custom"],
   period:["fromAge","toAge","val","timeUnit","name","custom"],
   extra:["age","val","timeUnit","name","custom"]
 };
@@ -1879,9 +1881,9 @@ function inferCount(data, type){
     inc:/^inc(\d+)_(age|val|timeUnit)$/,
     insPay:/^insPay(\d+)_(type|owner|insured|fromAge|toAge|val|unit)$/,
     insRecv:/^insRecv(\d+)_(type|receiveType|receiver|fromAge|toAge|val|unit)$/,
-    rent:/^rent(\d+)_(fromAge|toAge|age|val)$/,
+    rent:/^rent(\d+)_(fromAge|toAge|age|val|timeUnit)$/,
     homeMaint:/^homeMaint(\d+)_(fromAge|toAge|age|val)$/,
-    life:/^life(\d+)_(fromAge|toAge|age|val)$/,
+    life:/^life(\d+)_(fromAge|toAge|age|val|timeUnit)$/,
     period:/^period(\d+)_(fromAge|toAge|age|val|timeUnit)$/,
     extra:/^extra(\d+)_(age|val|timeUnit)$/
   };
@@ -5576,6 +5578,13 @@ function normalizeIncomeCurveConfig(curve, currentAge, retireAge, salaryMonth, b
     bonusLinkedPct: Number.isFinite(Number(cfg.bonusLinkedPct)) ? Number(cfg.bonusLinkedPct) : 33
   };
 }
+function formatIncomeCurveAgeLabel(age){
+  const n = Number(age);
+  if(!Number.isFinite(n)) return '';
+  const rounded = Math.round(n * 100) / 100;
+  return Number.isInteger(rounded) ? String(rounded) : String(rounded).replace(/\.0+$/, '').replace(/(\.\d*[1-9])0+$/, '$1');
+}
+
 function buildIncomeCurveSeries(incomeCfg, baseAge, targetAge){
   const currentAge = baseAge;
   const retireAge = Number(incomeCfg.retireAge) || 200;
@@ -7174,7 +7183,7 @@ function renderIncomeCurveModal(){
   const tbody = document.getElementById("incomeCurveRows");
   tbody.innerHTML = incomeCurveDraft.points.map((p, idx)=>{
     const fixed = idx === 0 || idx === incomeCurveDraft.points.length - 1;
-    return `<tr data-idx="${idx}"><td class="${fixed ? "readonly-cell" : ""}">${fixed ? `${Math.round(p.age)}歳` : `<input type="number" class="agebox age-input" data-curve-field="age" value="${attrValue(p.age)}">`}</td><td><input type="number" class="moneybox money-input" data-curve-field="salary" value="${attrValue(p.salary,0)}" ${modes.salary !== "custom" || incomeCurveDraft.salaryGrowthOn ? "disabled" : ""}></td><td><input type="number" class="moneybox money-input" data-curve-field="bonus" value="${attrValue(p.bonus,0)}" ${modes.bonus !== "custom" || incomeCurveDraft.bonusLinkedOn ? "disabled" : ""}></td><td>${fixed ? "固定" : `<button type="button" class="delete-curve-point-btn" data-curve-delete="${idx}">削除</button>`}</td></tr>`;
+    return `<tr data-idx="${idx}"><td class="${fixed ? "readonly-cell" : ""}">${fixed ? `${escapeHtml(formatIncomeCurveAgeLabel(p.age))}歳` : `<input type="number" class="agebox age-input" step="0.01" data-curve-field="age" value="${attrValue(p.age)}">`}</td><td><input type="number" class="moneybox money-input" data-curve-field="salary" value="${attrValue(p.salary,0)}" ${modes.salary !== "custom" || incomeCurveDraft.salaryGrowthOn ? "disabled" : ""}></td><td><input type="number" class="moneybox money-input" data-curve-field="bonus" value="${attrValue(p.bonus,0)}" ${modes.bonus !== "custom" || incomeCurveDraft.bonusLinkedOn ? "disabled" : ""}></td><td>${fixed ? "固定" : `<button type="button" class="delete-curve-point-btn" data-curve-delete="${idx}">削除</button>`}</td></tr>`;
   }).join("");
   enhanceNumericInputs(document.getElementById("incomeCurveModal"));
   formatAllNumericInputs(document.getElementById("incomeCurveModal"), true);
@@ -7241,24 +7250,30 @@ function drawIncomeCurveChart(){
   const seriesCfg = {salaryMonth:numInput(c.salaryInputId,0), bonusYear:numInput(c.bonusInputId,0), salaryMode:getIncomeModes(activeIncomeCurveOwner).salary, bonusMode:getIncomeModes(activeIncomeCurveOwner).bonus, incomeCurve:incomeCurveDraft, retireAge};
   const salaryPoints = [];
   const bonusPoints = [];
-  for(let age=Math.floor(currentAge); age<=Math.ceil(retireAge); age++){
+  const sampleAges = new Set();
+  for(let age=Math.floor(currentAge); age<=Math.floor(retireAge); age++) sampleAges.add(age);
+  (incomeCurveDraft.points || []).forEach(p=>{
+    const age = Number(p?.age);
+    if(Number.isFinite(age) && age >= currentAge && age <= retireAge) sampleAges.add(Math.round(age * 1000) / 1000);
+  });
+  sampleAges.add(Math.round(currentAge * 1000) / 1000);
+  sampleAges.add(Math.round(retireAge * 1000) / 1000);
+  Array.from(sampleAges).sort((a,b)=>a-b).forEach(age=>{
     const s = buildIncomeCurveSeries(seriesCfg, currentAge, age);
     salaryPoints.push({x:age, y:s.salaryMonth});
     bonusPoints.push({x:age, y:s.bonusYear});
-  }
-  const retirePoint = buildIncomeCurveSeries(seriesCfg, currentAge, retireAge);
-  salaryPoints.push({x:retireAge, y:retirePoint.salaryMonth});
-  bonusPoints.push({x:retireAge, y:retirePoint.bonusYear});
-  salaryPoints.push({x:retireAge + 1, y:0}, {x:chartEndAge, y:0});
-  bonusPoints.push({x:retireAge + 1, y:0}, {x:chartEndAge, y:0});
+  });
+  const dropAge = Math.min(chartEndAge, retireAge + (1 / 12));
+  salaryPoints.push({x:dropAge, y:0}, {x:chartEndAge, y:0});
+  bonusPoints.push({x:dropAge, y:0}, {x:chartEndAge, y:0});
   const ctx = document.getElementById("incomeCurveChart").getContext("2d");
   if(incomeCurveChart) incomeCurveChart.destroy();
   incomeCurveChart = new Chart(ctx, {
     type:"line",
     data:{
       datasets:[
-        {label:"手取り（月）", data:salaryPoints, parsing:false, borderColor:"#2563eb", backgroundColor:"#2563eb", pointRadius:0, borderWidth:2, yAxisID:"y", spanGaps:false},
-        {label:"ボーナス（年）", data:bonusPoints, parsing:false, borderColor:"#d97706", backgroundColor:"#d97706", pointRadius:0, borderWidth:2, yAxisID:"y1", spanGaps:false}
+        {label:"手取り（月）", data:salaryPoints, parsing:false, borderColor:"#2563eb", backgroundColor:"#2563eb", pointRadius:0, pointHoverRadius:3, borderWidth:2, yAxisID:"y", spanGaps:false},
+        {label:"ボーナス（年）", data:bonusPoints, parsing:false, borderColor:"#d97706", backgroundColor:"#d97706", pointRadius:0, pointHoverRadius:3, borderWidth:2, yAxisID:"y1", spanGaps:false}
       ]
     },
     options:{
@@ -7270,7 +7285,7 @@ function drawIncomeCurveChart(){
         y1:{position:"right", title:{display:true,text:"年間ボーナス（万円）"}, beginAtZero:true, grace:"12%", grid:{drawOnChartArea:false}}
       }
     },
-    plugins:[{id:"retireLine", afterDraw(chart){ const xScale=chart.scales.x; const area=chart.chartArea; const px=xScale.getPixelForValue(retireAge); const ctx=chart.ctx; ctx.save(); ctx.strokeStyle="#dc2626"; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(px, area.top); ctx.lineTo(px, area.bottom); ctx.stroke(); ctx.fillStyle="#dc2626"; ctx.font="12px Arial"; ctx.fillText("リタイア時点", Math.min(px+6, area.right-72), area.top+14); ctx.restore(); }}]
+    plugins:[{id:"retireLine", afterDraw(chart){ const xScale=chart.scales.x; const area=chart.chartArea; const px=xScale.getPixelForValue(retireAge); const ctx=chart.ctx; ctx.save(); ctx.strokeStyle="#dc2626"; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(px, area.top); ctx.lineTo(px, area.bottom); ctx.stroke(); ctx.fillStyle="#dc2626"; ctx.font="12px Arial"; ctx.textAlign="right"; ctx.textBaseline="alphabetic"; ctx.fillText("リタイア時点", Math.max(area.left + 72, px - 6), area.top + 14); ctx.restore(); }}]
   });
 }
 function addIncomeCurvePoint(){
@@ -7457,8 +7472,8 @@ document.addEventListener("input", (e)=>{
   if(!(el.matches("input") || el.matches("select"))) return;
   if(["graphType","overlayToggle","fixedScale","fixedScaleMin","fixedScaleMax","xAxisMin","xAxisMax"].includes(el.id)) return;
   if(el.closest && el.closest("#loanDetailModal")) return;
-  if(/^(reginc|inc|homeMaint|period|extra)\d+_timeUnit$/.test(el.id)){
-    const match = el.id.match(/^(reginc|inc|homeMaint|period|extra)(\d+)_timeUnit$/);
+  if(/^(reginc|inc|rent|homeMaint|life|period|extra)\d+_timeUnit$/.test(el.id)){
+    const match = el.id.match(/^(reginc|inc|rent|homeMaint|life|period|extra)(\d+)_timeUnit$/);
     if(match){
       const fromMode = el.dataset.prevValue === "year" ? "year" : "age";
       const toMode = el.value === "year" ? "year" : "age";
@@ -7499,8 +7514,8 @@ function commitMainInputChange(e){
   if(!(el.matches("input") || el.matches("select"))) return;
   if(["graphType","overlayToggle","fixedScale","fixedScaleMin","fixedScaleMax","xAxisMin","xAxisMax"].includes(el.id)) return;
   if(el.closest && el.closest("#loanDetailModal")) return;
-  if(/^(reginc|inc|homeMaint|period|extra)\d+_timeUnit$/.test(el.id)){
-    const match = el.id.match(/^(reginc|inc|homeMaint|period|extra)(\d+)_timeUnit$/);
+  if(/^(reginc|inc|rent|homeMaint|life|period|extra)\d+_timeUnit$/.test(el.id)){
+    const match = el.id.match(/^(reginc|inc|rent|homeMaint|life|period|extra)(\d+)_timeUnit$/);
     if(match){
       const fromMode = el.dataset.prevValue === "year" ? "year" : "age";
       const toMode = el.value === "year" ? "year" : "age";
