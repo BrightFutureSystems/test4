@@ -141,22 +141,27 @@
   .expense-point-table th:nth-child(4),.expense-point-table td:nth-child(4){width:94px;min-width:94px;}
   .expense-range-table{min-width:760px;table-layout:fixed;}
   .expense-point-table{min-width:610px;table-layout:fixed;}
-  .insurance-pay-table{min-width:1160px;table-layout:fixed;}
-  .insurance-pay-table th:nth-child(1),.insurance-pay-table td:nth-child(1){width:132px;min-width:132px;}
-  .insurance-pay-table th:nth-child(2),.insurance-pay-table td:nth-child(2){width:190px;min-width:190px;}
+  .insurance-pay-table{min-width:1180px;table-layout:fixed;}
+  .insurance-pay-table th:nth-child(1),.insurance-pay-table td:nth-child(1){width:112px;min-width:112px;}
+  .insurance-pay-table th:nth-child(2),.insurance-pay-table td:nth-child(2){width:180px;min-width:180px;padding-left:4px;padding-right:4px;}
   .insurance-pay-table th:nth-child(3),.insurance-pay-table td:nth-child(3){width:96px;min-width:96px;}
   .insurance-pay-table th:nth-child(4),.insurance-pay-table td:nth-child(4){width:96px;min-width:96px;}
-  .insurance-pay-table th:nth-child(5),.insurance-pay-table td:nth-child(5){width:154px;min-width:154px;}
-  .insurance-pay-table th:nth-child(6),.insurance-pay-table td:nth-child(6){width:128px;min-width:128px;}
-  .insurance-pay-table th:nth-child(7),.insurance-pay-table td:nth-child(7){width:94px;min-width:94px;}
-  .insurance-pay-table th:nth-child(8),.insurance-pay-table td:nth-child(8){width:94px;min-width:94px;}
-  .insurance-recv-table{min-width:1290px;table-layout:fixed;}
+  .insurance-pay-table th:nth-child(5),.insurance-pay-table td:nth-child(5){width:244px;min-width:244px;}
+  .insurance-pay-table th:nth-child(6),.insurance-pay-table td:nth-child(6){width:96px;min-width:96px;}
+  .insurance-pay-table th:nth-child(7),.insurance-pay-table td:nth-child(7){width:82px;min-width:82px;}
+  .insurance-pay-table th:nth-child(8),.insurance-pay-table td:nth-child(8){width:110px;min-width:110px;}
+  .insurance-pay-period-wrap{display:inline-flex;align-items:center;justify-content:center;gap:2px;white-space:nowrap;width:100%;}
+  .insurance-pay-year-select{width:78px !important;min-width:78px !important;}
+  .insurance-pay-month-select{width:62px !important;min-width:62px !important;}
+  .insurance-pay-end-age{width:50px !important;min-width:50px !important;padding-left:4px !important;padding-right:4px !important;}
+  .insurance-pay-period-wrap .suffix{flex:0 0 auto;}
+  .insurance-recv-table{min-width:1250px;table-layout:fixed;}
   .insurance-recv-table th:nth-child(1),.insurance-recv-table td:nth-child(1){width:128px;min-width:128px;}
   .insurance-recv-table th:nth-child(2),.insurance-recv-table td:nth-child(2){width:196px;min-width:196px;}
   .insurance-recv-table th:nth-child(3),.insurance-recv-table td:nth-child(3){width:110px;min-width:110px;}
   .insurance-recv-table th:nth-child(4),.insurance-recv-table td:nth-child(4){width:90px;min-width:90px;}
-  .insurance-recv-table th:nth-child(5),.insurance-recv-table td:nth-child(5){width:144px;min-width:144px;}
-  .insurance-recv-table th:nth-child(6),.insurance-recv-table td:nth-child(6){width:144px;min-width:144px;}
+  .insurance-recv-table th:nth-child(5),.insurance-recv-table td:nth-child(5){width:124px;min-width:124px;}
+  .insurance-recv-table th:nth-child(6),.insurance-recv-table td:nth-child(6){width:124px;min-width:124px;}
   .insurance-recv-table th:nth-child(7),.insurance-recv-table td:nth-child(7){width:118px;min-width:118px;}
   .insurance-recv-table th:nth-child(8),.insurance-recv-table td:nth-child(8){width:88px;min-width:88px;}
   .insurance-recv-table th:nth-child(9),.insurance-recv-table td:nth-child(9){width:112px;min-width:112px;}
@@ -449,7 +454,13 @@
   .loan-prepay-table .loan-year-month-wrap{display:inline-flex;align-items:center;justify-content:flex-start;gap:4px;white-space:nowrap;width:100%;}
   .loan-prepay-table .loan-year-select{width:78px !important;min-width:78px !important;}
   .loan-prepay-table .loan-month-select{width:52px !important;min-width:52px !important;}
-  .loan-buy-inline{display:inline-flex;align-items:center;justify-content:flex-start;gap:4px;flex-wrap:nowrap;width:100%;}
+  
+  .insurance-pay-period-wrap{display:inline-flex;align-items:center;justify-content:center;gap:2px;flex-wrap:nowrap;width:100%;}
+  .insurance-pay-year-select{width:72px !important;min-width:72px !important;}
+  .insurance-pay-month-select{width:50px !important;min-width:50px !important;}
+  .insurance-pay-period-wrap .agebox{width:60px !important;min-width:60px !important;padding-left:6px;padding-right:6px;}
+  .insurance-pay-period-wrap .suffix{font-size:13px;line-height:1;white-space:nowrap;}
+.loan-buy-inline{display:inline-flex;align-items:center;justify-content:flex-start;gap:4px;flex-wrap:nowrap;width:100%;}
   .loan-buy-year-select{width:78px !important;min-width:78px !important;}
   .loan-buy-month-select{width:52px !important;min-width:52px !important;}
   .loan-buy-age-inline{display:inline-flex;align-items:center;gap:2px;color:#111827;white-space:nowrap;}
@@ -1358,7 +1369,7 @@
       <div class="help">学資金・満期保険金・個人年金など、将来の受取予定を入力してください。一時金は開始年齢のみ、年金形式は受取期間を設定してください。</div>
       <div class="table-scroll">
       <table class="center-table insurance-recv-table">
-        <tr><th>項目</th><th>保険種類</th><th>受取種類</th><th>受取人</th><th>受取時期</th><th>受取期間</th><th>金額</th><th>受取単位</th><th>インフレ連動</th></tr>
+        <tr><th>項目</th><th>保険種類</th><th>受取種類</th><th>受取人</th><th>受取開始</th><th>受取終了</th><th>金額</th><th>受取単位</th><th>インフレ連動</th></tr>
         <tbody id="insRecvRows"></tbody>
       </table>
       </div>
@@ -1934,6 +1945,14 @@ function migrateLegacyData(data){
     if(data[`inv${i}_idecoCategory`] == null) data[`inv${i}_idecoCategory`] = "";
     delete data[`inv${i}_taxOn`];
   }
+  const insPayCount = inferCount(data, "insPay");
+  for(let i=1;i<=insPayCount;i++){
+    if(data[`insPay${i}_startYear`] == null || data[`insPay${i}_startYear`] === "" || data[`insPay${i}_startMonth`] == null || data[`insPay${i}_startMonth`] === ""){
+      const derived = deriveInsuranceStartYearMonthFromAge(data[`insPay${i}_fromAge`], data.baseDate || '', data.age || 0);
+      if(data[`insPay${i}_startYear`] == null || data[`insPay${i}_startYear`] === "") data[`insPay${i}_startYear`] = derived.year || '';
+      if(data[`insPay${i}_startMonth`] == null || data[`insPay${i}_startMonth`] === "") data[`insPay${i}_startMonth`] = derived.month || 1;
+    }
+  }
   const futureInvCount = inferCount(data, "futureInv");
   for(let i=1;i<=futureInvCount;i++){
     if(data[`futureInv${i}_owner`] == null || data[`futureInv${i}_owner`] === "") data[`futureInv${i}_owner`] = "本人";
@@ -2113,17 +2132,22 @@ function renderPointRows(prefix, bodyId, label, suffix, defaultAge, defaultVal, 
 function renderInsurancePayRows(data = {}){
   const body = document.getElementById("insPayRows"); if(!body) return;
   const personOptions = getInsurancePersonOptions(data);
+  const baseDateValue = data.baseDate || document.getElementById('baseDate')?.value || '';
+  const currentAge = currentAgeValue(data);
   let html = "";
   for(let i=1;i<=dynamicCounts.insPay;i++){
     const typeVal = data[`insPay${i}_type`] ?? "生命保険";
     const ownerVal = normalizeInsurancePersonValue(data[`insPay${i}_owner`] ?? "本人", data);
     const insuredVal = normalizeInsurancePersonValue(data[`insPay${i}_insured`] ?? "本人", data);
-    const fromVal = attrValue(data[`insPay${i}_fromAge`], currentAgeValue(data));
+    const fromAgeVal = Number(data[`insPay${i}_fromAge`] ?? currentAge) || currentAge;
+    const derivedStart = deriveInsuranceStartYearMonthFromAge(fromAgeVal, baseDateValue, currentAge);
+    const startYearVal = Number(data[`insPay${i}_startYear`] ?? derivedStart.year) || derivedStart.year || '';
+    const startMonthVal = Number(data[`insPay${i}_startMonth`] ?? derivedStart.month) || derivedStart.month || 1;
     const toVal = attrValue(data[`insPay${i}_toAge`], 120);
     const val = attrValue(data[`insPay${i}_val`], 0);
     const unitVal = data[`insPay${i}_unit`] ?? "month";
     const inflOn = !!data[`insPay${i}_inflationOn`];
-    html += `<tr>${buildRowLabelCell("insPay", i, data)}<td><select id="insPay${i}_type">${buildOptionsHtml(INSURANCE_TYPE_OPTIONS, typeVal)}</select></td><td><select id="insPay${i}_owner">${buildOptionsHtml(personOptions, ownerVal)}</select></td><td><select id="insPay${i}_insured">${buildOptionsHtml(personOptions, insuredVal)}</select></td><td><div class="period-range"><input id="insPay${i}_fromAge" type="number" class="agebox" value="${fromVal}"><span class="suffix">〜</span><input id="insPay${i}_toAge" type="number" class="agebox" value="${toVal}"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="insPay${i}_val" type="number" class="moneybox" value="${val}" step="0.1"><span class="suffix">万円</span></div></td><td><select id="insPay${i}_unit">${buildOptionsHtml(INSURANCE_PAY_UNIT_OPTIONS, unitVal)}</select></td><td><label class="inline-check"><input id="insPay${i}_inflationOn" type="checkbox" ${inflOn ? "checked" : ""}></label></td></tr>`;
+    html += `<tr>${buildRowLabelCell("insPay", i, data)}<td><select id="insPay${i}_type">${buildOptionsHtml(INSURANCE_TYPE_OPTIONS, typeVal)}</select></td><td><select id="insPay${i}_owner">${buildOptionsHtml(personOptions, ownerVal)}</select></td><td><select id="insPay${i}_insured">${buildOptionsHtml(personOptions, insuredVal)}</select></td><td><div class="insurance-pay-period-wrap"><select id="insPay${i}_startYear" class="insurance-pay-year-select">${buildInsuranceYearOptionsHtml(startYearVal, baseDateValue, currentAge)}</select><span class="suffix">年</span><select id="insPay${i}_startMonth" class="insurance-pay-month-select">${buildMonthOptionsHtml(startMonthVal)}</select><span class="suffix">月</span><span class="suffix">〜</span><input id="insPay${i}_toAge" type="number" class="agebox insurance-pay-end-age" value="${toVal}"><span class="suffix">歳</span><input id="insPay${i}_fromAge" type="hidden" value="${fromAgeVal}"></div></td><td><div class="input-unit center"><input id="insPay${i}_val" type="number" class="moneybox" value="${val}" step="0.1"><span class="suffix">万円</span></div></td><td><select id="insPay${i}_unit">${buildOptionsHtml(INSURANCE_PAY_UNIT_OPTIONS, unitVal)}</select></td><td><label class="inline-check"><input id="insPay${i}_inflationOn" type="checkbox" ${inflOn ? "checked" : ""}></label></td></tr>`;
   }
   body.innerHTML = html;
 }
@@ -2140,7 +2164,7 @@ function renderInsuranceReceiveRows(data = {}){
     const val = attrValue(data[`insRecv${i}_val`], 0);
     const unitVal = data[`insRecv${i}_unit`] ?? "lump";
     const inflOn = !!data[`insRecv${i}_inflationOn`];
-    html += `<tr>${buildRowLabelCell("insRecv", i, data)}<td><select id="insRecv${i}_type">${buildOptionsHtml(INSURANCE_TYPE_OPTIONS.filter(v=>!["火災保険","地震保険","自動車保険"].includes(v)), typeVal)}</select></td><td><select id="insRecv${i}_receiveType">${buildOptionsHtml(INSURANCE_RECEIVE_TYPE_OPTIONS, receiveTypeVal)}</select></td><td><select id="insRecv${i}_receiver">${buildOptionsHtml(personOptions, receiverVal)}</select></td><td><div class="input-unit center"><input id="insRecv${i}_fromAge" type="number" class="agebox" value="${fromVal}"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="insRecv${i}_toAge" type="number" class="agebox" value="${toVal}"><span class="suffix">歳まで</span></div></td><td><div class="input-unit center"><input id="insRecv${i}_val" type="number" class="moneybox" value="${val}" step="0.1"><span class="suffix">万円</span></div></td><td><select id="insRecv${i}_unit">${buildOptionsHtml(INSURANCE_RECEIVE_UNIT_OPTIONS, unitVal)}</select></td><td><label class="inline-check"><input id="insRecv${i}_inflationOn" type="checkbox" ${inflOn ? "checked" : ""}></label></td></tr>`;
+    html += `<tr>${buildRowLabelCell("insRecv", i, data)}<td><select id="insRecv${i}_type">${buildOptionsHtml(INSURANCE_TYPE_OPTIONS.filter(v=>!["火災保険","地震保険","自動車保険"].includes(v)), typeVal)}</select></td><td><select id="insRecv${i}_receiveType">${buildOptionsHtml(INSURANCE_RECEIVE_TYPE_OPTIONS, receiveTypeVal)}</select></td><td><select id="insRecv${i}_receiver">${buildOptionsHtml(personOptions, receiverVal)}</select></td><td><div class="input-unit center"><input id="insRecv${i}_fromAge" type="number" class="agebox" value="${fromVal}"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="insRecv${i}_toAge" type="number" class="agebox" value="${toVal}"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="insRecv${i}_val" type="number" class="moneybox" value="${val}" step="0.1"><span class="suffix">万円</span></div></td><td><select id="insRecv${i}_unit">${buildOptionsHtml(INSURANCE_RECEIVE_UNIT_OPTIONS, unitVal)}</select></td><td><label class="inline-check"><input id="insRecv${i}_inflationOn" type="checkbox" ${inflOn ? "checked" : ""}></label></td></tr>`;
   }
   body.innerHTML = html;
 }
@@ -2702,6 +2726,44 @@ function buildMonthOptionsHtml(selectedMonth){
     const month = idx + 1;
     return `<option value="${month}" ${Number(selectedMonth) === month ? "selected" : ""}>${month}</option>`;
   }).join('');
+}
+function getInsuranceYearRangeParts(baseDateValue, currentAgeValueForRange){
+  const base = parseDateInput(baseDateValue || '');
+  const fallbackYear = base ? base.year : new Date().getFullYear();
+  const currentAge = Math.max(0, Math.round(Number(currentAgeValueForRange) || 0));
+  if(currentAge > 0){
+    return {
+      minYear:fallbackYear - Math.max(0, currentAge - 18),
+      maxYear:fallbackYear + Math.max(0, 80 - currentAge)
+    };
+  }
+  return {minYear:fallbackYear - 32, maxYear:fallbackYear + 30};
+}
+function buildInsuranceYearOptionsHtml(selectedYear, baseDateValue, currentAgeValueForRange){
+  const range = getInsuranceYearRangeParts(baseDateValue, currentAgeValueForRange);
+  const fallbackYear = parseDateInput(baseDateValue || '')?.year || new Date().getFullYear();
+  const selectedRaw = Math.round(Number(selectedYear) || fallbackYear);
+  const selected = Math.min(range.maxYear, Math.max(range.minYear, selectedRaw));
+  let html = '';
+  for(let year = range.minYear; year <= range.maxYear; year++){
+    html += `<option value="${year}" ${year === selected ? 'selected' : ''}>${year}</option>`;
+  }
+  return html;
+}
+function deriveInsuranceStartYearMonthFromAge(ageValue, baseDateValue, currentAge){
+  const base = parseDateInput(baseDateValue || '');
+  if(!base) return {year:0, month:1};
+  const age = Math.max(0, Math.round(Number(ageValue) || 0));
+  const curAge = Math.max(0, Math.round(Number(currentAge) || 0));
+  return {year: base.year + (age - curAge), month: base.month};
+}
+function calcSimulationAgeAtDateParts(baseDateValue, currentAge, targetParts){
+  const base = parseDateInput(baseDateValue || '');
+  if(!base || !targetParts) return Math.max(0, Math.round(Number(currentAge) || 0));
+  let age = Math.max(0, Math.round(Number(currentAge) || 0)) + (targetParts.year - base.year);
+  const anniversary = {year:base.year + (targetParts.year - base.year), month:base.month, day:base.day};
+  if(compareDateParts(targetParts, anniversary) < 0) age -= 1;
+  return Math.max(0, age);
 }
 function getRetireMonthEndParts(yearValue, monthValue){
   const year = Number(yearValue) || 0;
@@ -4053,20 +4115,26 @@ function getScenarioFromDOM(){
     extraIncome:pointRows("inc"),
     insurancePayRows:(()=>{
       const arr = [];
+      const baseDateValue = document.getElementById('baseDate')?.value || '';
+      const currentAge = numInput('age', 0);
       for(let i=1;i<=dynamicCounts.insPay;i++){
+        const startYear = numInput(`insPay${i}_startYear`, 0);
+        const startMonth = numInput(`insPay${i}_startMonth`, 1);
         arr.push({
           name:document.getElementById(`insPay${i}_name`)?.value || `保険料${i}`,
           type:document.getElementById(`insPay${i}_type`)?.value || "生命保険",
           owner:document.getElementById(`insPay${i}_owner`)?.value || "本人",
           insured:document.getElementById(`insPay${i}_insured`)?.value || "本人",
-          fromAge:numInput(`insPay${i}_fromAge`, 0),
+          startYear,
+          startMonth,
+          fromAge:calcSimulationAgeAtDateParts(baseDateValue, currentAge, {year:startYear, month:startMonth, day:1}) || numInput(`insPay${i}_fromAge`, 0),
           toAge:numInput(`insPay${i}_toAge`, 0),
           val:numInput(`insPay${i}_val`, 0),
           unit:document.getElementById(`insPay${i}_unit`)?.value || "month",
           inflationOn:!!document.getElementById(`insPay${i}_inflationOn`)?.checked
         });
       }
-      return arr.filter(r=>r.fromAge>0 || r.toAge>0 || r.val>0);
+      return arr.filter(r=>r.fromAge>0 || r.toAge>0 || r.val>0 || r.startYear>0);
     })(),
     insuranceReceiveRows:(()=>{
       const arr = [];
@@ -5234,10 +5302,24 @@ function getPointValue(rows, age, inflRate = 0, yearIndex = 0){
 function getRegularIncomeForYear(cfg, age, yearIndex){
   return getRangeValue(cfg.regularIncomeRows || [], age, cfg.inflRate, yearIndex);
 }
+function getInsurancePayProrationForYear(cfg, row, yearIndex){
+  const startYear = Number(row?.startYear) || 0;
+  const startMonth = Number(row?.startMonth) || 0;
+  if(startYear <= 0 || startMonth < 1 || startMonth > 12) return 1;
+  const yearStart = getSimulationYearStartParts(cfg, yearIndex);
+  const yearEndExclusive = getSimulationYearEndExclusiveParts(cfg, yearIndex);
+  const contractStart = {year:startYear, month:startMonth, day:1};
+  const overlap = getOverlapPeriodParts(contractStart, yearEndExclusive, yearStart, yearEndExclusive);
+  if(!overlap) return 0;
+  const totalDays = getDaysBetweenParts(yearStart, yearEndExclusive);
+  if(totalDays <= 0) return 0;
+  return Math.max(0, Math.min(1, getDaysBetweenParts(overlap.start, overlap.endExclusive) / totalDays));
+}
 function getInsurancePayForYear(cfg, age, yearIndex){
   return (cfg.insurancePayRows || []).filter(r=>age >= (r.fromAge || 0) && age <= (r.toAge || 0)).reduce((sum, row)=>{
     const annualBase = (row.unit === "month" ? (row.val || 0) * 12 : (row.val || 0));
-    return sum + applyInflation(annualBase, !!row.inflationOn, cfg.inflRate, yearIndex);
+    const prorated = annualBase * (row.unit === 'month' ? getInsurancePayProrationForYear(cfg, row, yearIndex) : (getInsurancePayProrationForYear(cfg, row, yearIndex) > 0 ? 1 : 0));
+    return sum + applyInflation(prorated, !!row.inflationOn, cfg.inflRate, yearIndex);
   }, 0);
 }
 function getInsuranceReceiveForYear(cfg, age, yearIndex){
