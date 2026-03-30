@@ -653,6 +653,26 @@
   .income-curve-checks label{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
   .income-curve-note{color:var(--muted);font-size:.92rem;line-height:1.5;}
 
+  .insurance-assist-row{margin:8px 0 10px;display:flex;justify-content:flex-start;}
+  .insurance-assist-btn{min-width:132px;}
+  .insurance-assist-modal{width:min(760px, calc(100vw - 20px));max-height:min(92vh, 860px);overflow:auto;}
+  .insurance-assist-grid{display:flex;flex-direction:column;gap:12px;}
+  .insurance-assist-note{color:var(--muted);font-size:.92rem;line-height:1.55;}
+  .insurance-assist-section{border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff;}
+  .insurance-assist-section-title{font-weight:700;margin-bottom:8px;color:#0f172a;}
+  .insurance-assist-type-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;}
+  .insurance-assist-type-row label{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .insurance-assist-fields{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px 12px;}
+  .insurance-assist-field{display:flex;flex-direction:column;gap:4px;min-width:0;}
+  .insurance-assist-field > label{font-size:.92rem;color:#374151;}
+  .insurance-assist-field .input-unit{max-width:none;width:100%;justify-content:flex-start;}
+  .insurance-assist-field input[type=number],.insurance-assist-field input[type=text],.insurance-assist-field select{width:100%;max-width:100%;min-width:0;}
+  .insurance-assist-field-wide{grid-column:1 / -1;}
+  .insurance-assist-hidden{display:none !important;}
+  .insurance-assist-preview{background:#f8fafc;border:1px solid #d8dee9;border-radius:10px;padding:10px 12px;color:#334155;line-height:1.7;}
+  .insurance-assist-preview strong{color:#0f172a;}
+  .insurance-assist-inline-note{margin-top:6px;color:#6b7280;font-size:.85rem;line-height:1.45;}
+
   .modal-backdrop{
     position:fixed;
     inset:0;
@@ -801,6 +821,9 @@
     .income-mode-line-normal .input-unit .moneybox{width:96px !important;}
     .income-mode-line-button .curve-btn{font-size:12px;align-self:flex-end;padding:6px 10px;}
     .curve-btn{padding:5px 8px;font-size:12px;}
+    .insurance-assist-modal{width:min(100vw - 12px, 760px);padding:14px 10px 12px;}
+    .insurance-assist-fields{grid-template-columns:1fr;}
+
     .income-curve-modal{width:min(100vw - 12px, 980px);padding:14px 10px 12px;}
     .loan-detail-modal{width:min(100vw - 12px, 920px);padding:14px 10px 12px;}
     .edu-detail-modal{width:min(100vw - 12px, 920px);padding:14px 10px 12px;}
@@ -1156,6 +1179,73 @@
     </div>
   </div>
 
+
+  <div id="insuranceAssistModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal-card insurance-assist-modal" role="dialog" aria-modal="true" aria-labelledby="insuranceAssistTitle">
+      <div id="insuranceAssistTitle" class="modal-text" style="font-weight:bold;margin-bottom:10px;">保険入力補助</div>
+      <div class="insurance-assist-grid">
+        <div class="insurance-assist-note">※ 1契約分の入力から、保険料支払い表と保険受取表へ初期値を自動登録します。条件付き受取（入院・診断・死亡など）は自動反映しません。登録後は表で自由に編集できます。</div>
+        <div class="insurance-assist-section">
+          <div class="insurance-assist-section-title">保険タイプ</div>
+          <div class="insurance-assist-type-row">
+            <label><input type="radio" name="insuranceAssistType" id="insuranceAssistTypeScholarship" value="scholarship" checked> 学資保険</label>
+            <label><input type="radio" name="insuranceAssistType" id="insuranceAssistTypePension" value="personal_pension"> 個人年金保険</label>
+            <label><input type="radio" name="insuranceAssistType" id="insuranceAssistTypeMedical" value="medical"> 医療保険・がん保険</label>
+          </div>
+        </div>
+        <div class="insurance-assist-section">
+          <div class="insurance-assist-section-title">共通項目</div>
+          <div class="insurance-assist-fields">
+            <div class="insurance-assist-field"><label for="insuranceAssistName">項目名</label><input id="insuranceAssistName" type="text" value=""></div>
+            <div class="insurance-assist-field"><label for="insuranceAssistOwner">契約者</label><select id="insuranceAssistOwner"></select></div>
+            <div class="insurance-assist-field"><label for="insuranceAssistInsured">被保険者</label><select id="insuranceAssistInsured"></select></div>
+            <div class="insurance-assist-field"><label for="insuranceAssistStartYear">契約開始年月</label><div class="input-unit"><select id="insuranceAssistStartYear" class="insurance-pay-year-select"></select><span class="suffix">年</span><select id="insuranceAssistStartMonth" class="insurance-pay-month-select"></select><span class="suffix">月</span></div></div>
+            <div class="insurance-assist-field"><label for="insuranceAssistPremium">保険料</label><div class="input-unit"><input id="insuranceAssistPremium" type="number" class="moneybox" value="0" step="0.1"><span class="suffix">万円</span></div></div>
+            <div class="insurance-assist-field"><label for="insuranceAssistPayUnit">支払単位</label><select id="insuranceAssistPayUnit"></select></div>
+            <div class="insurance-assist-field"><label for="insuranceAssistPayEndAge">支払終了年齢</label><div class="input-unit"><input id="insuranceAssistPayEndAge" type="number" class="agebox" value="60"><span class="suffix">歳</span></div></div>
+            <div class="insurance-assist-field"><label>インフレ連動</label><label class="inline-check"><input id="insuranceAssistInflationOn" type="checkbox"> 反映する</label></div>
+          </div>
+        </div>
+        <div id="insuranceAssistScholarshipSection" class="insurance-assist-section">
+          <div class="insurance-assist-section-title">学資保険の受取設定</div>
+          <div class="insurance-assist-fields">
+            <div class="insurance-assist-field"><label for="insuranceAssistScholarshipChild">対象の子</label><select id="insuranceAssistScholarshipChild"></select></div>
+            <div class="insurance-assist-field"><label for="insuranceAssistScholarshipReceiveType">受取タイプ</label><select id="insuranceAssistScholarshipReceiveType"><option value="lump">満期一時金</option><option value="year">年次受取</option></select></div>
+            <div class="insurance-assist-field"><label for="insuranceAssistScholarshipReceiver">受取人</label><select id="insuranceAssistScholarshipReceiver"></select></div>
+            <div class="insurance-assist-field"><label for="insuranceAssistScholarshipReceiveAmount">受取金額</label><div class="input-unit"><input id="insuranceAssistScholarshipReceiveAmount" type="number" class="moneybox" value="0" step="0.1"><span class="suffix">万円</span></div></div>
+            <div class="insurance-assist-field"><label for="insuranceAssistScholarshipReceiveStartAge">受取開始年齢</label><div class="input-unit"><input id="insuranceAssistScholarshipReceiveStartAge" type="number" class="agebox" value="18"><span class="suffix">歳</span></div></div>
+            <div class="insurance-assist-field"><label for="insuranceAssistScholarshipReceiveEndAge">受取終了年齢</label><div class="input-unit"><input id="insuranceAssistScholarshipReceiveEndAge" type="number" class="agebox" value="18"><span class="suffix">歳</span></div></div>
+          </div>
+        </div>
+        <div id="insuranceAssistPensionSection" class="insurance-assist-section insurance-assist-hidden">
+          <div class="insurance-assist-section-title">個人年金保険の受取設定</div>
+          <div class="insurance-assist-fields">
+            <div class="insurance-assist-field"><label for="insuranceAssistPensionReceiver">受取人</label><select id="insuranceAssistPensionReceiver"></select></div>
+            <div class="insurance-assist-field"><label for="insuranceAssistPensionAmount">年金額</label><div class="input-unit"><input id="insuranceAssistPensionAmount" type="number" class="moneybox" value="0" step="0.1"><span class="suffix">万円</span></div></div>
+            <div class="insurance-assist-field"><label for="insuranceAssistPensionUnit">受取単位</label><select id="insuranceAssistPensionUnit"><option value="year">年</option><option value="month">月</option></select></div>
+            <div class="insurance-assist-field"><label for="insuranceAssistPensionStartAge">受取開始年齢</label><div class="input-unit"><input id="insuranceAssistPensionStartAge" type="number" class="agebox" value="65"><span class="suffix">歳</span></div></div>
+            <div class="insurance-assist-field"><label for="insuranceAssistPensionEndAge">受取終了年齢</label><div class="input-unit"><input id="insuranceAssistPensionEndAge" type="number" class="agebox" value="75"><span class="suffix">歳</span></div></div>
+          </div>
+        </div>
+        <div id="insuranceAssistMedicalSection" class="insurance-assist-section insurance-assist-hidden">
+          <div class="insurance-assist-section-title">医療保険・がん保険の設定</div>
+          <div class="insurance-assist-fields">
+            <div class="insurance-assist-field"><label for="insuranceAssistMedicalSubtype">保険種類</label><select id="insuranceAssistMedicalSubtype"><option value="医療保険・がん保険">医療保険・がん保険</option><option value="医療保険">医療保険</option><option value="がん保険">がん保険</option></select></div>
+            <div class="insurance-assist-field insurance-assist-field-wide"><label>受取の扱い</label><div class="insurance-assist-inline-note">医療保険・がん保険の給付金は、入院・診断など条件付きのため、この補助では保険料支払いのみ登録します。</div></div>
+          </div>
+        </div>
+        <div class="insurance-assist-section">
+          <div class="insurance-assist-section-title">生成プレビュー</div>
+          <div id="insuranceAssistPreview" class="insurance-assist-preview"></div>
+        </div>
+      </div>
+      <div class="modal-actions" style="margin-top:14px;">
+        <button type="button" id="cancelInsuranceAssistBtn">キャンセル</button>
+        <button type="button" id="saveInsuranceAssistBtn">この内容で追加</button>
+      </div>
+    </div>
+  </div>
+
   <div id="deleteTabModal" class="modal-backdrop" aria-hidden="true">
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="deleteTabMessage">
       <div id="deleteTabMessage" class="modal-text"></div>
@@ -1354,6 +1444,7 @@
     <div class="section">
       <h2>保険</h2>
       <div class="help">保険では、保険料の支払いと、将来確定している受取を管理します。死亡・入院・介護発生などの条件付き受取は、現時点では反映しません。</div>
+      <div class="insurance-assist-row"><button type="button" id="insuranceAssistBtn" class="add-row-btn insurance-assist-btn">保険入力補助</button></div>
 
       <div class="subhead">保険料支払い</div>
       <div class="help">生命保険・医療保険・学資保険・個人年金保険など、継続して支払う保険料を入力してください。月払い・年払いのどちらにも対応します。</div>
@@ -1684,10 +1775,12 @@ const ROW_FIELD_MAP = {
 const DEFAULT_ROW_LABEL_PREFIX = {child:"子",dep:"預貯金",inv:"運用",futureInv:"投資",sumInv:"積立",reginc:"定期収入",inc:"臨時収入",insPay:"保険料",insRecv:"保険受取",rent:"家賃",homeMaint:"持ち家維持費",life:"生活費",period:"定期支出",extra:"臨時支出"};
 const DEFAULT_ROW_COUNT = {child:1,dep:1,inv:1,futureInv:1,sumInv:1,reginc:1,inc:1,insPay:1,insRecv:1,rent:1,homeMaint:4,life:1,period:1,extra:1};
 const HOME_MAINT_DEFAULT_LABELS = ["固定資産税・都市計画税","火災保険・地震保険","修繕・メンテナンス","管理費・修繕積立金"];
-const INSURANCE_TYPE_OPTIONS = ["生命保険","医療保険・がん保険","学資保険","個人年金保険","介護保険","火災保険","地震保険","自動車保険","その他"];
+const INSURANCE_TYPE_OPTIONS = ["生命保険","医療保険・がん保険","医療保険","がん保険","学資保険","個人年金保険","介護保険","火災保険","地震保険","自動車保険","その他"];
 const INSURANCE_RECEIVE_TYPE_OPTIONS = ["満期保険金","一時金","年金形式","学資金","その他"];
 const INSURANCE_PAY_UNIT_OPTIONS = [{value:"month", label:"月"},{value:"year", label:"年"}];
 const INSURANCE_RECEIVE_UNIT_OPTIONS = [{value:"lump", label:"一時金"},{value:"year", label:"年"},{value:"month", label:"月"}];
+const INSURANCE_ASSIST_TYPE_LABELS = {scholarship:"学資保険", personal_pension:"個人年金保険", medical:"医療保険・がん保険"};
+const INSURANCE_ASSIST_PAY_END_AGE_OPTIONS = [18,20,55,60,65,70,75,80,90,100,120];
 const OWNER_OPTIONS = ["本人","配偶者"];
 const ACCOUNT_TYPE_OPTIONS = ["課税","つみたてNISA","成長NISA","iDeCo","企業型DC","その他"];
 const RECEIPT_METHOD_OPTIONS = ["一括","年金","併用"];
@@ -2168,6 +2261,258 @@ function renderInsuranceReceiveRows(data = {}){
   }
   body.innerHTML = html;
 }
+
+function getEnabledChildOptionList(data = {}){
+  const list = [];
+  const count = inferCount(data, "child");
+  for(let i=1;i<=count;i++){
+    const enabledRaw = data[`child${i}_enabled`];
+    const enabled = enabledRaw == null ? (i === 1) : !(enabledRaw === false || String(enabledRaw) === "false");
+    if(!enabled) continue;
+    list.push({value:getRowLabel(data, "child", i), label:getRowLabel(data, "child", i), index:i});
+  }
+  if(!list.length){
+    list.push({value:"子1", label:"子1", index:1});
+  }
+  return list;
+}
+function buildInsuranceAssistPersonOptionsHtml(data = {}, selectedValue = "本人") {
+  return buildOptionsHtml(getInsurancePersonOptions(data), selectedValue);
+}
+function buildInsuranceAssistChildOptionsHtml(data = {}, selectedValue = "") {
+  const options = getEnabledChildOptionList(data).map(item=>({value:item.value, label:item.label}));
+  const selected = selectedValue || options[0]?.value || "子1";
+  return buildOptionsHtml(options, selected);
+}
+function countInsuranceRowsByType(data, type, section){
+  const prefix = section === "recv" ? "insRecv" : "insPay";
+  const count = inferCount(data, prefix);
+  let n = 0;
+  for(let i=1;i<=count;i++){
+    if(String(data[`${prefix}${i}_type`] || '') === String(type || '')) n++;
+  }
+  return n;
+}
+function getNextInsuranceAssistName(data, type){
+  const label = INSURANCE_ASSIST_TYPE_LABELS[type] || "保険";
+  const base = Math.max(countInsuranceRowsByType(data, label, "pay"), countInsuranceRowsByType(data, label, "recv"));
+  return `${label}${base + 1}`;
+}
+function getInsuranceAssistSelectedType(){
+  return document.querySelector('input[name="insuranceAssistType"]:checked')?.value || 'scholarship';
+}
+function getInsuranceAssistModalData(){
+  const type = getInsuranceAssistSelectedType();
+  return {
+    type,
+    name:document.getElementById('insuranceAssistName')?.value?.trim() || '',
+    owner:document.getElementById('insuranceAssistOwner')?.value || '本人',
+    insured:document.getElementById('insuranceAssistInsured')?.value || '本人',
+    startYear:numInput('insuranceAssistStartYear', 0),
+    startMonth:numInput('insuranceAssistStartMonth', 1),
+    premium:numInput('insuranceAssistPremium', 0),
+    payUnit:document.getElementById('insuranceAssistPayUnit')?.value || 'month',
+    payEndAge:numInput('insuranceAssistPayEndAge', 60),
+    inflationOn:!!document.getElementById('insuranceAssistInflationOn')?.checked,
+    scholarshipChild:document.getElementById('insuranceAssistScholarshipChild')?.value || '子1',
+    scholarshipReceiveType:document.getElementById('insuranceAssistScholarshipReceiveType')?.value || 'lump',
+    scholarshipReceiver:document.getElementById('insuranceAssistScholarshipReceiver')?.value || '本人',
+    scholarshipReceiveAmount:numInput('insuranceAssistScholarshipReceiveAmount', 0),
+    scholarshipReceiveStartAge:numInput('insuranceAssistScholarshipReceiveStartAge', 18),
+    scholarshipReceiveEndAge:numInput('insuranceAssistScholarshipReceiveEndAge', 18),
+    pensionReceiver:document.getElementById('insuranceAssistPensionReceiver')?.value || '本人',
+    pensionAmount:numInput('insuranceAssistPensionAmount', 0),
+    pensionUnit:document.getElementById('insuranceAssistPensionUnit')?.value || 'year',
+    pensionStartAge:numInput('insuranceAssistPensionStartAge', 65),
+    pensionEndAge:numInput('insuranceAssistPensionEndAge', 75),
+    medicalSubtype:document.getElementById('insuranceAssistMedicalSubtype')?.value || '医療保険・がん保険'
+  };
+}
+function formatMoneyForDisplay(v){
+  const n = Number(v || 0);
+  if(!Number.isFinite(n)) return '0';
+  return Number.isInteger(n) ? String(n) : String(Math.round(n * 10) / 10);
+}
+
+function updateInsuranceAssistPreview(){
+  const preview = document.getElementById('insuranceAssistPreview');
+  if(!preview) return;
+  const modal = getInsuranceAssistModalData();
+  const payLine = `保険料支払い：1行追加（${escapeHtml(modal.name || (INSURANCE_ASSIST_TYPE_LABELS[modal.type] || '保険'))} / ${escapeHtml(modal.owner)} / ${escapeHtml(modal.insured)} / ${modal.startYear || '-'}年${modal.startMonth || '-'}月〜${modal.payEndAge || '-'}歳 / ${formatMoneyForDisplay(modal.premium)}万円 / ${modal.payUnit === 'year' ? '年払い' : '月払い'}）`;
+  let recvLine = '保険受取：追加なし';
+  if(modal.type === 'scholarship'){
+    recvLine = `保険受取：1行追加（学資保険 / ${escapeHtml(modal.scholarshipReceiver)} / ${modal.scholarshipReceiveStartAge}歳〜${modal.scholarshipReceiveEndAge}歳 / ${formatMoneyForDisplay(modal.scholarshipReceiveAmount)}万円 / ${modal.scholarshipReceiveType === 'year' ? '年次受取' : '一時金'}）`;
+  }else if(modal.type === 'personal_pension'){
+    recvLine = `保険受取：1行追加（個人年金保険 / ${escapeHtml(modal.pensionReceiver)} / ${modal.pensionStartAge}歳〜${modal.pensionEndAge}歳 / ${formatMoneyForDisplay(modal.pensionAmount)}万円 / ${modal.pensionUnit === 'month' ? '月額' : '年額'}）`;
+  }
+  preview.innerHTML = `<div>${payLine}</div><div>${recvLine}</div>`;
+}
+
+function syncInsuranceAssistTypeUI(applyDefaults = false){
+  const type = getInsuranceAssistSelectedType();
+  const scholarship = document.getElementById('insuranceAssistScholarshipSection');
+  const pension = document.getElementById('insuranceAssistPensionSection');
+  const medical = document.getElementById('insuranceAssistMedicalSection');
+  scholarship?.classList.toggle('insurance-assist-hidden', type !== 'scholarship');
+  pension?.classList.toggle('insurance-assist-hidden', type !== 'personal_pension');
+  medical?.classList.toggle('insurance-assist-hidden', type !== 'medical');
+  if(applyDefaults){
+    const currentData = migrateLegacyData(getAllInputs());
+    const nameEl = document.getElementById('insuranceAssistName');
+    const payEndEl = document.getElementById('insuranceAssistPayEndAge');
+    const insuredEl = document.getElementById('insuranceAssistInsured');
+    if(nameEl) nameEl.value = getNextInsuranceAssistName(currentData, type);
+    if(type === 'scholarship'){
+      const childVal = document.getElementById('insuranceAssistScholarshipChild')?.value || getEnabledChildOptionList(currentData)[0]?.value || '子1';
+      if(insuredEl) insuredEl.value = childVal;
+      if(payEndEl) payEndEl.value = 18;
+    }else if(type === 'personal_pension'){
+      if(insuredEl) insuredEl.value = document.getElementById('insuranceAssistOwner')?.value || '本人';
+      if(payEndEl) payEndEl.value = 60;
+    }else if(type === 'medical'){
+      if(insuredEl) insuredEl.value = document.getElementById('insuranceAssistOwner')?.value || '本人';
+      if(payEndEl) payEndEl.value = 120;
+    }
+  }
+  updateInsuranceAssistPreview();
+}
+function openInsuranceAssistModal(){
+  const data = migrateLegacyData(getAllInputs());
+  const ownerEl = document.getElementById('insuranceAssistOwner');
+  const insuredEl = document.getElementById('insuranceAssistInsured');
+  const scholarshipChildEl = document.getElementById('insuranceAssistScholarshipChild');
+  const scholarshipReceiverEl = document.getElementById('insuranceAssistScholarshipReceiver');
+  const pensionReceiverEl = document.getElementById('insuranceAssistPensionReceiver');
+  const startYearEl = document.getElementById('insuranceAssistStartYear');
+  const startMonthEl = document.getElementById('insuranceAssistStartMonth');
+  const payUnitEl = document.getElementById('insuranceAssistPayUnit');
+  if(ownerEl) ownerEl.innerHTML = buildOptionsHtml(OWNER_OPTIONS, '本人');
+  if(insuredEl) insuredEl.innerHTML = buildInsuranceAssistPersonOptionsHtml(data, '本人');
+  if(scholarshipChildEl) scholarshipChildEl.innerHTML = buildInsuranceAssistChildOptionsHtml(data);
+  if(scholarshipReceiverEl) scholarshipReceiverEl.innerHTML = buildInsuranceAssistPersonOptionsHtml(data, '本人');
+  if(pensionReceiverEl) pensionReceiverEl.innerHTML = buildInsuranceAssistPersonOptionsHtml(data, '本人');
+  if(startYearEl) startYearEl.innerHTML = buildInsuranceYearOptionsHtml(parseDateInput(data.baseDate || '')?.year || new Date().getFullYear(), data.baseDate || '', currentAgeValue(data));
+  if(startMonthEl) startMonthEl.innerHTML = buildMonthOptionsHtml(parseDateInput(data.baseDate || '')?.month || 1);
+  if(payUnitEl) payUnitEl.innerHTML = buildOptionsHtml(INSURANCE_PAY_UNIT_OPTIONS, 'month');
+  const startYear = parseDateInput(data.baseDate || '')?.year || new Date().getFullYear();
+  const startMonth = parseDateInput(data.baseDate || '')?.month || 1;
+  const defaults = {
+    insuranceAssistPremium:0,
+    insuranceAssistPayEndAge:18,
+    insuranceAssistScholarshipReceiveAmount:0,
+    insuranceAssistScholarshipReceiveStartAge:18,
+    insuranceAssistScholarshipReceiveEndAge:18,
+    insuranceAssistPensionAmount:0,
+    insuranceAssistPensionStartAge:65,
+    insuranceAssistPensionEndAge:75
+  };
+  Object.entries(defaults).forEach(([id, val])=>{ const el = document.getElementById(id); if(el) el.value = val; });
+  const inflationEl = document.getElementById('insuranceAssistInflationOn'); if(inflationEl) inflationEl.checked = false;
+  const nameEl = document.getElementById('insuranceAssistName'); if(nameEl) nameEl.value = getNextInsuranceAssistName(data, 'scholarship');
+  if(ownerEl) ownerEl.value = '本人';
+  if(startYearEl) startYearEl.value = String(startYear);
+  if(startMonthEl) startMonthEl.value = String(startMonth);
+  document.getElementById('insuranceAssistScholarshipReceiveType').value = 'lump';
+  document.getElementById('insuranceAssistMedicalSubtype').value = '医療保険・がん保険';
+  document.getElementById('insuranceAssistPensionUnit').value = 'year';
+  document.getElementById('insuranceAssistTypeScholarship').checked = true;
+  const childValue = scholarshipChildEl?.value || getEnabledChildOptionList(data)[0]?.value || '子1';
+  if(insuredEl) insuredEl.value = childValue;
+  document.getElementById('insuranceAssistModal')?.classList.add('show');
+  syncInsuranceAssistTypeUI(false);
+}
+function closeInsuranceAssistModal(){
+  document.getElementById('insuranceAssistModal')?.classList.remove('show');
+}
+function isInsurancePayRowBlank(data, index){
+  const currentAge = currentAgeValue(data);
+  const baseDateValue = data.baseDate || '';
+  const fromAgeVal = Number(data[`insPay${index}_fromAge`] ?? currentAge) || currentAge;
+  const derivedStart = deriveInsuranceStartYearMonthFromAge(fromAgeVal, baseDateValue, currentAge);
+  const startYearVal = Number(data[`insPay${index}_startYear`] ?? derivedStart.year) || derivedStart.year || 0;
+  const startMonthVal = Number(data[`insPay${index}_startMonth`] ?? derivedStart.month) || derivedStart.month || 1;
+  return !isRowCustom(data, 'insPay', index) && (data[`insPay${index}_name`] == null || data[`insPay${index}_name`] === defaultRowLabel('insPay', index)) &&
+    String(data[`insPay${index}_type`] ?? '生命保険') === '生命保険' &&
+    normalizeInsurancePersonValue(data[`insPay${index}_owner`] ?? '本人', data) === '本人' &&
+    normalizeInsurancePersonValue(data[`insPay${index}_insured`] ?? '本人', data) === '本人' &&
+    startYearVal === (parseDateInput(baseDateValue || '')?.year || new Date().getFullYear()) &&
+    startMonthVal === (parseDateInput(baseDateValue || '')?.month || 1) &&
+    Number(data[`insPay${index}_toAge`] ?? 120) === 120 &&
+    Number(data[`insPay${index}_val`] ?? 0) === 0 &&
+    String(data[`insPay${index}_unit`] ?? 'month') === 'month' &&
+    !Boolean(data[`insPay${index}_inflationOn`]);
+}
+function isInsuranceRecvRowBlank(data, index){
+  return !isRowCustom(data, 'insRecv', index) && (data[`insRecv${index}_name`] == null || data[`insRecv${index}_name`] === defaultRowLabel('insRecv', index)) &&
+    String(data[`insRecv${index}_type`] ?? '生命保険') === '生命保険' &&
+    String(data[`insRecv${index}_receiveType`] ?? '満期保険金') === '満期保険金' &&
+    normalizeInsurancePersonValue(data[`insRecv${index}_receiver`] ?? '本人', data) === '本人' &&
+    Number(data[`insRecv${index}_fromAge`] ?? 65) === 65 &&
+    Number(data[`insRecv${index}_toAge`] ?? 65) === 65 &&
+    Number(data[`insRecv${index}_val`] ?? 0) === 0 &&
+    String(data[`insRecv${index}_unit`] ?? 'lump') === 'lump' &&
+    !Boolean(data[`insRecv${index}_inflationOn`]);
+}
+function getInsurancePayTargetIndex(data){
+  const count = inferCount(data, 'insPay');
+  if(count === 1 && isInsurancePayRowBlank(data, 1)) return 1;
+  return count + 1;
+}
+function getInsuranceRecvTargetIndex(data){
+  const count = inferCount(data, 'insRecv');
+  if(count === 1 && isInsuranceRecvRowBlank(data, 1)) return 1;
+  return count + 1;
+}
+function applyInsuranceAssistModal(){
+  const data = migrateLegacyData(getAllInputs());
+  const modal = getInsuranceAssistModalData();
+  const name = modal.name || getNextInsuranceAssistName(data, modal.type);
+  const payIndex = getInsurancePayTargetIndex(data);
+  const baseDateValue = data.baseDate || document.getElementById('baseDate')?.value || '';
+  const currentAge = currentAgeValue(data);
+  const fromAge = calcSimulationAgeAtDateParts(baseDateValue, currentAge, {year:modal.startYear, month:modal.startMonth, day:1}) || currentAge;
+  setRowLabelMeta(data, 'insPay', payIndex, name, true);
+  data[`insPay${payIndex}_type`] = modal.type === 'medical' ? modal.medicalSubtype : INSURANCE_ASSIST_TYPE_LABELS[modal.type];
+  data[`insPay${payIndex}_owner`] = modal.owner;
+  data[`insPay${payIndex}_insured`] = modal.type === 'scholarship' ? modal.scholarshipChild : modal.insured;
+  data[`insPay${payIndex}_startYear`] = modal.startYear;
+  data[`insPay${payIndex}_startMonth`] = modal.startMonth;
+  data[`insPay${payIndex}_fromAge`] = fromAge;
+  data[`insPay${payIndex}_toAge`] = modal.payEndAge;
+  data[`insPay${payIndex}_val`] = modal.premium;
+  data[`insPay${payIndex}_unit`] = modal.payUnit;
+  data[`insPay${payIndex}_inflationOn`] = modal.inflationOn;
+  if(modal.type === 'scholarship' || modal.type === 'personal_pension'){
+    const recvIndex = getInsuranceRecvTargetIndex(data);
+    setRowLabelMeta(data, 'insRecv', recvIndex, name, true);
+    if(modal.type === 'scholarship'){
+      data[`insRecv${recvIndex}_type`] = '学資保険';
+      data[`insRecv${recvIndex}_receiveType`] = modal.scholarshipReceiveType === 'year' ? '学資金' : '満期保険金';
+      data[`insRecv${recvIndex}_receiver`] = modal.scholarshipReceiver;
+      data[`insRecv${recvIndex}_fromAge`] = modal.scholarshipReceiveStartAge;
+      data[`insRecv${recvIndex}_toAge`] = modal.scholarshipReceiveEndAge;
+      data[`insRecv${recvIndex}_val`] = modal.scholarshipReceiveAmount;
+      data[`insRecv${recvIndex}_unit`] = modal.scholarshipReceiveType === 'year' ? 'year' : 'lump';
+      data[`insRecv${recvIndex}_inflationOn`] = false;
+    }else{
+      data[`insRecv${recvIndex}_type`] = '個人年金保険';
+      data[`insRecv${recvIndex}_receiveType`] = '年金形式';
+      data[`insRecv${recvIndex}_receiver`] = modal.pensionReceiver;
+      data[`insRecv${recvIndex}_fromAge`] = modal.pensionStartAge;
+      data[`insRecv${recvIndex}_toAge`] = modal.pensionEndAge;
+      data[`insRecv${recvIndex}_val`] = modal.pensionAmount;
+      data[`insRecv${recvIndex}_unit`] = modal.pensionUnit;
+      data[`insRecv${recvIndex}_inflationOn`] = false;
+    }
+  }
+  setAllInputs(data);
+  updatePeriodDisplays();
+  monteMode = false;
+  requestDraw();
+  persistState();
+  closeInsuranceAssistModal();
+}
+
 function renderFutureInvestmentRows(data = {}){
   const body = document.getElementById("futureInvRows"); if(!body) return;
   let html="";
@@ -3212,7 +3557,7 @@ function getAllInputs(){
   const baseYear = currentBaseYearValue();
   document.querySelectorAll("input, select").forEach(el=>{
     if(!el.id) return;
-    if(el.closest && (el.closest("#loanDetailModal") || el.closest("#incomeCurveModal") || el.closest("#pensionHelperModal") || el.closest("#educationDetailModal"))) return;
+    if(el.closest && (el.closest("#loanDetailModal") || el.closest("#incomeCurveModal") || el.closest("#pensionHelperModal") || el.closest("#educationDetailModal") || el.closest("#insuranceAssistModal"))) return;
     if(el.type === "checkbox"){
       data[el.id] = el.checked;
       return;
@@ -7617,7 +7962,7 @@ document.addEventListener("input", (e)=>{
   const el = e.target;
   if(!(el.matches("input") || el.matches("select"))) return;
   if(["graphType","overlayToggle","fixedScale","fixedScaleMin","fixedScaleMax","xAxisMin","xAxisMax"].includes(el.id)) return;
-  if(el.closest && el.closest("#loanDetailModal")) return;
+  if(el.closest && (el.closest("#loanDetailModal") || el.closest("#insuranceAssistModal"))) return;
   if(/^(reginc|inc|rent|homeMaint|life|period|extra)\d+_timeUnit$/.test(el.id)){
     const match = el.id.match(/^(reginc|inc|rent|homeMaint|life|period|extra)(\d+)_timeUnit$/);
     if(match){
@@ -7829,6 +8174,35 @@ document.querySelector("#loanDetailModal .loan-detail-modal")?.addEventListener(
 ["mousedown","mouseup","dblclick","selectstart"].forEach(evt=>{
   document.querySelector("#loanDetailModal .loan-detail-modal")?.addEventListener(evt, (e)=>e.stopPropagation());
 });
+
+document.getElementById('insuranceAssistBtn')?.addEventListener('click', openInsuranceAssistModal);
+document.getElementById('cancelInsuranceAssistBtn')?.addEventListener('click', closeInsuranceAssistModal);
+document.getElementById('saveInsuranceAssistBtn')?.addEventListener('click', applyInsuranceAssistModal);
+document.querySelectorAll('input[name="insuranceAssistType"]').forEach(el=>el.addEventListener('change', ()=>syncInsuranceAssistTypeUI(true)));
+['insuranceAssistOwner','insuranceAssistInsured','insuranceAssistStartYear','insuranceAssistStartMonth','insuranceAssistPremium','insuranceAssistPayUnit','insuranceAssistPayEndAge','insuranceAssistInflationOn','insuranceAssistScholarshipChild','insuranceAssistScholarshipReceiveType','insuranceAssistScholarshipReceiver','insuranceAssistScholarshipReceiveAmount','insuranceAssistScholarshipReceiveStartAge','insuranceAssistScholarshipReceiveEndAge','insuranceAssistPensionReceiver','insuranceAssistPensionAmount','insuranceAssistPensionUnit','insuranceAssistPensionStartAge','insuranceAssistPensionEndAge','insuranceAssistMedicalSubtype','insuranceAssistName'].forEach(id=>{
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.addEventListener(el.tagName === 'SELECT' || el.type === 'checkbox' || el.type === 'radio' ? 'change' : 'input', ()=>{
+    if(id === 'insuranceAssistOwner' && getInsuranceAssistSelectedType() !== 'scholarship'){
+      const insuredEl = document.getElementById('insuranceAssistInsured');
+      if(insuredEl) insuredEl.value = document.getElementById('insuranceAssistOwner')?.value || '本人';
+    }
+    if(id === 'insuranceAssistScholarshipChild' && getInsuranceAssistSelectedType() === 'scholarship'){
+      const insuredEl = document.getElementById('insuranceAssistInsured');
+      if(insuredEl) insuredEl.value = document.getElementById('insuranceAssistScholarshipChild')?.value || '子1';
+    }
+    updateInsuranceAssistPreview();
+  });
+});
+document.querySelector('#insuranceAssistModal .insurance-assist-modal')?.addEventListener('click', (e)=>e.stopPropagation());
+['mousedown','mouseup','dblclick','selectstart'].forEach(evt=>{
+  document.querySelector('#insuranceAssistModal .insurance-assist-modal')?.addEventListener(evt, (e)=>e.stopPropagation());
+  document.querySelectorAll('#insuranceAssistModal input, #insuranceAssistModal textarea, #insuranceAssistModal select').forEach(el=>el.addEventListener(evt, (e)=>e.stopPropagation()));
+});
+let insuranceAssistBackdropPointerDown = false;
+document.getElementById('insuranceAssistModal')?.addEventListener('mousedown', (e)=>{ insuranceAssistBackdropPointerDown = e.target === e.currentTarget; });
+document.getElementById('insuranceAssistModal')?.addEventListener('mouseup', (e)=>{ if(insuranceAssistBackdropPointerDown && e.target === e.currentTarget) closeInsuranceAssistModal(); insuranceAssistBackdropPointerDown = false; });
+
 document.getElementById('eduBody')?.addEventListener('click', (e)=>{
   const btn = e.target.closest('[data-edu-detail-open]');
   if(!btn) return;
