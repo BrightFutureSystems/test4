@@ -1207,15 +1207,16 @@
 
     <div class="section">
       <h2>資産</h2>
-      <div class="help">預金・現在の運用資産・今後の投資・積立投資に分けて入力します。現在保有分は「現在の運用資産」、将来の一括投資予定は「今後の投資」、継続積立は「積立投資」へ入力してください。</div>
-      <div class="subhead">預金</div>
+      <div class="help">預貯金・現在の運用資産・今後の投資・積立投資に分けて入力します。現在保有分は「現在の運用資産」、将来の一括投資予定は「今後の投資」、継続積立は「積立投資」へ入力してください。</div>
+      <div class="subhead">預貯金</div>
       <div class="table-scroll">
       <table class="center-table">
-        <tr><th>項目</th><th>預金額</th><th>通貨</th><th>金利</th></tr>
+        <tr><th>項目</th><th>預貯金額</th><th>通貨</th><th>金利</th></tr>
         <tbody id="depRows"></tbody>
       </table>
       </div>
       <div class="add-row-wrap"><button type="button" class="add-row-btn" data-add-row="dep">＋</button></div>
+      <div class="stack-note">収支プラス分や臨時収入等で増えた現金は、預貯金行に均等配分されます。各行には、それぞれ設定した金利が翌年以降反映されます。</div>
 
       <div class="subhead">現在の運用資産</div>
       <div class="help">元本は取得額、現在額は現在の評価額を入力してください。</div>
@@ -1228,6 +1229,7 @@
       <div class="add-row-wrap"><button type="button" class="add-row-btn" data-add-row="inv">＋</button></div>
 
       <div class="subhead">今後の投資</div>
+      <div class="help">将来の一括投資は、その時点の預貯金から拠出します。資金不足時は実行されない、または一部のみ実行されます。</div>
       <div class="table-scroll">
       <table class="center-table asset-invest-table future-invest-table">
         <tr><th>項目</th><th>名義</th><th>口座</th><th>年齢</th><th>投資額</th><th>通貨</th><th>利回り</th><th>iDeCo区分</th></tr>
@@ -1237,7 +1239,7 @@
       <div class="add-row-wrap"><button type="button" class="add-row-btn" data-add-row="futureInv">＋</button></div>
 
       <div class="subhead">積立投資</div>
-      <div class="help">将来の一括投資予定は「今後の投資」、毎月の積立予定は「積立投資」へ入力してください。</div>
+      <div class="help">積立投資は、その時点の預貯金から拠出する想定です。資金不足時は積立額が減額または停止されます。</div>
       <div class="table-scroll">
       <table class="center-table asset-invest-table sum-invest-table">
         <tr><th>項目</th><th>名義</th><th>口座</th><th>積立期間</th><th>積立額</th><th>通貨</th><th>利回り</th><th>iDeCo区分</th></tr>
@@ -1247,7 +1249,8 @@
       <div class="add-row-wrap"><button type="button" class="add-row-btn" data-add-row="sumInv">＋</button></div>
 
       <div class="stack-note">運用益課税率 20.315%（売却時のみ課税）</div>
-      <div class="stack-note">取り崩しルール：まず預金から使う。預金が生活費2年分以下になったら運用資産も使う。運用資産は均等売却。</div>
+      <div class="stack-note">取り崩しルール：まず預貯金から使う。預貯金が今後2年分の主要生活支出を下回ったら、運用資産を売却して補う。運用資産は均等売却。</div>
+      <div class="stack-note">主要生活支出には、生活費・住居費・保険料・定期支出・教育費の継続部分などを含みます。臨時支出や入学一時金などの単発費用は含みません。</div>
 
       <div class="subhead">DC加入歴設定</div>
       <table class="center-table income-table">
@@ -1667,7 +1670,7 @@ const ROW_FIELD_MAP = {
   period:["fromAge","toAge","val","timeUnit","name","custom"],
   extra:["age","val","timeUnit","name","custom"]
 };
-const DEFAULT_ROW_LABEL_PREFIX = {child:"子",dep:"預金",inv:"運用",futureInv:"投資",sumInv:"積立",reginc:"定期収入",inc:"臨時収入",insPay:"保険料",insRecv:"保険受取",rent:"家賃",homeMaint:"持ち家維持費",life:"生活費",period:"定期支出",extra:"臨時支出"};
+const DEFAULT_ROW_LABEL_PREFIX = {child:"子",dep:"預貯金",inv:"運用",futureInv:"投資",sumInv:"積立",reginc:"定期収入",inc:"臨時収入",insPay:"保険料",insRecv:"保険受取",rent:"家賃",homeMaint:"持ち家維持費",life:"生活費",period:"定期支出",extra:"臨時支出"};
 const DEFAULT_ROW_COUNT = {child:1,dep:1,inv:1,futureInv:1,sumInv:1,reginc:1,inc:1,insPay:1,insRecv:1,rent:1,homeMaint:4,life:1,period:1,extra:1};
 const HOME_MAINT_DEFAULT_LABELS = ["固定資産税・都市計画税","火災保険・地震保険","修繕・メンテナンス","管理費・修繕積立金"];
 const INSURANCE_TYPE_OPTIONS = ["生命保険","医療保険・がん保険","学資保険","個人年金保険","介護保険","火災保険","地震保険","自動車保険","その他"];
@@ -3915,7 +3918,7 @@ function getScenarioFromDOM(){
   const deposits = [];
   for(let i=1;i<=dynamicCounts.dep;i++){
     deposits.push({
-      name:document.getElementById(`dep${i}_name`)?.value || `預金${i}`,
+      name:document.getElementById(`dep${i}_name`)?.value || `預貯金${i}`,
       amount:toManYen(document.getElementById(`dep${i}_amount`).value, document.getElementById(`dep${i}_cur`).value, usdRate),
       rate:(numInput(`dep${i}_rate`, 0)||0)/100
     });
@@ -5134,6 +5137,48 @@ function getPreschoolDetailedEducationCostForPeriod(child, detail, simStartParts
   });
   return total;
 }
+function getEducationRecurringCostForYear(cfg, yearIndex){
+  const simStartParts = getSimulationYearStartParts(cfg, yearIndex);
+  const simEndExclusiveParts = getSimulationYearEndExclusiveParts(cfg, yearIndex);
+  if(!simStartParts || !simEndExclusiveParts) return 0;
+  let total = 0;
+  cfg.children.forEach(child=>{
+    if(!parseDateInput(child?.birthDate || '')) return;
+    const childEdu = cfg.educationMatrix[child.idx] || {};
+    const detail = normalizeEducationDetail(childEdu.detail || null);
+
+    for(let grade=-5; grade<=30; grade++){
+      const period = getSchoolYearPeriodForGrade(child, grade);
+      if(!period) continue;
+      const overlap = getOverlapPeriodParts(simStartParts, simEndExclusiveParts, period.start, period.endExclusive);
+      if(!overlap) continue;
+      const comp = getEducationGradeComponents(child, childEdu, detail, grade);
+      if(!comp) continue;
+      const overlapDays = getDaysBetweenParts(overlap.start, overlap.endExclusive);
+      const totalDays = getDaysBetweenParts(period.start, period.endExclusive);
+      if(overlapDays <= 0 || totalDays <= 0) continue;
+      total += (Number(comp.annualCost) || 0) * (overlapDays / totalDays);
+      total += getProratedMonthlyAmountForPeriod(Number(comp.monthlyCost) || 0, overlap.start, overlap.endExclusive);
+    }
+
+    if(detail?.preschool?.enabled){
+      normalizePreschoolRows(detail.preschool.rows).forEach(row=>{
+        if((row?.type || 'none') === 'none') return;
+        const period = getPreschoolAgePeriodForAge(child, Number(row.age || 0));
+        if(!period) return;
+        const overlap = getOverlapPeriodParts(simStartParts, simEndExclusiveParts, period.start, period.endExclusive);
+        if(!overlap) return;
+        const overlapDays = getDaysBetweenParts(overlap.start, overlap.endExclusive);
+        const totalDays = getDaysBetweenParts(period.start, period.endExclusive);
+        if(overlapDays <= 0 || totalDays <= 0) return;
+        total += (Number(row.annualCost) || 0) * (overlapDays / totalDays);
+        total += getProratedMonthlyAmountForPeriod(Number(row.extraMonthly) || 0, overlap.start, overlap.endExclusive);
+      });
+    }
+  });
+  return total;
+}
+
 function getEducationCostForYear(cfg, yearIndex){
   const simStartParts = getSimulationYearStartParts(cfg, yearIndex);
   const simEndExclusiveParts = getSimulationYearEndExclusiveParts(cfg, yearIndex);
@@ -5717,10 +5762,15 @@ function getExpenseForYear(cfg, age, yearIndex){
     }
   }
 
+  const educationRecurring = getEducationRecurringCostForYear(cfg, yearIndex);
   return {
     total: life + rent + homeMaint + insurance + periodic + extra + education + loan + down,
-    parts:{life,rent,homeMaint,insurance,periodic,extra,education,loan:loan+down,educationByChild:eduObj.byChild}
+    parts:{life,rent,homeMaint,insurance,periodic,extra,education,educationRecurring,loan:loan+down,educationByChild:eduObj.byChild}
   };
+}
+function annualCashBufferNeed(parts){
+  const p = parts || {};
+  return (p.life || 0) + (p.rent || 0) + (p.homeMaint || 0) + (p.insurance || 0) + (p.loan || 0) + (p.periodic || 0) + (p.educationRecurring || 0);
 }
 function randomizeReturn(base){
   return base + (Math.random()-0.5)*0.30;
@@ -5874,7 +5924,7 @@ function getOrderedSellableInvestments(investments, cfg, age){
 function sellInvestmentsNetToDeposits(targetNet, deposits, investments, cfg, age){
   let remaining = Math.max(0, targetNet || 0);
   if(remaining <= 0) return 0;
-  if(!deposits.length) deposits.push({name:"預金1", amount:0, rate:0});
+  if(!deposits.length) deposits.push({name:"預貯金1", amount:0, rate:0});
   let raised = 0;
   const ordered = getOrderedSellableInvestments(investments, cfg, age);
   for(const inv of ordered){
@@ -5896,29 +5946,24 @@ function sellInvestmentsNetToDeposits(targetNet, deposits, investments, cfg, age
   }
   return raised;
 }
-function fundInvestmentFromAssets(targetAmount, deposits, investments, cfg, age){
+function fundInvestmentFromAssets(targetAmount, deposits, reserveAmount = 0){
   let remaining = Math.max(0, targetAmount || 0);
   if(remaining <= 0) return 0;
+  const reserve = Math.max(0, reserveAmount || 0);
+  let funded = 0;
+  let totalDeposit = deposits.reduce((s,d)=>s + Math.max(0, d.amount || 0), 0);
   for(const d of deposits){
     if(remaining <= 0) break;
-    const use = Math.min(d.amount, remaining);
+    const current = Math.max(0, d.amount || 0);
+    const availableTotal = Math.max(0, totalDeposit - reserve);
+    if(availableTotal <= 0.0001) break;
+    const use = Math.min(current, remaining, availableTotal);
     d.amount -= use;
     remaining -= use;
+    funded += use;
+    totalDeposit -= use;
   }
-  if(remaining > 0.0001){
-    sellInvestmentsNetToDeposits(remaining, deposits, investments, cfg, age);
-    for(const d of deposits){
-      if(remaining <= 0) break;
-      const use = Math.min(d.amount, remaining);
-      d.amount -= use;
-      remaining -= use;
-    }
-  }
-  if(remaining > 0.0001){
-    if(!deposits.length) deposits.push({name:"預金1", amount:0, rate:0});
-    deposits[0].amount -= remaining;
-  }
-  return Math.max(0, targetAmount || 0);
+  return funded;
 }
 function createAnnualOwnerState(baseNisaBookCost = 0, baseGrowthNisaBookCost = 0){
   return {
@@ -5990,20 +6035,22 @@ function registerContributionUsage(owner, accountType, amount, annualState){
     ownerState.idecoUsed = (ownerState.idecoUsed || 0) + amount;
   }
 }
-function processScheduledInvestments(cfg, age, deposits, investments, annualState){
+function processScheduledInvestments(cfg, age, yearIndex, deposits, investments, annualState){
   const futureOffset = cfg.investments.length;
   const sumOffset = futureOffset + (cfg.futureInvestments || []).length;
+  const reserveAmount = Math.max(0, (getExpenseForYear(cfg, age, yearIndex)?.parts?.life || 0) * 2);
   (cfg.futureInvestments || []).forEach((plan, idx)=>{
     if(plan.age !== age || (plan.amount || 0) <= 0) return;
     const actual = getAllowedContributionAmount(plan, annualState, investments);
     if(actual <= 0) return;
-    fundInvestmentFromAssets(actual, deposits, investments, cfg, age);
+    const funded = fundInvestmentFromAssets(actual, deposits, reserveAmount);
+    if(funded <= 0) return;
     const target = investments[futureOffset + idx];
     if(target){
-      target.amount += actual;
-      target.cost += actual;
+      target.amount += funded;
+      target.cost += funded;
     }
-    registerContributionUsage(plan.owner, plan.accountType, actual, annualState);
+    registerContributionUsage(plan.owner, plan.accountType, funded, annualState);
   });
   (cfg.sumInvestments || []).forEach((plan, idx)=>{
     if(age < (plan.fromAge || 0) || age > (plan.toAge || 0)) return;
@@ -6011,19 +6058,20 @@ function processScheduledInvestments(cfg, age, deposits, investments, annualStat
     if(requested <= 0) return;
     const actual = getAllowedContributionAmount({...plan, amount:requested}, annualState, investments);
     if(actual <= 0) return;
-    fundInvestmentFromAssets(actual, deposits, investments, cfg, age);
+    const funded = fundInvestmentFromAssets(actual, deposits, reserveAmount);
+    if(funded <= 0) return;
     const target = investments[sumOffset + idx];
     if(target){
-      target.amount += actual;
-      target.cost += actual;
+      target.amount += funded;
+      target.cost += funded;
     }
-    registerContributionUsage(plan.owner, plan.accountType, actual, annualState);
+    registerContributionUsage(plan.owner, plan.accountType, funded, annualState);
   });
 }
 
 function simulate(cfg, random=false){
   const deposits = deepClone(cfg.deposits);
-  if(!deposits.length) deposits.push({name:"預金1", amount:0, rate:0});
+  if(!deposits.length) deposits.push({name:"預貯金1", amount:0, rate:0});
   const investments = deepClone(cfg.investments);
   (cfg.futureInvestments || []).forEach(plan=>investments.push(makeInvestmentEntryFromPlan(plan, 0)));
   (cfg.sumInvestments || []).forEach(plan=>investments.push(makeInvestmentEntryFromPlan(plan, 0)));
@@ -6064,8 +6112,6 @@ function simulate(cfg, random=false){
     const annualState = initializeAnnualContributionState(investments);
     const yearIndex = age - cfg.age;
 
-    processScheduledInvestments(cfg, age, deposits, investments, annualState);
-
     deposits.forEach(d=>{ d.amount *= (1 + d.rate); });
     investments.forEach(inv=>{
       let r = inv.rate;
@@ -6103,7 +6149,7 @@ function simulate(cfg, random=false){
         need -= use;
       }
 
-      const currentLifeNeed = expenseObj.parts.life || 0;
+      const currentLifeNeed = annualCashBufferNeed(expenseObj.parts);
       const depositLeft = deposits.reduce((s,d)=>s+d.amount,0);
       const triggerSell = depositLeft <= currentLifeNeed * 2;
       let sellNeed = 0;
@@ -6144,6 +6190,24 @@ function simulate(cfg, random=false){
       if(need > 0){
         liability += need;
         need = 0;
+      }
+    }
+
+    processScheduledInvestments(cfg, age, yearIndex, deposits, investments, annualState);
+
+    const desiredDepositBuffer = Math.max(0, annualCashBufferNeed(expenseObj.parts) * 2);
+    if(desiredDepositBuffer > 0){
+      let depositNow = deposits.reduce((s,d)=>s + d.amount, 0);
+      if(depositNow < desiredDepositBuffer){
+        let replenishNeed = desiredDepositBuffer - depositNow;
+        let guard = 0;
+        while(replenishNeed > 0.0001 && guard < 10){
+          guard++;
+          const netCollected = sellInvestmentsNetToDeposits(replenishNeed, deposits, investments, cfg, age);
+          const nextDeposit = deposits.reduce((s,d)=>s + d.amount, 0);
+          replenishNeed = Math.max(0, desiredDepositBuffer - nextDeposit);
+          if(netCollected <= 0.0001) break;
+        }
       }
     }
 
@@ -6383,14 +6447,14 @@ function buildIncomeExpenseDatasets(sim, color, overlay, labelPrefix=""){
 function buildAssetBreakdownDatasets(sim, color, overlay, labelPrefix=""){
   if(overlay){
     return [
-      makeLineDataset(`${labelPrefix} 預金`, sim.labels, sim.totalDeposits, {borderColor:color, borderWidth:2}),
+      makeLineDataset(`${labelPrefix} 預貯金`, sim.labels, sim.totalDeposits, {borderColor:color, borderWidth:2}),
       makeLineDataset(`${labelPrefix} 運用`, sim.labels, sim.totalInvestments, {borderColor:color, borderDash:[6,4], borderWidth:2}),
       makeLineDataset(`${labelPrefix} 不足額`, sim.labels, sim.totalLiability.map(v=>-v), {borderColor:color, borderDash:[2,3], borderWidth:1.5})
     ];
   }
   const shortfall = sim.totalAssets.map(v=>v<0 ? v : 0);
   return [
-    makeBarDataset("預金", sim.labels, sim.totalDeposits, {backgroundColor:"#2563eb", stack:"asset"}),
+    makeBarDataset("預貯金", sim.labels, sim.totalDeposits, {backgroundColor:"#2563eb", stack:"asset"}),
     makeBarDataset("運用", sim.labels, sim.totalInvestments, {backgroundColor:"#f59e0b", stack:"asset"}),
     makeBarDataset("不足額", sim.labels, shortfall, {backgroundColor:"#dc2626", stack:"short"})
   ];
