@@ -863,6 +863,23 @@
     .delete-curve-point-btn{padding:4px 6px;font-size:11px;min-width:auto;}
   }
 
+  .cashflow-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .cashflow-table{width:max-content;min-width:100%;table-layout:fixed;border-collapse:collapse;}
+  .cashflow-table th,.cashflow-table td{white-space:nowrap;font-size:12px;min-width:90px;}
+  .cashflow-table thead th{position:sticky;top:0;background:#f8fafc;z-index:2;}
+  .cashflow-table .cashflow-item-col{position:sticky;left:0;z-index:3;min-width:190px;width:190px;background:#f8fafc;text-align:left;padding-left:10px;}
+  .cashflow-table tbody th.cashflow-item-col{z-index:1;background:#fff;}
+  .cashflow-table .cashflow-year-col{min-width:86px;width:86px;}
+  .cashflow-table .cashflow-item-group{background:#f3f4f6;font-weight:700;}
+  .cashflow-neg{color:#b91c1c;font-weight:700;}
+  .cashflow-pos{color:#15803d;font-weight:700;}
+  .cashflow-muted{color:#6b7280;}
+  .social-detail-table{table-layout:fixed;width:100%;}
+  .social-detail-table th,.social-detail-table td{white-space:normal;word-break:break-word;}
+  .social-detail-table th:nth-child(1),.social-detail-table td:nth-child(1){width:18%;}
+  .social-detail-table th:nth-child(2),.social-detail-table td:nth-child(2){width:26%;}
+  .social-detail-table th:nth-child(3),.social-detail-table td:nth-child(3){width:20%;}
+  .social-detail-table th:nth-child(4),.social-detail-table td:nth-child(4){width:36%;}
   .numeric-assist{display:none !important;
     position:fixed;
     z-index:9999;
@@ -1396,7 +1413,7 @@
 
       <div class="subhead">DC・退職金 受取方法設定</div>
       <div class="table-scroll">
-      <table class="center-table receipt-table">
+      <table class="center-table social-detail-table">
         <tr><th>対象</th><th>受取方法</th><th>一括年齢</th><th>一括割合</th><th>年金開始</th><th>年金終了</th></tr>
         <tr><td>本人 iDeCo</td><td><select id="receipt_self_ideco_method"><option selected>一括</option><option>年金</option><option>併用</option></select></td><td><div class="input-unit center"><input id="receipt_self_ideco_lumpAge" type="number" class="agebox" value="0"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="receipt_self_ideco_lumpRatio" type="number" class="ratebox" value="50" step="0.1"><span class="suffix">%</span></div></td><td><div class="input-unit center"><input id="receipt_self_ideco_pensionStart" type="number" class="agebox" value="0"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="receipt_self_ideco_pensionEnd" type="number" class="agebox" value="0"><span class="suffix">歳</span></div></td></tr>
         <tr><td>本人 企業型DC</td><td><select id="receipt_self_corpdc_method"><option selected>一括</option><option>年金</option><option>併用</option></select></td><td><div class="input-unit center"><input id="receipt_self_corpdc_lumpAge" type="number" class="agebox" value="0"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="receipt_self_corpdc_lumpRatio" type="number" class="ratebox" value="50" step="0.1"><span class="suffix">%</span></div></td><td><div class="input-unit center"><input id="receipt_self_corpdc_pensionStart" type="number" class="agebox" value="0"><span class="suffix">歳</span></div></td><td><div class="input-unit center"><input id="receipt_self_corpdc_pensionEnd" type="number" class="agebox" value="0"><span class="suffix">歳</span></div></td></tr>
@@ -1614,6 +1631,57 @@
       </div>
       <div class="add-row-wrap"><button type="button" class="add-row-btn" data-add-row="extra">＋</button></div>
     </div>
+
+    <div class="section">
+      <h2>社保・税</h2>
+      <div class="grid2">
+        <div>
+          <div class="subhead">退職後の社会保険料（簡易）</div>
+          <table class="center-table income-table">
+            <tr><th>項目</th><th>入力</th></tr>
+            <tr><td>社保を計算に含める</td><td><label class="inline-check"><input id="socialOn" type="checkbox" checked> 反映する</label></td></tr>
+            <tr><td>国民年金を含める</td><td><label class="inline-check"><input id="socialNationalPensionOn" type="checkbox" checked> 反映する</label></td></tr>
+            <tr><td>健保・介護を含める</td><td><label class="inline-check"><input id="socialHealthOn" type="checkbox" checked> 反映する</label></td></tr>
+            <tr><td>国民年金（年額）</td><td><div class="input-unit center"><input id="socialNationalPensionAnnual" type="number" class="moneybox" value="21.5" step="0.1"><span class="suffix">万円 / 年</span></div></td></tr>
+            <tr><td>国保簡易 料率</td><td><div class="input-unit center"><input id="socialKokuhoRatePct" type="number" class="ratebox" value="10" step="0.1"><span class="suffix">%</span></div></td></tr>
+            <tr><td>国保簡易 均等割等</td><td><div class="input-unit center"><input id="socialKokuhoBaseAnnual" type="number" class="moneybox" value="8" step="0.1"><span class="suffix">万円 / 年</span></div></td></tr>
+            <tr><td>国保簡易 上限</td><td><div class="input-unit center"><input id="socialKokuhoCapAnnual" type="number" class="moneybox" value="100" step="0.1"><span class="suffix">万円 / 年</span></div></td></tr>
+            <tr><td>介護保険（65歳以上 年額）</td><td><div class="input-unit center"><input id="socialNursingAnnual" type="number" class="moneybox" value="8" step="0.1"><span class="suffix">万円 / 年</span></div></td></tr>
+          </table>
+        </div>
+        <div>
+          <div class="subhead">社会保険・税の詳細設定（簡易）</div>
+          <table class="center-table receipt-table">
+            <tr><th>対象</th><th>退職後健保</th><th>任意継続年額</th><th>備考</th></tr>
+            <tr><td>本人</td><td><select id="social_self_healthMode"><option value="kokuho" selected>国保簡易</option><option value="voluntary">任意継続</option><option value="dependent">扶養</option><option value="lateElderly">後期高齢</option></select></td><td><div class="input-unit center"><input id="social_self_voluntaryAnnual" type="number" class="moneybox" value="30" step="0.1"><span class="suffix">万円</span></div></td><td class="small">退職後のみ反映。勤務中の社会保険は手取り前提で別計算しません。</td></tr>
+            <tr><td>配偶者</td><td><select id="social_sp_healthMode"><option value="kokuho" selected>国保簡易</option><option value="voluntary">任意継続</option><option value="dependent">扶養</option><option value="lateElderly">後期高齢</option></select></td><td><div class="input-unit center"><input id="social_sp_voluntaryAnnual" type="number" class="moneybox" value="20" step="0.1"><span class="suffix">万円</span></div></td><td class="small">扶養を選ぶと健康保険料・国民年金を0として扱います。</td></tr>
+          </table>
+          <table class="center-table income-table" style="margin-top:12px;">
+            <tr><th>項目</th><th>入力</th></tr>
+            <tr><td>税を計算に含める</td><td><label class="inline-check"><input id="taxOn" type="checkbox" checked> 反映する</label></td></tr>
+            <tr><td>公的年金のみ課税計算</td><td><label class="inline-check"><input id="taxPensionOnlyOn" type="checkbox" checked> 簡易モード</label></td></tr>
+            <tr><td>所得税 基礎控除</td><td><div class="input-unit center"><input id="taxIncomeBasicDeduction" type="number" class="moneybox" value="48" step="0.1"><span class="suffix">万円</span></div></td></tr>
+            <tr><td>住民税 基礎控除</td><td><div class="input-unit center"><input id="taxResidentBasicDeduction" type="number" class="moneybox" value="43" step="0.1"><span class="suffix">万円</span></div></td></tr>
+            <tr><td>公的年金控除（65歳未満）</td><td><div class="input-unit center"><input id="taxPublicPensionDeductionUnder65" type="number" class="moneybox" value="60" step="0.1"><span class="suffix">万円</span></div></td></tr>
+            <tr><td>公的年金控除（65歳以上）</td><td><div class="input-unit center"><input id="taxPublicPensionDeduction65Plus" type="number" class="moneybox" value="110" step="0.1"><span class="suffix">万円</span></div></td></tr>
+            <tr><td>住民税率（簡易）</td><td><div class="input-unit center"><input id="taxResidentRatePct" type="number" class="ratebox" value="10" step="0.1"><span class="suffix">%</span></div></td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="help">v191では簡易モデルです。まずは退職後の公的年金課税と、退職後の国保・国民年金・介護保険の概算を年度別収支表へ反映します。勤務中の給与や手取り入力の定期収入・臨時収入は、従来どおり手取り前提です。</div>
+    </div>
+
+    <div class="section">
+      <h2>年度別収支表</h2>
+      <div class="help">現在表示中の条件について、社会保険料・税を含めた簡易の年度別収支表を表示します。v191では項目を行、各年を列にして、年ごとの列幅をそろえて見やすくしています。</div>
+      <div id="cashflowSummaryNote" class="stack-note"></div>
+      <div class="cashflow-table-wrap table-scroll">
+        <table class="center-table cashflow-table">
+          <thead id="annualCashflowHead"></thead>
+          <tbody id="annualCashflowBody"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1635,8 +1703,39 @@ const STAGE_ORDER = ["preschool","elem","junior","high","uni","grad"];
 const EDUCATION_STAGE_LABELS = {preschool:"未就学",elem:"小学校",junior:"中学校",high:"高校",uni:"大学",grad:"大学院"};
 const DEFAULT_STAGE_OPTIONS = {kind:"公立",elem:"公立",junior:"公立",high:"公立",uni:"国公立（自宅）"};
 const INCOME_COLORS = {self:"#2563eb",spouse:"#60a5fa",pension:"#0f766e",regular:"#16a34a",extra:"#8b5cf6",childAllowance:"#f59e0b",insurance:"#14b8a6",retirePay:"#ec4899",interest:"#0ea5e9"};
-const EXPENSE_COLORS = {life:"#ef4444",rent:"#fb7185",homeMaint:"#a16207",insurance:"#0891b2",education:"#f97316",loan:"#b91c1c",periodic:"#7c2d12",extra:"#dc2626"};
+const EXPENSE_COLORS = {life:"#ef4444",rent:"#fb7185",homeMaint:"#a16207",insurance:"#0891b2",education:"#f97316",loan:"#b91c1c",periodic:"#7c2d12",extra:"#dc2626",social:"#7c3aed",tax:"#334155"};
 const INVESTMENT_COLORS = ["#2563eb","#16a34a","#dc2626","#7c3aed","#d97706"];
+const CASHFLOW_TABLE_COLUMNS = [
+  {label:"西暦", path:"year", type:"int"},
+  {label:"本人年齢", path:"ages.self", type:"int"},
+  {label:"配偶者年齢", path:"ages.spouse", type:"int"},
+  {label:"勤労収入合計", path:"income.work.total"},
+  {label:"年金収入合計", path:"income.pension.total"},
+  {label:"その他収入合計", path:"income.other.total"},
+  {label:"児童手当", path:"income.childAllowance"},
+  {label:"保険受取", path:"income.insuranceReceive"},
+  {label:"利息収入", path:"income.interest"},
+  {label:"収入合計(A)", path:"income.total", className:"cashflow-pos"},
+  {label:"生活費", path:"expense.life"},
+  {label:"教育費", path:"expense.education.total"},
+  {label:"住宅費", path:"expense.housing.total"},
+  {label:"保険料", path:"expense.insurancePremium"},
+  {label:"定期支出", path:"expense.regular"},
+  {label:"臨時支出", path:"expense.temporary"},
+  {label:"支出合計(B)", path:"expense.total", className:"cashflow-neg"},
+  {label:"社会保険料", path:"social.total", className:"cashflow-neg"},
+  {label:"所得税・住民税等", path:"tax.total", className:"cashflow-neg"},
+  {label:"税社保合計", path:"cashflow.taxSocialTotal", className:"cashflow-neg"},
+  {label:"年間収支(A-B)", path:"cashflow.gross", className:"cashflow-posneg"},
+  {label:"税社保反映後収支", path:"cashflow.afterTaxSocial", className:"cashflow-posneg"},
+  {label:"資産運用：投資額(C)", path:"investment.contribution", className:"cashflow-neg"},
+  {label:"資産運用：取崩し額(D)", path:"investment.withdrawal", className:"cashflow-pos"},
+  {label:"資産運用：運用益", path:"investment.gain", className:"cashflow-posneg"},
+  {label:"現預金の増減", path:"cash.changeBeforeInterest", className:"cashflow-posneg"},
+  {label:"現預金の利息", path:"cash.interest", className:"cashflow-posneg"},
+  {label:"年末の現預金額", path:"cash.endingCash", className:"cashflow-posneg"},
+  {label:"年末の総資産額", path:"assets.endingTotal", className:"cashflow-posneg"}
+];
 const DRAW_DEBOUNCE_MS = 150;
 const PERSIST_DEBOUNCE_MS = 300;
 
@@ -4542,6 +4641,27 @@ function getScenarioFromDOM(){
       loan:!!document.getElementById("inflLoan")?.checked,
       edu:!!document.getElementById("inflEdu")?.checked
     },
+    social:{
+      enabled:!!document.getElementById("socialOn")?.checked,
+      nationalPensionOn:!!document.getElementById("socialNationalPensionOn")?.checked,
+      healthOn:!!document.getElementById("socialHealthOn")?.checked,
+      nationalPensionAnnual:Math.max(0, numInput("socialNationalPensionAnnual", 21.5) || 0),
+      kokuhoRate:Math.max(0, numInput("socialKokuhoRatePct", 10) || 0) / 100,
+      kokuhoBaseAnnual:Math.max(0, numInput("socialKokuhoBaseAnnual", 8) || 0),
+      kokuhoCapAnnual:Math.max(0, numInput("socialKokuhoCapAnnual", 100) || 0),
+      nursingAnnual:Math.max(0, numInput("socialNursingAnnual", 8) || 0),
+      self:{healthMode:document.getElementById("social_self_healthMode")?.value || "kokuho", voluntaryAnnual:Math.max(0, numInput("social_self_voluntaryAnnual", 30) || 0)},
+      spouse:{healthMode:document.getElementById("social_sp_healthMode")?.value || "kokuho", voluntaryAnnual:Math.max(0, numInput("social_sp_voluntaryAnnual", 20) || 0)}
+    },
+    tax:{
+      enabled:!!document.getElementById("taxOn")?.checked,
+      pensionOnly:!!document.getElementById("taxPensionOnlyOn")?.checked,
+      incomeBasicDeduction:Math.max(0, numInput("taxIncomeBasicDeduction", 48) || 0),
+      residentBasicDeduction:Math.max(0, numInput("taxResidentBasicDeduction", 43) || 0),
+      publicPensionDeductionUnder65:Math.max(0, numInput("taxPublicPensionDeductionUnder65", 60) || 0),
+      publicPensionDeduction65Plus:Math.max(0, numInput("taxPublicPensionDeduction65Plus", 110) || 0),
+      residentRate:Math.max(0, numInput("taxResidentRatePct", 10) || 0) / 100
+    },
     children,
     educationMatrix,
     deposits,
@@ -6354,6 +6474,208 @@ function annualCashBufferNeed(parts){
 function randomizeReturn(base){
   return base + (Math.random()-0.5)*0.30;
 }
+function getPublicPensionDeductionByAge(age, cfg){
+  const tax = cfg?.tax || {};
+  return age >= 65 ? Number(tax.publicPensionDeduction65Plus || 0) : Number(tax.publicPensionDeductionUnder65 || 0);
+}
+function calcSimpleIncomeTaxProgressive(taxableIncome){
+  const x = Math.max(0, Number(taxableIncome) || 0);
+  if(x <= 195) return x * 0.05;
+  if(x <= 330) return x * 0.10 - 9.75;
+  if(x <= 695) return x * 0.20 - 42.75;
+  if(x <= 900) return x * 0.23 - 63.6;
+  if(x <= 1800) return x * 0.33 - 153.6;
+  if(x <= 4000) return x * 0.40 - 279.6;
+  return x * 0.45 - 479.6;
+}
+function estimatePublicPensionTax(grossIncome, age, cfg){
+  const gross = Math.max(0, Number(grossIncome) || 0);
+  if(gross <= 0 || !cfg?.tax?.enabled) return {gross, miscIncome:0, taxableIncome:0, residentTaxable:0, incomeTax:0, residentTax:0, total:0};
+  const miscIncome = Math.max(0, gross - getPublicPensionDeductionByAge(age, cfg));
+  const taxableIncome = Math.max(0, miscIncome - Number(cfg?.tax?.incomeBasicDeduction || 0));
+  const residentTaxable = Math.max(0, miscIncome - Number(cfg?.tax?.residentBasicDeduction || 0));
+  const incomeTax = calcSimpleIncomeTaxProgressive(taxableIncome);
+  const residentTax = residentTaxable * (Number(cfg?.tax?.residentRate || 0) || 0);
+  return {gross, miscIncome, taxableIncome, residentTaxable, incomeTax, residentTax, total:incomeTax + residentTax};
+}
+function getHealthModeForPerson(cfg, personKey, age){
+  const mode = personKey === 'self' ? cfg?.social?.self?.healthMode : cfg?.social?.spouse?.healthMode;
+  if(age >= 75) return 'lateElderly';
+  return mode || 'kokuho';
+}
+function estimateRetirementSocialForPerson(cfg, personKey, age, workedMonths, publicPensionGross){
+  if(!cfg?.social?.enabled || workedMonths > 0) return {nationalPension:0, healthInsurance:0, nursingCare:0, total:0, mode:'work'};
+  const mode = getHealthModeForPerson(cfg, personKey, age);
+  let nationalPension = 0;
+  let healthInsurance = 0;
+  let nursingCare = 0;
+  if(cfg?.social?.nationalPensionOn && age >= 20 && age < 60 && mode !== 'dependent'){
+    nationalPension = Math.max(0, Number(cfg?.social?.nationalPensionAnnual || 0));
+  }
+  if(cfg?.social?.healthOn){
+    if(mode === 'voluntary'){
+      healthInsurance = Math.max(0, Number((personKey === 'self' ? cfg?.social?.self?.voluntaryAnnual : cfg?.social?.spouse?.voluntaryAnnual) || 0));
+    }else if(mode === 'dependent'){
+      healthInsurance = 0;
+    }else{
+      const rate = Math.max(0, Number(cfg?.social?.kokuhoRate || 0));
+      const base = Math.max(0, Number(cfg?.social?.kokuhoBaseAnnual || 0));
+      const cap = Math.max(0, Number(cfg?.social?.kokuhoCapAnnual || 0));
+      healthInsurance = publicPensionGross * rate + base;
+      if(cap > 0) healthInsurance = Math.min(cap, healthInsurance);
+      if(mode === 'kokuho' && age >= 65 && age < 75){
+        nursingCare = Math.max(0, Number(cfg?.social?.nursingAnnual || 0));
+      }
+    }
+  }
+  const total = nationalPension + healthInsurance + nursingCare;
+  return {nationalPension, healthInsurance, nursingCare, total, mode};
+}
+function getChildrenSnapshotForYear(cfg, yearIndex){
+  return (cfg?.children || []).map(child=>({
+    id:`child${child.idx}`,
+    name:child.name || `子${child.idx}`,
+    age:Math.max(0, Number(child.age || 0) + yearIndex),
+    school:child.school || ''
+  }));
+}
+function buildAnnualYearlyRow(cfg, age, yearIndex, incomeObj, expenseObj, socialObj, taxObj, depTotal, safeTotal, invTotal, liability, annualState, beginningTotal){
+  const selfPension = getPensionAnnualAmountForYear(cfg, 'self', yearIndex);
+  const spousePension = getPensionAnnualAmountForYear(cfg, 'sp', yearIndex);
+  const workSelf = (()=>{ const curve=buildIncomeCurveSeries(cfg.incomeSelf, cfg.age, age); const wm=getWorkedMonthsForYear(cfg, 'self', yearIndex); return wm > 0 ? curve.salaryMonth * wm + curve.bonusYear * (wm / 12) : 0; })();
+  const workSpouse = (()=>{ const curve=buildIncomeCurveSeries(cfg.incomeSp, cfg.age, age); const wm=getWorkedMonthsForYear(cfg, 'sp', yearIndex); return wm > 0 ? curve.salaryMonth * wm + curve.bonusYear * (wm / 12) : 0; })();
+  const investmentContribution = (annualState?.totalContributed || 0);
+  const investmentEnding = invTotal;
+  const netOperating = incomeObj.total - expenseObj.total - socialObj.total - taxObj.total;
+  const withdrawal = Math.max(0, investmentContribution - Math.max(0, netOperating)) + Math.max(0, socialObj.withdrawalFromInvestments || 0);
+  const interest = Number(incomeObj.parts?.interest || 0);
+  const endingCash = depTotal;
+  const endingTotal = depTotal + safeTotal + invTotal - liability;
+  return {
+    year:(parseDateInput(cfg.baseDate || '')?.year || new Date().getFullYear()) + yearIndex,
+    ages:{
+      self:age,
+      spouse:Math.max(0, Number(cfg.spouseAge || 0) + yearIndex),
+      children:getChildrenSnapshotForYear(cfg, yearIndex)
+    },
+    income:{
+      work:{self:workSelf, spouse:workSpouse, total:workSelf + workSpouse},
+      pension:{selfPublic:selfPension, spousePublic:spousePension, total:selfPension + spousePension},
+      other:{regular:incomeObj.parts.regular || 0, temporary:incomeObj.parts.extra || 0, dcReceipt:incomeObj.parts.retirePay || 0, retireReceipt:0, total:(incomeObj.parts.regular || 0) + (incomeObj.parts.extra || 0) + (incomeObj.parts.retirePay || 0)},
+      childAllowance:incomeObj.parts.childAllowance || 0,
+      insuranceReceive:incomeObj.parts.insurance || 0,
+      interest,
+      total:incomeObj.total
+    },
+    expense:{
+      life:expenseObj.parts.life || 0,
+      education:{total:expenseObj.parts.education || 0, byChild:expenseObj.parts.educationByChild || {}},
+      housing:{rent:expenseObj.parts.rent || 0, loan:expenseObj.parts.loan || 0, homeMaint:expenseObj.parts.homeMaint || 0, total:(expenseObj.parts.rent || 0) + (expenseObj.parts.loan || 0) + (expenseObj.parts.homeMaint || 0)},
+      insurancePremium:expenseObj.parts.insurance || 0,
+      regular:expenseObj.parts.periodic || 0,
+      temporary:expenseObj.parts.extra || 0,
+      total:expenseObj.total
+    },
+    social:{
+      nationalPension:socialObj.nationalPension || 0,
+      healthInsurance:socialObj.healthInsurance || 0,
+      nursingCare:socialObj.nursingCare || 0,
+      total:socialObj.total || 0,
+      detail:socialObj.detail || {}
+    },
+    tax:{
+      incomeTax:taxObj.incomeTax || 0,
+      residentTax:taxObj.residentTax || 0,
+      otherTax:0,
+      total:taxObj.total || 0,
+      detail:taxObj.detail || {}
+    },
+    cashflow:{
+      gross:incomeObj.total - expenseObj.total,
+      taxSocialTotal:(socialObj.total || 0) + (taxObj.total || 0),
+      afterTaxSocial:netOperating
+    },
+    investment:{
+      contribution:investmentContribution,
+      withdrawal,
+      gain:(investmentEnding + (annualState?.grossSold || 0)) - ((annualState?.beginningInvestmentTotal || 0) + investmentContribution),
+      endingValue:investmentEnding
+    },
+    cash:{
+      changeBeforeInterest:netOperating - investmentContribution + withdrawal,
+      interest,
+      endingCash
+    },
+    assets:{
+      beginningTotal:beginningTotal || 0,
+      endingCash,
+      endingSafe:safeTotal,
+      endingInvestments:invTotal,
+      endingDc:0,
+      endingTotal
+    },
+    meta:{notes:[], events:[]}
+  };
+}
+function estimateSocialAndTaxForYear(cfg, age, yearIndex, incomeObj){
+  const selfWorkedMonths = getWorkedMonthsForYear(cfg, 'self', yearIndex);
+  const spWorkedMonths = getWorkedMonthsForYear(cfg, 'sp', yearIndex);
+  const selfPension = getPensionAnnualAmountForYear(cfg, 'self', yearIndex);
+  const spPension = getPensionAnnualAmountForYear(cfg, 'sp', yearIndex);
+  const selfSocial = estimateRetirementSocialForPerson(cfg, 'self', age, selfWorkedMonths, selfPension);
+  const spouseAge = Math.max(0, Number(cfg.spouseAge || 0) + yearIndex);
+  const spSocial = estimateRetirementSocialForPerson(cfg, 'sp', spouseAge, spWorkedMonths, spPension);
+  const selfTax = estimatePublicPensionTax(selfPension, age, cfg);
+  const spTax = estimatePublicPensionTax(spPension, spouseAge, cfg);
+  return {
+    social:{
+      nationalPension:(selfSocial.nationalPension || 0) + (spSocial.nationalPension || 0),
+      healthInsurance:(selfSocial.healthInsurance || 0) + (spSocial.healthInsurance || 0),
+      nursingCare:(selfSocial.nursingCare || 0) + (spSocial.nursingCare || 0),
+      total:(selfSocial.total || 0) + (spSocial.total || 0),
+      detail:{self:selfSocial, spouse:spSocial}
+    },
+    tax:{
+      incomeTax:(selfTax.incomeTax || 0) + (spTax.incomeTax || 0),
+      residentTax:(selfTax.residentTax || 0) + (spTax.residentTax || 0),
+      total:(selfTax.total || 0) + (spTax.total || 0),
+      detail:{self:selfTax, spouse:spTax}
+    }
+  };
+}
+function getValueByPath(obj, path){
+  return String(path || '').split('.').reduce((acc, key)=> acc == null ? undefined : acc[key], obj);
+}
+function formatCashflowDisplayValue(value, type='money'){
+  if(type === 'int') return Number(value || 0).toLocaleString('ja-JP', {maximumFractionDigits:0});
+  const n = Math.round((Number(value) || 0) * 10) / 10;
+  return n.toLocaleString('ja-JP', {minimumFractionDigits:0, maximumFractionDigits:1});
+}
+function renderCashflowTable(sim){
+  const thead = document.getElementById('annualCashflowHead');
+  const tbody = document.getElementById('annualCashflowBody');
+  const note = document.getElementById('cashflowSummaryNote');
+  if(!thead || !tbody) return;
+  const rows = Array.isArray(sim?.yearlyRows) ? sim.yearlyRows : [];
+  thead.innerHTML = rows.length
+    ? `<tr><th class="cashflow-item-col">項目</th>${rows.map(row=>`<th class="cashflow-year-col">${escapeHtml(String(row?.year ?? ''))}年</th>`).join('')}</tr>`
+    : `<tr><th class="cashflow-item-col">項目</th></tr>`;
+  tbody.innerHTML = CASHFLOW_TABLE_COLUMNS.map(col=>{
+    const cells = rows.map(row=>{
+      const raw = getValueByPath(row, col.path);
+      const cls = col.className === 'cashflow-posneg'
+        ? ((Number(raw) || 0) < 0 ? 'cashflow-neg' : ((Number(raw) || 0) > 0 ? 'cashflow-pos' : 'cashflow-muted'))
+        : (col.className || '');
+      return `<td class="${cls}">${formatCashflowDisplayValue(raw, col.type || 'money')}</td>`;
+    }).join('');
+    return `<tr><th class="cashflow-item-col">${escapeHtml(col.label)}</th>${cells}</tr>`;
+  }).join('');
+  if(note){
+    const first = rows[0];
+    const last = rows[rows.length - 1];
+    note.textContent = rows.length ? `表示期間：${first?.year ?? ''}年〜${last?.year ?? ''}年 / 項目を行、各年を列にして比較できるようにしています。計算側は yearlyRows、表示側は renderCashflowTable に分けてあり、将来の分離もしやすい構成です。` : '';
+  }
+}
 
 function normalizeOwner(owner){
   return owner === "配偶者" ? "配偶者" : "本人";
@@ -6500,7 +6822,7 @@ function getOrderedSellableInvestments(investments, cfg, age){
       return (b.amount || 0) - (a.amount || 0);
     });
 }
-function sellInvestmentsNetToDeposits(targetNet, deposits, investments, cfg, age){
+function sellInvestmentsNetToDeposits(targetNet, deposits, investments, cfg, age, annualState=null){
   let remaining = Math.max(0, targetNet || 0);
   if(remaining <= 0) return 0;
   if(!deposits.length) deposits.push({name:"預貯金1", amount:0, rate:0});
@@ -6522,6 +6844,11 @@ function sellInvestmentsNetToDeposits(targetNet, deposits, investments, cfg, age
     deposits[0].amount += net;
     raised += net;
     remaining -= net;
+    if(annualState){
+      annualState.grossSold = (annualState.grossSold || 0) + grossSell;
+      annualState.netRaisedFromSales = (annualState.netRaisedFromSales || 0) + net;
+      annualState.saleTax = (annualState.saleTax || 0) + tax;
+    }
   }
   return raised;
 }
@@ -6557,7 +6884,12 @@ function createAnnualOwnerState(baseNisaBookCost = 0, baseGrowthNisaBookCost = 0
 function initializeAnnualContributionState(investments){
   return {
     本人:createAnnualOwnerState(getCurrentNisaBookCost(investments, "本人"), getCurrentGrowthNisaBookCost(investments, "本人")),
-    配偶者:createAnnualOwnerState(getCurrentNisaBookCost(investments, "配偶者"), getCurrentGrowthNisaBookCost(investments, "配偶者"))
+    配偶者:createAnnualOwnerState(getCurrentNisaBookCost(investments, "配偶者"), getCurrentGrowthNisaBookCost(investments, "配偶者")),
+    totalContributed:0,
+    beginningInvestmentTotal:0,
+    grossSold:0,
+    netRaisedFromSales:0,
+    saleTax:0
   };
 }
 function ensureAnnualOwnerState(annualState, owner){
@@ -6600,6 +6932,7 @@ function getAllowedContributionAmount(plan, annualState, investments){
 }
 function registerContributionUsage(owner, accountType, amount, annualState){
   if(amount <= 0) return;
+  annualState.totalContributed = (annualState.totalContributed || 0) + amount;
   const type = normalizeAccountType(accountType);
   const ownerState = ensureAnnualOwnerState(annualState, owner);
   if(type === "つみたてNISA"){
@@ -6666,6 +6999,16 @@ function initializeSafeAssetState(cfg){
     ended:false
   }));
 }
+function currentSafeAssetTotal(safeAssets, age){
+  if(!Array.isArray(safeAssets)) return 0;
+  return safeAssets.reduce((sum, asset)=>{
+    if(asset?.ended) return sum;
+    const startAge = Number(asset?.startAge || 0) || 0;
+    if(age < startAge) return sum;
+    if(asset?.active || asset?.started || age >= startAge) return sum + (Number(asset?.amount || 0) || 0);
+    return sum;
+  }, 0);
+}
 function processSafeAssetsForYear(cfg, age, safeAssets, deposits){
   let interestIncome = 0;
   if(!Array.isArray(safeAssets) || !safeAssets.length) return {interestIncome, totalSafeAssets:0};
@@ -6730,11 +7073,12 @@ function simulate(cfg, random=false){
   const annualEducationCum = [];
   const educationByChildSeries = {};
   const incomePartsSeries = {self:[],spouse:[],pension:[],regular:[],extra:[],childAllowance:[],insurance:[],retirePay:[],interest:[]};
-  const expensePartsSeries = {life:[],rent:[],homeMaint:[],insurance:[],education:[],loan:[],periodic:[],extra:[]};
+  const expensePartsSeries = {life:[],rent:[],homeMaint:[],insurance:[],education:[],loan:[],periodic:[],extra:[],social:[],tax:[]};
   const invSeries = {};
   const principalSeries = {};
   const depositSeries = {};
   const childNames = {};
+  const yearlyRows = [];
   for(let i=1;i<=dynamicCounts.child;i++) educationByChildSeries[i] = [];
   const invNames = {};
   for(let i=1;i<=dynamicCounts.dep;i++) depositSeries[i] = [];
@@ -6750,7 +7094,12 @@ function simulate(cfg, random=false){
 
   for(let age=cfg.age; age<=120; age++){
     const annualState = initializeAnnualContributionState(investments);
+    annualState.beginningInvestmentTotal = investments.reduce((s, inv)=>s + (Number(inv.amount) || 0), 0);
     const yearIndex = age - cfg.age;
+    const beginningDepTotal = deposits.reduce((s,d)=>s + (Number(d.amount) || 0), 0);
+    const beginningInvTotal = annualState.beginningInvestmentTotal;
+    const beginningSafeTotal = currentSafeAssetTotal(safeAssets, age) || 0;
+    const beginningTotal = beginningDepTotal + beginningInvTotal + beginningSafeTotal - liability;
 
     deposits.forEach(d=>{ const netRate = d.taxOn ? (Number(d.rate || 0) || 0) * (1 - DEPOSIT_INTEREST_TAX_RATE) : (Number(d.rate || 0) || 0); d.amount *= (1 + netRate); });
     investments.forEach(inv=>{
@@ -6762,9 +7111,12 @@ function simulate(cfg, random=false){
     const incomeObj = getIncomeForYear(cfg, age, yearIndex, investments, receiptState);
     const safeAssetObj = processSafeAssetsForYear(cfg, age, safeAssets, deposits);
     const expenseObj = getExpenseForYear(cfg, age, yearIndex);
+    const socialTaxObj = estimateSocialAndTaxForYear(cfg, age, yearIndex, incomeObj);
+    const socialObj = socialTaxObj.social;
+    const taxObj = socialTaxObj.tax;
     incomeObj.parts.interest = safeAssetObj.interestIncome || 0;
     let income = incomeObj.total + (safeAssetObj.interestIncome || 0);
-    let expense = expenseObj.total;
+    let expense = expenseObj.total + (socialObj.total || 0) + (taxObj.total || 0);
     let net = income - expense;
 
     totalIncomeSum += income;
@@ -6791,7 +7143,7 @@ function simulate(cfg, random=false){
         need -= use;
       }
 
-      const currentLifeNeed = annualCashBufferNeed(expenseObj.parts);
+      const currentLifeNeed = annualCashBufferNeed(expenseObj.parts) + (socialObj.total || 0) + (taxObj.total || 0);
       const depositLeft = deposits.reduce((s,d)=>s+d.amount,0);
       const triggerSell = depositLeft <= currentLifeNeed * 2;
       let sellNeed = 0;
@@ -6802,7 +7154,7 @@ function simulate(cfg, random=false){
         let safeLoop = 0;
         while(sellNeed > 0.0001 && safeLoop < 25){
           safeLoop++;
-          const netCollected = sellInvestmentsNetToDeposits(sellNeed, deposits, investments, cfg, age);
+          const netCollected = sellInvestmentsNetToDeposits(sellNeed, deposits, investments, cfg, age, annualState);
 
           if(need > 0){
             for(const d of deposits){
@@ -6837,7 +7189,7 @@ function simulate(cfg, random=false){
 
     processScheduledInvestments(cfg, age, yearIndex, deposits, investments, annualState);
 
-    const desiredDepositBuffer = Math.max(0, annualCashBufferNeed(expenseObj.parts) * 2);
+    const desiredDepositBuffer = Math.max(0, annualCashBufferNeed(expenseObj.parts) * 2 + (socialObj.total || 0) + (taxObj.total || 0));
     if(desiredDepositBuffer > 0){
       let depositNow = deposits.reduce((s,d)=>s + d.amount, 0);
       if(depositNow < desiredDepositBuffer){
@@ -6845,7 +7197,7 @@ function simulate(cfg, random=false){
         let guard = 0;
         while(replenishNeed > 0.0001 && guard < 10){
           guard++;
-          const netCollected = sellInvestmentsNetToDeposits(replenishNeed, deposits, investments, cfg, age);
+          const netCollected = sellInvestmentsNetToDeposits(replenishNeed, deposits, investments, cfg, age, annualState);
           const nextDeposit = deposits.reduce((s,d)=>s + d.amount, 0);
           replenishNeed = Math.max(0, desiredDepositBuffer - nextDeposit);
           if(netCollected <= 0.0001) break;
@@ -6883,6 +7235,8 @@ function simulate(cfg, random=false){
     expensePartsSeries.loan.push(expenseObj.parts.loan || 0);
     expensePartsSeries.periodic.push(expenseObj.parts.periodic || 0);
     expensePartsSeries.extra.push(expenseObj.parts.extra || 0);
+    expensePartsSeries.social.push(socialObj.total || 0);
+    expensePartsSeries.tax.push(taxObj.total || 0);
 
     for(let c=1;c<=dynamicCounts.child;c++) educationByChildSeries[c].push(expenseObj.parts.educationByChild[c] || 0);
     Object.keys(invSeries).forEach(key=>{
@@ -6891,6 +7245,7 @@ function simulate(cfg, random=false){
       principalSeries[key].push(investments[idx]?.cost || 0);
     });
     for(let c=1;c<=dynamicCounts.dep;c++) depositSeries[c].push(deposits[c-1]?.amount || 0);
+    yearlyRows.push(buildAnnualYearlyRow(cfg, age, yearIndex, {total:income, parts:incomeObj.parts}, expenseObj, socialObj, taxObj, depTotal, safeTotal, invTotal, liability, annualState, beginningTotal));
   }
 
   if(retireAsset === null) retireAsset = totalAssets[0] ?? 0;
@@ -6899,7 +7254,7 @@ function simulate(cfg, random=false){
     annualIncome,annualExpense,annualCashflow,
     annualEducation,annualEducationCum,educationByChildSeries,
     incomePartsSeries,expensePartsSeries,invSeries,principalSeries,depositSeries,
-    childNames,invNames,
+    childNames,invNames,yearlyRows,
     depletionAge,retireAsset,totalIncomeSum,totalExpenseSum
   };
 }
@@ -7077,10 +7432,10 @@ function buildIncomeExpenseDatasets(sim, color, overlay, labelPrefix=""){
     ));
   });
   Object.entries(EXPENSE_COLORS).forEach(([k,c])=>{
-    const expenseSeries = sim.expensePartsSeries[k].map(v=>-v);
+    const expenseSeries = (sim.expensePartsSeries[k] || []).map(v=>-v);
     if(!hasAnyVisibleValue(expenseSeries)) return;
     d.push(makeBarDataset(
-      {life:"生活費",rent:"家賃",homeMaint:"持ち家維持費",insurance:"保険料",education:"教育費",loan:"住宅ローン",periodic:"定期支出",extra:"臨時支出"}[k],
+      {life:"生活費",rent:"家賃",homeMaint:"持ち家維持費",insurance:"保険料",education:"教育費",loan:"住宅ローン",periodic:"定期支出",extra:"臨時支出",social:"社会保険料",tax:"税金"}[k],
       sim.labels,
       expenseSeries,
       {backgroundColor:c, stack:"expense"}
@@ -7311,7 +7666,10 @@ function draw(){
     yData.push(...(arrays[graphType] || [0]));
   });
   setAllInputs(scenarios[currentTab].data);
-  updateResultCards(firstCfg, baseSim);
+  const currentCfg = getScenarioFromDOM();
+  const currentSim = simulate(currentCfg, false);
+  updateResultCards(currentCfg, currentSim);
+  renderCashflowTable(currentSim);
 
   if(chart) chart.destroy();
   chart = new Chart(document.getElementById("chart").getContext("2d"), {
@@ -7381,7 +7739,10 @@ function runMonte(){
     }
   });
   setAllInputs(scenarios[currentTab].data);
-  updateResultCards(firstCfg, baseSim);
+  const currentCfg = getScenarioFromDOM();
+  const currentSim = simulate(currentCfg, false);
+  updateResultCards(currentCfg, currentSim);
+  renderCashflowTable(currentSim);
 
   if(chart) chart.destroy();
   chart = new Chart(document.getElementById("chart").getContext("2d"), {
