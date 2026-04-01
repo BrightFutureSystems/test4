@@ -25,9 +25,12 @@
   *{box-sizing:border-box}ac
   body{
     margin:0;
-    font-family:"Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", Arial, sans-serif;
+    font-family:Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "YuGothic", Meiryo, sans-serif;
     background:#fff;
     color:#111;
+  }
+  html, body, button, input, select, textarea, table, th, td{
+    font-family:Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "YuGothic", Meiryo, sans-serif;
   }
   .page{
     max-width:var(--maxw);
@@ -132,6 +135,15 @@
   .safe-asset-table th:nth-child(9),.safe-asset-table td:nth-child(9){width:128px;min-width:128px;}
   .safe-asset-table th:nth-child(10),.safe-asset-table td:nth-child(10){width:90px;min-width:90px;}
   .safe-asset-table td > select,.safe-asset-table td > input[type=number],.safe-asset-table td > input[type=text],.safe-asset-table td .input-unit > select,.safe-asset-table td .input-unit > input[type=number],.safe-asset-table td .input-unit > input[type=text]{width:100%;max-width:100%;min-width:0;}
+  .receipt-table th:nth-child(1),.receipt-table td:nth-child(1){width:120px;min-width:120px;}
+  .receipt-table th:nth-child(2),.receipt-table td:nth-child(2){width:96px;min-width:96px;}
+  .receipt-table th:nth-child(3),.receipt-table td:nth-child(3),
+  .receipt-table th:nth-child(5),.receipt-table td:nth-child(5),
+  .receipt-table th:nth-child(6),.receipt-table td:nth-child(6){width:88px;min-width:88px;}
+  .receipt-table th:nth-child(4),.receipt-table td:nth-child(4){width:92px;min-width:92px;}
+  .receipt-table td > select,
+  .receipt-table td > input[type=number],
+  .receipt-table td .input-unit > input[type=number]{width:100%;max-width:100%;min-width:0;}
   .reginc-table{min-width:776px;table-layout:fixed;}
   .reginc-table th:nth-child(1),.reginc-table td:nth-child(1),
   .inc-table th:nth-child(1),.inc-table td:nth-child(1),
@@ -230,8 +242,7 @@
     color:#fff;
     border-color:#222;
   }
-  button,select,input[type=number],input[type=text],textarea,table,th,td{
-    font-family:inherit;
+  button,select,input[type=number],input[type=text]{
     font-size:14px;
   }
   button{
@@ -866,6 +877,12 @@
   .cashflow-neg{color:#b91c1c;font-weight:700;}
   .cashflow-pos{color:#15803d;font-weight:700;}
   .cashflow-muted{color:#6b7280;}
+  .social-detail-table{table-layout:fixed;width:100%;}
+  .social-detail-table th,.social-detail-table td{white-space:normal;word-break:break-word;}
+  .social-detail-table th:nth-child(1),.social-detail-table td:nth-child(1){width:18%;}
+  .social-detail-table th:nth-child(2),.social-detail-table td:nth-child(2){width:26%;}
+  .social-detail-table th:nth-child(3),.social-detail-table td:nth-child(3){width:20%;}
+  .social-detail-table th:nth-child(4),.social-detail-table td:nth-child(4){width:36%;}
   .numeric-assist{display:none !important;
     position:fixed;
     z-index:9999;
@@ -1619,69 +1636,46 @@
     </div>
 
     <div class="section">
-      <h2>社保・税</h2>
+      <h2>社会保険料・公的年金課税（簡易）</h2>
       <div class="grid2">
         <div>
-          <div class="subhead">退職後の社会保険料（簡易）</div>
+          <div class="subhead">社会保険料（簡易）</div>
           <table class="center-table income-table">
             <tr><th>項目</th><th>入力</th></tr>
-            <tr><td>社保を計算に含める</td><td><label class="inline-check"><input id="socialOn" type="checkbox" checked> 反映する</label></td></tr>
-            <tr><td>国民年金を含める</td><td><label class="inline-check"><input id="socialNationalPensionOn" type="checkbox" checked> 反映する</label></td></tr>
-            <tr><td>健保・介護を含める</td><td><label class="inline-check"><input id="socialHealthOn" type="checkbox" checked> 反映する</label></td></tr>
+            <tr><td>国民年金の支払いを反映</td><td><label class="inline-check"><input id="socialNationalPensionOn" type="checkbox" checked> 反映する</label></td></tr>
             <tr><td>国民年金</td><td><div class="input-unit center"><input id="socialNationalPensionAnnual" type="number" class="moneybox" value="21.5" step="0.1"><span class="suffix">万円 / 年 / 人</span></div></td></tr>
+            <tr><td>健保・介護の支払いを反映</td><td><label class="inline-check"><input id="socialHealthOn" type="checkbox" checked> 反映する</label></td></tr>
+            <tr><td>退職後健保（本人）</td><td><select id="social_self_healthMode"><option value="kokuho" selected>国保簡易</option><option value="voluntary">任意継続</option><option value="dependent">扶養</option><option value="lateElderly">後期高齢</option></select></td></tr>
+            <tr><td>退職後健保（配偶者）</td><td><select id="social_sp_healthMode"><option value="kokuho" selected>国保簡易</option><option value="voluntary">任意継続</option><option value="dependent">扶養</option><option value="lateElderly">後期高齢</option></select></td></tr>
+            <tr><td>任意継続年額</td><td><div class="input-unit center"><input id="socialVoluntaryAnnual" type="number" class="moneybox" value="30" step="0.1"><span class="suffix">万円 / 年 / 人</span></div></td></tr>
             <tr><td>国保簡易 料率</td><td><div class="input-unit center"><input id="socialKokuhoRatePct" type="number" class="ratebox" value="10" step="0.1"><span class="suffix">%</span></div></td></tr>
             <tr><td>国保簡易 均等割等</td><td><div class="input-unit center"><input id="socialKokuhoBaseAnnual" type="number" class="moneybox" value="8" step="0.1"><span class="suffix">万円 / 年 / 世帯</span></div></td></tr>
             <tr><td>国保簡易 上限</td><td><div class="input-unit center"><input id="socialKokuhoCapAnnual" type="number" class="moneybox" value="100" step="0.1"><span class="suffix">万円 / 年 / 世帯</span></div></td></tr>
             <tr><td>介護保険（65歳以上）</td><td><div class="input-unit center"><input id="socialNursingAnnual" type="number" class="moneybox" value="8" step="0.1"><span class="suffix">万円 / 年 / 人</span></div></td></tr>
             <tr><td>後期高齢保険料</td><td><div class="input-unit center"><input id="socialLateElderlyAnnual" type="number" class="moneybox" value="12" step="0.1"><span class="suffix">万円 / 年 / 人</span></div></td></tr>
           </table>
-          <div class="help small">国民年金：20〜59歳の対象者1人あたりの概算年額です。夫婦とも対象なら原則2人分かかります。<br>国保簡易 料率：国保の所得連動部分を表す簡易率です。自治体差があります。<br>国保簡易 均等割等：均等割・平等割など固定部分をまとめた世帯ベースの概算です。<br>国保簡易 上限：国保年額の簡易上限です。自治体や年度で異なります。<br>介護保険（65歳以上）：65歳以上の対象者1人あたりの概算年額です。夫婦とも65歳以上なら2人分かかり得ます。<br>後期高齢保険料：75歳以上の本人1人あたりの概算年額です。実際の保険料は地域や所得で変わります。</div>
+          <div class="help small">国民年金：20〜59歳の対象者1人あたりの概算年額です。夫婦とも対象なら原則2人分かかります。<br>退職後健保（本人・配偶者）：退職後に使う健康保険の種類をそれぞれ選びます。<br>任意継続年額：任意継続を選んだ本人1人あたりの概算年額です。本人・配偶者とも任意継続を選ぶ場合は、この金額をそれぞれに適用します。<br>国保簡易 料率：国保の所得連動部分を表す簡易率です。自治体差があります。<br>国保簡易 均等割等：均等割・平等割など固定部分をまとめた世帯ベースの概算です。<br>国保簡易 上限：国保年額の簡易上限です。自治体や年度で異なります。<br>介護保険（65歳以上）：65歳以上の対象者1人あたりの概算年額です。夫婦とも65歳以上なら2人分かかり得ます。<br>後期高齢保険料：75歳以上の本人1人あたりの概算年額です。実際の保険料は地域や所得で変わります。</div>
         </div>
         <div>
-          <div class="subhead">社会保険・税の詳細設定（簡易）</div>
-      <div class="grid2">
-        <div>
-          <table class="center-table income-table" style="margin-top:0;">
+          <div class="subhead">公的年金課税（簡易）</div>
+          <table class="center-table income-table">
             <tr><th>項目</th><th>入力</th></tr>
-            <tr><td>社保を計算に含める</td><td><label class="inline-check"><input id="socialOn" type="checkbox" checked> 反映する</label></td></tr>
-            <tr><td>国民年金を含める</td><td><label class="inline-check"><input id="socialNationalPensionOn" type="checkbox" checked> 反映する</label></td></tr>
-            <tr><td>健保・介護を含める</td><td><label class="inline-check"><input id="socialHealthOn" type="checkbox" checked> 反映する</label></td></tr>
-            <tr><td>国民年金</td><td><div class="input-unit center"><input id="socialNationalPensionAnnual" type="number" class="moneybox" value="21.5" step="0.1"><span class="suffix">万円 / 年 / 人</span></div></td></tr>
-            <tr><td>国保簡易 料率</td><td><div class="input-unit center"><input id="socialKokuhoRatePct" type="number" class="ratebox" value="10" step="0.1"><span class="suffix">%</span></div></td></tr>
-            <tr><td>国保簡易 均等割等</td><td><div class="input-unit center"><input id="socialKokuhoBaseAnnual" type="number" class="moneybox" value="8" step="0.1"><span class="suffix">万円 / 年 / 世帯</span></div></td></tr>
-            <tr><td>国保簡易 上限</td><td><div class="input-unit center"><input id="socialKokuhoCapAnnual" type="number" class="moneybox" value="100" step="0.1"><span class="suffix">万円 / 年 / 世帯</span></div></td></tr>
-            <tr><td>介護保険（65歳以上）</td><td><div class="input-unit center"><input id="socialNursingAnnual" type="number" class="moneybox" value="8" step="0.1"><span class="suffix">万円 / 年 / 人</span></div></td></tr>
-            <tr><td>後期高齢保険料</td><td><div class="input-unit center"><input id="socialLateElderlyAnnual" type="number" class="moneybox" value="12" step="0.1"><span class="suffix">万円 / 年 / 人</span></div></td></tr>
-          </table>
-          <div class="help small">国民年金：20〜59歳の対象者1人あたりの概算年額です。夫婦とも対象なら原則2人分かかります。<br>国保簡易 料率：国保の所得連動部分を表す簡易率です。自治体差があります。<br>国保簡易 均等割等：均等割・平等割など固定部分をまとめた世帯ベースの概算です。<br>国保簡易 上限：国保年額の簡易上限です。自治体や年度で異なります。<br>介護保険（65歳以上）：65歳以上の対象者1人あたりの概算年額です。夫婦とも65歳以上なら2人分かかり得ます。<br>後期高齢保険料：75歳以上の本人1人あたりの概算年額です。実際の保険料は地域や所得で変わります。</div>
-        </div>
-        <div>
-          <div class="table-scroll">
-          <table class="center-table receipt-table">
-            <tr><th>対象</th><th>退職後健保</th><th>任意継続年額</th><th>備考</th><th></th><th></th></tr>
-            <tr><td>本人</td><td><select id="social_self_healthMode"><option value="kokuho" selected>国保簡易</option><option value="voluntary">任意継続</option><option value="dependent">扶養</option><option value="lateElderly">後期高齢</option></select></td><td><div class="input-unit center"><input id="social_self_voluntaryAnnual" type="number" class="moneybox" value="30" step="0.1"><span class="suffix">万円 / 年 / 人</span></div></td><td colspan="3" class="small">退職後のみ反映。勤務中の社会保険は手取り前提で別計算しません。</td></tr>
-            <tr><td>配偶者</td><td><select id="social_sp_healthMode"><option value="kokuho" selected>国保簡易</option><option value="voluntary">任意継続</option><option value="dependent">扶養</option><option value="lateElderly">後期高齢</option></select></td><td><div class="input-unit center"><input id="social_sp_voluntaryAnnual" type="number" class="moneybox" value="20" step="0.1"><span class="suffix">万円 / 年 / 人</span></div></td><td colspan="3" class="small">扶養を選ぶと健康保険料負担を0、国民年金も0として扱います。</td></tr>
-          </table>
-          </div>
-          <div class="help small">国保簡易：左の国保簡易パラメータを使って概算保険料を計算します。<br>任意継続：入力した任意継続年額を最大2年間適用し、その後は国保簡易へ切り替える想定です。<br>扶養：健康保険料負担を0として扱う簡易設定です。<br>後期高齢：左の後期高齢保険料を使って計算します。原則75歳以上を想定します。<br>任意継続年額：任意継続を選んだ本人1人あたりの概算年額です。通常は退職後最長2年間使います。</div>
-          <table class="center-table income-table" style="margin-top:12px;">
-            <tr><th>項目</th><th>入力</th></tr>
-            <tr><td>公的年金の税を計算に含める</td><td><label class="inline-check"><input id="taxPensionOnlyOn" type="checkbox" checked> 反映する</label></td></tr>
+            <tr><td>公的年金の税を反映</td><td><label class="inline-check"><input id="taxOn" type="checkbox" checked> 反映する</label></td></tr>
             <tr><td>所得税 基礎控除（簡易）</td><td><div class="input-unit center"><input id="taxIncomeBasicDeduction" type="number" class="moneybox" value="58" step="0.1"><span class="suffix">万円 / 人</span></div></td></tr>
             <tr><td>住民税 基礎控除</td><td><div class="input-unit center"><input id="taxResidentBasicDeduction" type="number" class="moneybox" value="43" step="0.1"><span class="suffix">万円 / 人</span></div></td></tr>
             <tr><td>公的年金控除（65歳未満）</td><td><div class="input-unit center"><input id="taxPublicPensionDeductionUnder65" type="number" class="moneybox" value="60" step="0.1"><span class="suffix">万円 / 人</span></div></td></tr>
             <tr><td>公的年金控除（65歳以上）</td><td><div class="input-unit center"><input id="taxPublicPensionDeduction65Plus" type="number" class="moneybox" value="110" step="0.1"><span class="suffix">万円 / 人</span></div></td></tr>
             <tr><td>住民税率（簡易）</td><td><div class="input-unit center"><input id="taxResidentRatePct" type="number" class="ratebox" value="10" step="0.1"><span class="suffix">%</span></div></td></tr>
           </table>
-          <div class="help small">公的年金の税を計算に含める：ON のとき、公的年金のみを簡易課税対象にします。その他の収入は手取り入力済みとして扱います。<br>所得税 基礎控除（簡易）：1人あたりの簡易基礎控除です。現行制度では所得に応じて変動するため、簡易モデルでは代表値を使います。<br>住民税 基礎控除：1人あたりの住民税計算用基礎控除です。<br>公的年金控除（65歳未満）：65歳未満の人1人あたりの簡易控除額です。<br>公的年金控除（65歳以上）：65歳以上の人1人あたりの簡易控除額です。<br>住民税率（簡易）：住民税の所得割部分を表す簡易率です。</div>
+          <div class="help small">公的年金の税を反映：ONのとき、公的年金のみを簡易課税対象にします。その他の収入は手取り入力済みとして扱います。<br>所得税 基礎控除（簡易）：1人あたりの簡易基礎控除です。現行制度では所得に応じて変動するため、簡易モデルでは代表値を使います。<br>住民税 基礎控除：1人あたりの住民税計算用基礎控除です。<br>公的年金控除（65歳未満）：65歳未満の人1人あたりの簡易控除額です。<br>公的年金控除（65歳以上）：65歳以上の人1人あたりの簡易控除額です。<br>住民税率（簡易）：住民税の所得割部分を表す簡易率です。</div>
         </div>
       </div>
-      <div class="help">v195では簡易モデルです。まずは退職後の公的年金課税と、退職後の国保・国民年金・介護保険・後期高齢保険料の概算を年度別収支表へ反映します。勤務中の給与や手取り入力の定期収入・臨時収入は、従来どおり手取り前提です。<br>※ 社会保険料（簡易）は、退職後の国民年金・健康保険・介護保険を概算で反映するための設定です。国民年金・介護保険・任意継続・後期高齢保険料は人ベース、国保簡易は世帯ベースの概算を基本としています。国保・介護・後期高齢の保険料は自治体や所得で変わるため、必要に応じて実額へ調整してください。<br>※ 税（簡易）は、当面は公的年金のみを対象とした簡易計算です。給与・定期収入・臨時収入・保険受取などは、原則として手取り入力済みとして扱います。</div>
+      <div class="help">まずは退職後の社会保険料と、公的年金に対する簡易課税を年度別収支表へ反映します。勤務中の給与や手取り入力の定期収入・臨時収入は、従来どおり手取り前提です。<br>※ 社会保険料（簡易）は、退職後の国民年金・健康保険・介護保険を概算で反映するための設定です。国民年金・介護保険・任意継続・後期高齢保険料は人ベース、国保簡易は世帯ベースの概算を基本としています。国保・介護・後期高齢の保険料は自治体や所得で変わるため、必要に応じて実額へ調整してください。<br>※ 退職後健保で「国保簡易」を選んだ場合は国保簡易パラメータを使い、「任意継続」を選んだ場合は任意継続年額を最大2年間適用し、その後は国保簡易へ切り替える想定です。「扶養」は健康保険料を0として扱い、「後期高齢」は後期高齢保険料を使います。<br>※ 公的年金課税（簡易）は、当面は公的年金のみを対象とした簡易計算です。給与・定期収入・臨時収入・保険受取などは、原則として手取り入力済みとして扱います。</div>
     </div>
 
     <div class="section">
       <h2>年度別収支表</h2>
-      <div class="help">現在表示中の条件について、社会保険料・税を含めた簡易の年度別収支表を表示します。v194では項目を行、各年を列にして、年ごとの列幅をそろえて見やすくしています。</div>
+      <div class="help">現在表示中の条件について、社会保険料・税を含めた簡易の年度別収支表を表示します。v195では項目を行、各年を列にして、年ごとの列幅をそろえて見やすくしています。</div>
       <div id="cashflowSummaryNote" class="stack-note"></div>
       <div class="cashflow-table-wrap table-scroll">
         <table class="center-table cashflow-table">
@@ -1714,7 +1708,7 @@ const INCOME_COLORS = {self:"#2563eb",spouse:"#60a5fa",pension:"#0f766e",regular
 const EXPENSE_COLORS = {life:"#ef4444",rent:"#fb7185",homeMaint:"#a16207",insurance:"#0891b2",education:"#f97316",loan:"#b91c1c",periodic:"#7c2d12",extra:"#dc2626",social:"#7c3aed",tax:"#334155"};
 const INVESTMENT_COLORS = ["#2563eb","#16a34a","#dc2626","#7c3aed","#d97706"];
 const CASHFLOW_TABLE_COLUMNS = [
-  {label:"西暦", path:"year", type:"year"},
+  {label:"西暦", path:"year", type:"int"},
   {label:"本人年齢", path:"ages.self", type:"int"},
   {label:"配偶者年齢", path:"ages.spouse", type:"int"},
   {label:"勤労収入合計", path:"income.work.total"},
@@ -2184,6 +2178,10 @@ function migrateLegacyData(data){
   if(!data.baseDate){
     const baseYear = Number(data.currentBaseYear || new Date().getFullYear()) || new Date().getFullYear();
     data.baseDate = formatDateParts(baseYear, 3, 29);
+  }
+  if(data.socialVoluntaryAnnual == null || data.socialVoluntaryAnnual === ""){
+    const legacyVol = data.social_self_voluntaryAnnual ?? data.social_sp_voluntaryAnnual;
+    if(legacyVol != null && legacyVol !== "") data.socialVoluntaryAnnual = legacyVol;
   }
   if(!data.selfBirthDate && data.age != null && data.age !== "") data.selfBirthDate = deriveBirthDateFromAge(data.age, data.baseDate);
   if(!data.spouseBirthDate && data.spouseAge != null && data.spouseAge !== "") data.spouseBirthDate = deriveBirthDateFromAge(data.spouseAge, data.baseDate);
@@ -4650,7 +4648,7 @@ function getScenarioFromDOM(){
       edu:!!document.getElementById("inflEdu")?.checked
     },
     social:{
-      enabled:!!document.getElementById("socialOn")?.checked,
+      enabled:!!document.getElementById("socialNationalPensionOn")?.checked || !!document.getElementById("socialHealthOn")?.checked,
       nationalPensionOn:!!document.getElementById("socialNationalPensionOn")?.checked,
       healthOn:!!document.getElementById("socialHealthOn")?.checked,
       nationalPensionAnnual:Math.max(0, numInput("socialNationalPensionAnnual", 21.5) || 0),
@@ -4659,12 +4657,13 @@ function getScenarioFromDOM(){
       kokuhoCapAnnual:Math.max(0, numInput("socialKokuhoCapAnnual", 100) || 0),
       nursingAnnual:Math.max(0, numInput("socialNursingAnnual", 8) || 0),
       lateElderlyAnnual:Math.max(0, numInput("socialLateElderlyAnnual", 12) || 0),
-      self:{healthMode:document.getElementById("social_self_healthMode")?.value || "kokuho", voluntaryAnnual:Math.max(0, numInput("social_self_voluntaryAnnual", 30) || 0)},
-      spouse:{healthMode:document.getElementById("social_sp_healthMode")?.value || "kokuho", voluntaryAnnual:Math.max(0, numInput("social_sp_voluntaryAnnual", 20) || 0)}
+      voluntaryAnnual:Math.max(0, numInput("socialVoluntaryAnnual", 30) || 0),
+      self:{healthMode:document.getElementById("social_self_healthMode")?.value || "kokuho", voluntaryAnnual:Math.max(0, numInput("socialVoluntaryAnnual", 30) || 0)},
+      spouse:{healthMode:document.getElementById("social_sp_healthMode")?.value || "kokuho", voluntaryAnnual:Math.max(0, numInput("socialVoluntaryAnnual", 30) || 0)}
     },
     tax:{
-      enabled:!!document.getElementById("taxPensionOnlyOn")?.checked,
-      pensionOnly:!!document.getElementById("taxPensionOnlyOn")?.checked,
+      enabled:!!document.getElementById("taxOn")?.checked,
+      pensionOnly:!!document.getElementById("taxOn")?.checked,
       incomeBasicDeduction:Math.max(0, numInput("taxIncomeBasicDeduction", 58) || 0),
       residentBasicDeduction:Math.max(0, numInput("taxResidentBasicDeduction", 43) || 0),
       publicPensionDeductionUnder65:Math.max(0, numInput("taxPublicPensionDeductionUnder65", 60) || 0),
@@ -6658,8 +6657,7 @@ function getValueByPath(obj, path){
   return String(path || '').split('.').reduce((acc, key)=> acc == null ? undefined : acc[key], obj);
 }
 function formatCashflowDisplayValue(value, type='money'){
-  if(type === 'year') return String(Math.round(Number(value || 0)) || 0);
-  if(type === 'int') return String(Math.round(Number(value || 0)) || 0);
+  if(type === 'int') return String(Math.round(Number(value || 0)));
   const n = Math.round((Number(value) || 0) * 10) / 10;
   return n.toLocaleString('ja-JP', {minimumFractionDigits:0, maximumFractionDigits:1});
 }
