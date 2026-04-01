@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>資産寿命シミュレータ</title>
+<title>資産寿命シミュレータ v213</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 <style>
@@ -253,6 +253,26 @@
     border-radius:10px;
   }
   button:hover{background:#f4f4f4}
+  .split-btn-group{display:inline-flex;align-items:stretch;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:#fff;}
+  .split-btn-group > button{border:none;border-radius:0;margin:0;}
+  .split-btn-group > button + button{border-left:1px solid var(--border);}
+  .split-btn-main{padding:7px 10px;}
+  .split-btn-toggle{padding:7px 8px;min-width:36px;font-weight:700;}
+  .split-btn-group:hover{background:#f4f4f4;}
+  .split-btn-group > button:hover{background:#f4f4f4;}
+  .monte-settings-modal{width:min(760px, calc(100vw - 20px));max-height:min(92vh, 860px);overflow:auto;}
+  .monte-settings-grid{display:flex;flex-direction:column;gap:12px;}
+  .monte-settings-note{color:var(--muted);font-size:.92rem;line-height:1.55;}
+  .monte-settings-section{border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff;}
+  .monte-settings-section-title{font-weight:700;margin-bottom:8px;color:#0f172a;}
+  .monte-settings-fields{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px 12px;}
+  .monte-settings-field{display:flex;flex-direction:column;gap:4px;min-width:0;}
+  .monte-settings-field > label{font-size:.92rem;color:#374151;}
+  .monte-settings-field .input-unit{max-width:none;width:100%;justify-content:flex-start;}
+  .monte-settings-field input[type=number],.monte-settings-field select,.monte-settings-field input[type=text]{width:100%;max-width:100%;min-width:0;}
+  .monte-settings-field-wide{grid-column:1 / -1;}
+  .monte-settings-hidden{display:none !important;}
+  .monte-settings-summary{background:#f8fafc;border:1px solid #d8dee9;border-radius:10px;padding:10px 12px;color:#334155;line-height:1.7;}
   #inputs{
     max-height:calc(100vh - 620px);
     overflow-y:auto;
@@ -848,6 +868,7 @@
     .curve-btn{padding:5px 8px;font-size:12px;}
     .insurance-assist-modal{width:min(100vw - 12px, 760px);padding:14px 10px 12px;}
     .withdrawal-rule-modal{width:min(100vw - 12px, 760px);padding:14px 10px 12px;}
+    .monte-settings-modal{width:min(100vw - 12px, 760px);padding:14px 10px 12px;}
     .withdrawal-rule-fields{grid-template-columns:1fr;}
     .withdrawal-compare-table{min-width:640px;}
     .withdrawal-compare-chart-wrap{height:220px;}
@@ -855,6 +876,7 @@
     .withdrawal-compare-chart-wrap{height:220px;}
 
     .insurance-assist-fields{grid-template-columns:1fr;}
+    .monte-settings-fields{grid-template-columns:1fr;}
 
     .income-curve-modal{width:min(100vw - 12px, 980px);padding:14px 10px 12px;}
     .loan-detail-modal{width:min(100vw - 12px, 920px);padding:14px 10px 12px;}
@@ -912,9 +934,21 @@
   .withdrawal-compare-table th{background:#fafafa;line-height:1.35;}
   .withdrawal-compare-table th:first-child,.withdrawal-compare-table td:first-child{text-align:left;width:180px;min-width:180px;}
   .withdrawal-compare-chart-wrap{height:260px;margin-top:10px;}
+  .withdrawal-compare-subcontrols{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px 12px;margin-bottom:10px;}
+  .withdrawal-param-case-table{width:100%;min-width:0;border-collapse:collapse;table-layout:fixed;font-size:13px;}
+  .withdrawal-param-case-table th,.withdrawal-param-case-table td{border:1px solid var(--border);padding:6px;text-align:center;vertical-align:middle;}
+  .withdrawal-param-case-table th{background:#fafafa;line-height:1.35;}
+  .withdrawal-param-case-table th:nth-child(1),.withdrawal-param-case-table td:nth-child(1){width:90px;min-width:90px;}
+  .withdrawal-param-case-table th:nth-child(2),.withdrawal-param-case-table td:nth-child(2){width:auto;}
+  .withdrawal-param-case-table th:nth-child(3),.withdrawal-param-case-table td:nth-child(3){width:96px;min-width:96px;}
+  .withdrawal-param-case-table td .input-unit{padding-left:0;justify-content:center;}
+  .withdrawal-param-case-table td input[type=number]{width:100%;max-width:120px;margin:0 auto;}
+  .withdrawal-param-case-help{margin-bottom:8px;color:var(--muted);font-size:.88rem;line-height:1.5;}
   @media (max-width:900px){
+    .withdrawal-compare-subcontrols{grid-template-columns:1fr;}
     .withdrawal-compare-table{min-width:720px;font-size:12px;}
     .withdrawal-compare-table th:first-child,.withdrawal-compare-table td:first-child{width:220px;min-width:220px;}
+    .withdrawal-param-case-table{min-width:420px;font-size:12px;}
   }
   .numeric-assist{display:none !important;
     position:fixed;
@@ -982,7 +1016,10 @@
       </div>
       <div id="rightTopControls">
         <button id="withdrawalRuleBtn" type="button" class="compact-btn">取り崩しルール</button>
-        <button id="runMonteBtn" type="button" class="compact-btn">確率計算</button>
+        <div class="split-btn-group">
+          <button id="runMonteBtn" type="button" class="compact-btn split-btn-main">確率計算</button>
+          <button id="openMonteSettingsBtn" type="button" class="compact-btn split-btn-toggle" aria-label="モンテカルロ設定">▼</button>
+        </div>
         <button id="copyUrlBtn" type="button" class="compact-btn">結果共有</button>
       </div>
     </div>
@@ -1368,10 +1405,50 @@
         </div>
         <div id="withdrawalCompareSection" class="withdrawal-compare-section">
           <div class="withdrawal-rule-section-title">取り崩し比較</div>
+          <div class="withdrawal-compare-subcontrols">
+            <div class="withdrawal-rule-field">
+              <label for="withdrawalCompareMode">比較モード</label>
+              <select id="withdrawalCompareMode">
+                <option value="rule">ルール比較</option>
+                <option value="parameter">同一ルール内パラメータ比較</option>
+              </select>
+            </div>
+            <div id="withdrawalCompareParamRuleField" class="withdrawal-rule-field withdrawal-rule-hidden">
+              <label for="withdrawalCompareParamRule">比較対象ルール</label>
+              <select id="withdrawalCompareParamRule">
+                <option value="current">固定年数バッファ型</option>
+                <option value="rebalance">目標配分リバランス型</option>
+                <option value="bucket">2バケツ戦略型</option>
+              </select>
+            </div>
+            <div id="withdrawalCompareParamKeyField" class="withdrawal-rule-field withdrawal-rule-hidden">
+              <label for="withdrawalCompareParamKey">比較するパラメータ</label>
+              <select id="withdrawalCompareParamKey"></select>
+            </div>
+            <div id="withdrawalCompareCaseCountField" class="withdrawal-rule-field withdrawal-rule-hidden">
+              <label for="withdrawalCompareCaseCount">ケース数</label>
+              <select id="withdrawalCompareCaseCount">
+                <option value="2">2</option>
+                <option value="3" selected>3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </div>
+          </div>
+          <div id="withdrawalCompareParamEditor" class="withdrawal-rule-hidden">
+            <div class="withdrawal-param-case-help">※ まずは1変数比較のみです。選んだ1つのパラメータだけを変え、他の条件は固定したまま 2〜5 ケースを同一乱数列で比較します。</div>
+            <div class="withdrawal-compare-table-wrap">
+              <table class="withdrawal-param-case-table">
+                <thead><tr><th>ケース</th><th>値</th><th>単位</th></tr></thead>
+                <tbody id="withdrawalCompareParamCaseBody"></tbody>
+              </table>
+            </div>
+            <input id="withdrawalCompareCaseJson" type="hidden" value="">
+          </div>
           <div id="withdrawalCompareStatus" class="withdrawal-compare-status">比較を実行すると、3つのルールを同一のモンテカルロ乱数列で比較します。</div>
           <div class="withdrawal-compare-table-wrap">
             <table class="withdrawal-compare-table">
-              <thead>
+              <thead id="withdrawalCompareHead">
                 <tr><th>指標</th><th>固定年数バッファ型</th><th>目標配分リバランス型</th><th>2バケツ戦略型</th></tr>
               </thead>
               <tbody id="withdrawalCompareBody"></tbody>
@@ -1389,6 +1466,60 @@
       </div>
     </div>
   </div>
+
+  <div id="monteCarloSettingsModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal-card monte-settings-modal" role="dialog" aria-modal="true" aria-labelledby="monteCarloSettingsTitle">
+      <div id="monteCarloSettingsTitle" class="modal-text" style="font-weight:bold;margin-bottom:10px;">モンテカルロ設定</div>
+      <div class="monte-settings-grid">
+        <div class="monte-settings-note">※ 「確率計算」本体クリックでは、ここで保存した設定を使って即実行します。将来別ファイル化しやすいよう、設定・乱数生成・描画は分離しやすい構成で実装しています。</div>
+        <div class="monte-settings-section">
+          <div class="monte-settings-section-title">基本設定</div>
+          <div class="monte-settings-fields">
+            <div class="monte-settings-field"><label for="monteSettingsTrials">試行回数</label><div class="input-unit"><input id="monteSettingsTrials" type="number" class="agebox" value="80" min="10" max="5000" step="10"><span class="suffix">回</span></div></div>
+            <div class="monte-settings-field"><label for="monteSettingsDrawPaths">描画本数</label><div class="input-unit"><input id="monteSettingsDrawPaths" type="number" class="agebox" value="80" min="10" max="500" step="10"><span class="suffix">本</span></div></div>
+            <div class="monte-settings-field"><label for="monteSettingsModel">利回りモデル</label><select id="monteSettingsModel"><option value="uniform">簡易（一様分布）</option><option value="normal">正規分布</option><option value="mean_reverting">平均回帰</option></select></div>
+            <div class="monte-settings-field"><label class="inline-check"><input id="monteSettingsSeedOn" type="checkbox"> 乱数シードを固定する</label><div class="input-unit"><input id="monteSettingsSeedValue" type="number" class="moneybox" value="12345" step="1"><span class="suffix">seed</span></div></div>
+          </div>
+        </div>
+        <div id="monteSettingsUniformSection" class="monte-settings-section">
+          <div class="monte-settings-section-title">簡易（一様分布）</div>
+          <div class="monte-settings-fields">
+            <div class="monte-settings-field"><label for="monteSettingsUniformRangePct">年次変動幅</label><div class="input-unit"><span class="prefix">±</span><input id="monteSettingsUniformRangePct" type="number" class="ratebox" value="15" min="0" step="0.1"><span class="suffix">%ポイント</span></div></div>
+          </div>
+        </div>
+        <div id="monteSettingsNormalSection" class="monte-settings-section monte-settings-hidden">
+          <div class="monte-settings-section-title">正規分布</div>
+          <div class="monte-settings-fields">
+            <div class="monte-settings-field"><label for="monteSettingsNormalStdPct">年次標準偏差</label><div class="input-unit"><input id="monteSettingsNormalStdPct" type="number" class="ratebox" value="15" min="0" step="0.1"><span class="suffix">%ポイント</span></div></div>
+          </div>
+        </div>
+        <div id="monteSettingsMeanRevertingSection" class="monte-settings-section monte-settings-hidden">
+          <div class="monte-settings-section-title">平均回帰</div>
+          <div class="monte-settings-fields">
+            <div class="monte-settings-field"><label for="monteSettingsMeanRevStdPct">長期標準偏差</label><div class="input-unit"><input id="monteSettingsMeanRevStdPct" type="number" class="ratebox" value="15" min="0" step="0.1"><span class="suffix">%ポイント</span></div></div>
+            <div class="monte-settings-field"><label for="monteSettingsMeanRevPhi">平均回帰の強さ</label><div class="input-unit"><input id="monteSettingsMeanRevPhi" type="number" class="ratebox" value="0.35" min="0" max="0.99" step="0.01"><span class="suffix">0〜0.99</span></div></div>
+          </div>
+        </div>
+        <div class="monte-settings-section">
+          <div class="monte-settings-section-title">概要</div>
+          <div id="monteSettingsSummary" class="monte-settings-summary"></div>
+        </div>
+      </div>
+      <div class="modal-actions" style="margin-top:14px;">
+        <button type="button" id="cancelMonteSettingsBtn">キャンセル</button>
+        <button type="button" id="saveMonteSettingsBtn">保存</button>
+      </div>
+    </div>
+  </div>
+  <input id="monteTrials" type="hidden" value="80">
+  <input id="monteDrawPaths" type="hidden" value="80">
+  <input id="monteModel" type="hidden" value="uniform">
+  <input id="monteUniformRangePct" type="hidden" value="10">
+  <input id="monteNormalStdPct" type="hidden" value="10">
+  <input id="monteMeanRevStdPct" type="hidden" value="10">
+  <input id="monteMeanRevPhi" type="hidden" value="0.35">
+  <input id="monteSeedOn" type="hidden" value="false">
+  <input id="monteSeedValue" type="hidden" value="12345">
 
   <div id="deleteTabModal" class="modal-backdrop" aria-hidden="true">
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="deleteTabMessage">
@@ -3790,7 +3921,7 @@ function isVisibleForTab(el){
 }
 function isInsideHiddenLayer(el){
   if(!el || !el.closest) return false;
-  return !!el.closest('#tabContextMenu:not(.show), #rowContextMenu:not(.show), #loanDetailModal:not(.show), #incomeCurveModal:not(.show), #pensionHelperModal:not(.show), #educationCopyModal:not(.show), #deleteRowModal:not(.show), #deleteTabModal:not(.show), [hidden], [aria-hidden="true"]');
+  return !!el.closest('#tabContextMenu:not(.show), #rowContextMenu:not(.show), #loanDetailModal:not(.show), #incomeCurveModal:not(.show), #pensionHelperModal:not(.show), #educationCopyModal:not(.show), #monteCarloSettingsModal:not(.show), #deleteRowModal:not(.show), #deleteTabModal:not(.show), [hidden], [aria-hidden="true"]');
 }
 function isTabNavigableElement(el){
   if(!el || !el.matches) return false;
@@ -3902,7 +4033,7 @@ function getAllInputs(){
   const baseYear = currentBaseYearValue();
   document.querySelectorAll("input, select").forEach(el=>{
     if(!el.id) return;
-    if(el.closest && (el.closest("#loanDetailModal") || el.closest("#incomeCurveModal") || el.closest("#pensionHelperModal") || el.closest("#educationDetailModal") || el.closest("#insuranceAssistModal"))) return;
+    if(el.closest && (el.closest("#loanDetailModal") || el.closest("#incomeCurveModal") || el.closest("#pensionHelperModal") || el.closest("#educationDetailModal") || el.closest("#insuranceAssistModal") || el.closest("#monteCarloSettingsModal"))) return;
     if(el.type === "checkbox"){
       data[el.id] = el.checked;
       return;
@@ -4789,6 +4920,7 @@ function getScenarioFromDOM(){
       bucketDefenseOn:!!document.getElementById("withdrawalBucketDefenseOn")?.checked,
       bucketDefenseThreshold:((numInput("withdrawalBucketDefenseThresholdPct", -15) || 0) / 100)
     },
+    monteCarlo:getMonteCarloSettingsFromDOM(),
     children,
     educationMatrix,
     deposits,
@@ -6599,8 +6731,110 @@ function annualCashBufferNeed(parts){
   return (p.life || 0) + (p.rent || 0) + (p.homeMaint || 0) + (p.insurance || 0) + (p.loan || 0) + (p.periodic || 0) + (p.educationRecurring || 0);
 }
 function randomizeReturn(base, shock=null){
-  const delta = Number.isFinite(Number(shock)) ? Number(shock) : (Math.random()-0.5)*0.30;
+  let delta = null;
+  if(shock && typeof shock === "object" && shock.type === "absolute") return Number(shock.value || 0);
+  if(shock && typeof shock === "object" && shock.type === "delta") delta = Number(shock.value);
+  else if(Number.isFinite(Number(shock))) delta = Number(shock);
+  if(!Number.isFinite(delta)) delta = (Math.random()-0.5)*0.30;
   return base + delta;
+}
+function clampMonteTrials(v){ return Math.max(10, Math.min(5000, Math.round(Number(v) || 80))); }
+function clampMonteDrawPaths(v, trials){ return Math.max(10, Math.min(Math.max(10, Number(trials) || 80), Math.round(Number(v) || 80))); }
+function clampMonteRatePct(v, fallback){ const n = Number(v); return Number.isFinite(n) ? Math.max(0, n) : fallback; }
+function clampMontePhi(v){ const n = Number(v); if(!Number.isFinite(n)) return 0.35; return Math.max(0, Math.min(0.99, n)); }
+function normalizeMonteModel(v){ return ["uniform","normal","mean_reverting"].includes(String(v || "")) ? String(v) : "uniform"; }
+function getMonteCarloSettingsFromDOM(){
+  const trials = clampMonteTrials(document.getElementById('monteTrials')?.value || 80);
+  return {
+    trials,
+    drawPaths: clampMonteDrawPaths(document.getElementById('monteDrawPaths')?.value || trials, trials),
+    model: normalizeMonteModel(document.getElementById('monteModel')?.value || 'uniform'),
+    uniformRangePct: clampMonteRatePct(document.getElementById('monteUniformRangePct')?.value || 10, 10),
+    normalStdPct: clampMonteRatePct(document.getElementById('monteNormalStdPct')?.value || 10, 10),
+    meanRevStdPct: clampMonteRatePct(document.getElementById('monteMeanRevStdPct')?.value || 10, 10),
+    meanRevPhi: clampMontePhi(document.getElementById('monteMeanRevPhi')?.value || 0.35),
+    seedOn: String(document.getElementById('monteSeedOn')?.value || 'false') === 'true',
+    seedValue: Math.round(Number(document.getElementById('monteSeedValue')?.value || 12345) || 12345)
+  };
+}
+function createSeededRng(seed){
+  let a = (Math.round(Number(seed) || 0) >>> 0) || 1;
+  return function(){
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function randomNormalFromRng(rng){
+  let u = 0, v = 0;
+  while(u <= 1e-12) u = rng();
+  while(v <= 1e-12) v = rng();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+function buildMonteCarloShockTrials(cfg, settings){
+  const years = Math.max(1, 121 - Number(cfg.age || 0));
+  const trials = clampMonteTrials(settings?.trials || 80);
+  const rng = settings?.seedOn ? createSeededRng(settings.seedValue) : Math.random;
+  const out = [];
+  for(let i=0;i<trials;i++){
+    const arr = [];
+    let prevDelta = 0;
+    for(let y=0;y<years;y++){
+      let delta = 0;
+      if(settings?.model === 'normal'){
+        delta = randomNormalFromRng(rng) * ((Number(settings.normalStdPct || 0) || 0) / 100);
+      }else if(settings?.model === 'mean_reverting'){
+        const phi = clampMontePhi(settings.meanRevPhi);
+        const sigma = (Number(settings.meanRevStdPct || 0) || 0) / 100;
+        const epsilonStd = sigma * Math.sqrt(Math.max(0, 1 - phi * phi));
+        delta = phi * prevDelta + randomNormalFromRng(rng) * epsilonStd;
+        prevDelta = delta;
+      }else{
+        delta = (rng() - 0.5) * 2 * ((Number(settings.uniformRangePct || 0) || 0) / 100);
+      }
+      arr.push(delta);
+    }
+    out.push(arr);
+  }
+  return out;
+}
+function pickMonteDisplayPaths(results, drawPaths){
+  if(!Array.isArray(results) || !results.length) return [];
+  const maxPaths = Math.max(1, Math.min(results.length, Math.round(Number(drawPaths) || results.length)));
+  if(results.length <= maxPaths) return results;
+  const out = [];
+  for(let i=0;i<maxPaths;i++){
+    const idx = Math.round(i * (results.length - 1) / Math.max(1, maxPaths - 1));
+    out.push(results[idx]);
+  }
+  return out;
+}
+function getMonteChartStartTotal(cfg){
+  const deposits = Array.isArray(cfg?.deposits) ? cfg.deposits : [];
+  const investments = Array.isArray(cfg?.investments) ? cfg.investments : [];
+  const safeAssets = initializeSafeAssetState(cfg);
+  const depositTotal = deposits.reduce((s, d)=>s + (Number(d?.amount) || 0), 0);
+  const investmentTotal = investments.reduce((s, inv)=>s + (Number(inv?.amount) || 0), 0);
+  const safeTotal = currentSafeAssetTotal(safeAssets, Number(cfg?.age) || 0) || 0;
+  return depositTotal + investmentTotal + safeTotal;
+}
+function buildMontePlotSeries(cfg, labels, series){
+  const safeLabels = Array.isArray(labels) ? labels.slice() : [];
+  const safeSeries = Array.isArray(series) ? series.slice() : [];
+  if(!safeLabels.length) return {labels:safeLabels, values:safeSeries};
+  const startTotal = getMonteChartStartTotal(cfg);
+  return {labels:safeLabels, values:[startTotal, ...safeSeries.slice(0, Math.max(0, safeLabels.length - 1))]};
+}
+function formatMonteSettingsSummary(settings){
+  if(!settings) return '';
+  if(settings.model === 'normal'){
+    return `<strong>正規分布</strong><br>試行回数 ${settings.trials} 回、描画本数 ${settings.drawPaths} 本、年次標準偏差 ${settings.normalStdPct}%ポイントです。`;
+  }
+  if(settings.model === 'mean_reverting'){
+    return `<strong>平均回帰</strong><br>試行回数 ${settings.trials} 回、描画本数 ${settings.drawPaths} 本、長期標準偏差 ${settings.meanRevStdPct}%ポイント、平均回帰の強さ ${settings.meanRevPhi} です。`;
+  }
+  return `<strong>簡易（一様分布）</strong><br>試行回数 ${settings.trials} 回、描画本数 ${settings.drawPaths} 本、年次変動幅 ±${settings.uniformRangePct}%ポイントです。`;
 }
 function getPublicPensionDeductionByAge(age, cfg){
   const tax = cfg?.tax || {};
@@ -7766,12 +8000,15 @@ function buildInvestmentDatasets(sim, color, overlay, labelPrefix=""){
   }
   return ds;
 }
-function requestDraw(options = {}){
-  const immediate = options && options.immediate === true;
+function clearScheduledDraw(){
   if(drawDebounceTimer){
     clearTimeout(drawDebounceTimer);
     drawDebounceTimer = null;
   }
+}
+function requestDraw(options = {}){
+  const immediate = options && options.immediate === true;
+  clearScheduledDraw();
   if(immediate){
     draw();
     return;
@@ -7955,10 +8192,10 @@ function draw(){
 }
 
 function runMonte(){
+  clearScheduledDraw();
   monteMode = true;
   ensureScenarioSaved();
   const overlay = document.getElementById("overlayToggle").checked;
-  const trials = 80;
   const targets = overlay ? scenarios : [scenarios[currentTab]];
   let datasets = [];
   let yData = [];
@@ -7969,6 +8206,8 @@ function runMonte(){
   targets.forEach((s, idx)=>{
     setAllInputs(s.data);
     const cfg = getScenarioFromDOM();
+    const monteSettings = cfg.monteCarlo || getMonteCarloSettingsFromDOM();
+    const trials = clampMonteTrials(monteSettings.trials || 80);
     const base = simulate(cfg, false);
     if(idx===0){
       firstCfg = cfg;
@@ -7976,41 +8215,52 @@ function runMonte(){
     }
 
     const staticSeries = buildMonteStaticSeries(cfg);
+    const shockTrials = buildSharedReturnShocks(cfg, trials);
     const results = [];
-    for(let i=0;i<trials;i++) results.push(simulate(cfg, true, {compact:true, staticSeries}).totalAssets);
+    for(let i=0;i<trials;i++){
+      results.push(simulate(cfg, true, {compact:true, staticSeries, returnShocks:shockTrials[i]}).totalAssets);
+    }
+    const displayResults = pickMonteDisplayPaths(results, monteSettings.drawPaths || trials);
     const lifeIndex = Math.max(0, Math.min(base.labels.length-1, cfg.lifeExpect - cfg.age));
     const fail = results.filter(r => (r[lifeIndex] ?? r[r.length-1]) <= 0).length;
     const prob = Math.round(fail / trials * 100);
-    const finals = results.map(r=>r.at(-1));
-    const best = results[finals.indexOf(Math.max(...finals))];
-    const worst = results[finals.indexOf(Math.min(...finals))];
+    const finalsAtLife = results.map(r => (r[lifeIndex] ?? r.at(-1) ?? 0));
+    const best = results[finalsAtLife.indexOf(Math.max(...finalsAtLife))];
+    const worst = results[finalsAtLife.indexOf(Math.min(...finalsAtLife))];
     const color = TAB_COLORS[idx % TAB_COLORS.length];
+    const allSame = results.every(r => r.length === base.totalAssets.length && r.every((v, i)=>Math.abs((Number(v) || 0) - (Number(base.totalAssets[i]) || 0)) < 1e-9));
+    const plotLabels = Array.isArray(base.labels) ? base.labels.slice() : [];
+    const basePlot = buildMontePlotSeries(cfg, plotLabels, base.totalAssets);
+    const displayPlots = displayResults.map(r => buildMontePlotSeries(cfg, plotLabels, r));
+    const bestPlot = buildMontePlotSeries(cfg, plotLabels, best);
+    const worstPlot = buildMontePlotSeries(cfg, plotLabels, worst);
 
     if(overlay){
-      results.forEach(r=>{
-        datasets.push(makeLineDataset("", base.labels, r, {
+      displayPlots.forEach(plot=>{
+        datasets.push(makeLineDataset("", plot.labels, plot.values, {
           borderColor:color + "33", borderWidth:1
         }));
       });
-      datasets.push(makeLineDataset(`${s.name} ベスト`, base.labels, best, {borderColor:color, borderWidth:2}));
-      datasets.push(makeLineDataset(`${s.name} 固定利率`, base.labels, base.totalAssets, {borderColor:color, borderWidth:3}));
-      datasets.push(makeLineDataset(`${s.name} ワースト`, base.labels, worst, {borderColor:color, borderDash:[5,4], borderWidth:2}));
+      datasets.push(makeLineDataset(`${s.name} ベスト`, bestPlot.labels, bestPlot.values, {borderColor:color, borderWidth:2}));
+      datasets.push(makeLineDataset(`${s.name} 固定利率`, basePlot.labels, basePlot.values, {borderColor:color, borderWidth:3}));
+      datasets.push(makeLineDataset(`${s.name} ワースト`, worstPlot.labels, worstPlot.values, {borderColor:color, borderDash:[5,4], borderWidth:2}));
     }else{
-      results.forEach(r=>{
-        datasets.push(makeLineDataset("", base.labels, r, {
+      displayPlots.forEach(plot=>{
+        datasets.push(makeLineDataset("", plot.labels, plot.values, {
           borderColor:"rgba(156,163,175,0.30)", borderWidth:1
         }));
       });
-      datasets.push(makeLineDataset("ベスト", base.labels, best, {borderColor:"green", borderWidth:2}));
-      datasets.push(makeLineDataset("固定利率", base.labels, base.totalAssets, {borderColor:"black", borderWidth:2.5}));
-      datasets.push(makeLineDataset("ワースト", base.labels, worst, {borderColor:"red", borderWidth:2}));
+      datasets.push(makeLineDataset("ベスト", bestPlot.labels, bestPlot.values, {borderColor:"green", borderWidth:2}));
+      datasets.push(makeLineDataset("固定利率", basePlot.labels, basePlot.values, {borderColor:"black", borderWidth:2.5}));
+      datasets.push(makeLineDataset("ワースト", worstPlot.labels, worstPlot.values, {borderColor:"red", borderWidth:2}));
     }
-    results.forEach(r=> yData.push(...getVisibleSeriesValues(base.labels, r, cfg.xAxisMax)));
-    yData.push(...getVisibleSeriesValues(base.labels, base.totalAssets, cfg.xAxisMax));
+    displayPlots.forEach(plot=> yData.push(...getVisibleSeriesValues(plot.labels, plot.values, cfg.xAxisMax)));
+    yData.push(...getVisibleSeriesValues(basePlot.labels, basePlot.values, cfg.xAxisMax));
     if(idx===0){
+      const summaryText = formatMonteSettingsSummary(monteSettings).replace(/<br>/g, ' ').replace(/<[^>]+>/g, '');
       monteInfo = overlay
-        ? {prob, legendItems:[{text:"各ケースの試行 / ベスト / 固定利率 / ワースト", color:TAB_COLORS[0]}]}
-        : {prob, legendItems:[{text:"グレー: 全試行", color:"#6b7280"},{text:"緑: ベスト", color:"green"},{text:"黒: 固定利率", color:"black"},{text:"赤: ワースト", color:"red"}]};
+        ? {prob, legendItems:[{text:`各ケースの試行 / ベスト / 固定利率 / ワースト（${summaryText}）`, color:TAB_COLORS[0]}, ...(allSame ? [{text:"全試行が固定利率と同一です（リスク資産や利回り設定を確認）", color:"#6b7280"}] : [])]}
+        : {prob, legendItems:[{text:`グレー: 全試行（表示 ${displayResults.length} 本 / 計算 ${trials} 回）`, color:"#6b7280"},{text:"緑: ベスト", color:"green"},{text:"黒: 固定利率", color:"black"},{text:"赤: ワースト", color:"red"},{text:summaryText, color:"#2563eb"}, ...(allSame ? [{text:"全試行が固定利率と同一です（リスク資産や利回り設定を確認）", color:"#6b7280"}] : [])]};
     }
   });
   setAllInputs(scenarios[currentTab].data);
@@ -8658,7 +8908,12 @@ const WITHDRAWAL_RULE_MODAL_IDS = [
   "withdrawalBucketTargetYears",
   "withdrawalBucketFloorYears",
   "withdrawalBucketDefenseOn",
-  "withdrawalBucketDefenseThresholdPct"
+  "withdrawalBucketDefenseThresholdPct",
+  "withdrawalCompareMode",
+  "withdrawalCompareParamRule",
+  "withdrawalCompareParamKey",
+  "withdrawalCompareCaseCount",
+  "withdrawalCompareCaseJson"
 ];
 let withdrawalRuleSnapshot = null;
 // ===== Withdrawal comparison: calculation / rendering を分け、将来別ファイルへ切り出しやすくする =====
@@ -8667,6 +8922,28 @@ const WITHDRAWAL_COMPARE_RULES = [
   {mode:'rebalance', label:'目標配分リバランス型'},
   {mode:'bucket', label:'2バケツ戦略型'}
 ];
+const WITHDRAWAL_PARAMETER_COMPARE_RULES = {
+  current:{
+    label:'固定年数バッファ型',
+    params:[
+      {key:'currentBufferYears', label:'現金バッファ年数', unit:'年分', step:0.5, min:0, max:20, fallback:2, format:(v)=>`${formatNumberJP(v, 1)}年分`}
+    ]
+  },
+  rebalance:{
+    label:'目標配分リバランス型',
+    params:[
+      {key:'rebalanceBufferYears', label:'最低現金バッファ', unit:'年分', step:0.5, min:0, max:20, fallback:1, format:(v)=>`${formatNumberJP(v, 1)}年分`},
+      {key:'rebalanceCashPct', label:'目標現金比率', unit:'%', step:1, min:0, max:100, fallback:20, format:(v)=>`${formatNumberJP(v, 0)}%`}
+    ]
+  },
+  bucket:{
+    label:'2バケツ戦略型',
+    params:[
+      {key:'bucketTargetYears', label:'短期バケツ目標', unit:'年分', step:0.5, min:0, max:20, fallback:2, format:(v)=>`${formatNumberJP(v, 1)}年分`},
+      {key:'bucketFloorYears', label:'最低維持ライン', unit:'年分', step:0.5, min:0, max:20, fallback:1, format:(v)=>`${formatNumberJP(v, 1)}年分`}
+    ]
+  }
+};
 let withdrawalCompareChart = null;
 let withdrawalCompareCache = null;
 function getWithdrawalPolicyOverride(mode){
@@ -8674,6 +8951,189 @@ function getWithdrawalPolicyOverride(mode){
   const base = deepClone(cfg.withdrawalPolicy || {});
   base.mode = mode;
   return base;
+}
+function formatNumberJP(value, decimals=1){
+  const n = Number(value);
+  if(!Number.isFinite(n)) return '0';
+  const factor = Math.pow(10, Math.max(0, decimals));
+  const rounded = Math.round(n * factor) / factor;
+  if(Math.abs(rounded - Math.round(rounded)) < 1e-9) return String(Math.round(rounded));
+  return rounded.toLocaleString('ja-JP', {minimumFractionDigits:0, maximumFractionDigits:decimals});
+}
+function getWithdrawalCompareMode(){
+  return document.getElementById('withdrawalCompareMode')?.value === 'parameter' ? 'parameter' : 'rule';
+}
+function getWithdrawalParameterDefinitions(ruleMode){
+  return WITHDRAWAL_PARAMETER_COMPARE_RULES[ruleMode]?.params || [];
+}
+function getWithdrawalParameterDefinition(ruleMode, paramKey){
+  return getWithdrawalParameterDefinitions(ruleMode).find(def=>def.key === paramKey) || null;
+}
+function getWithdrawalPolicyFieldCurrentValue(policy, paramDef){
+  if(!paramDef) return 0;
+  const raw = Number(policy?.[paramDef.key]);
+  if(Number.isFinite(raw)) return raw;
+  return Number(paramDef.fallback || 0) || 0;
+}
+function normalizeWithdrawalParamValue(value, paramDef){
+  if(!paramDef) return 0;
+  const step = Math.max(0.0001, Number(paramDef.step) || 1);
+  const min = Number.isFinite(Number(paramDef.min)) ? Number(paramDef.min) : -Infinity;
+  const max = Number.isFinite(Number(paramDef.max)) ? Number(paramDef.max) : Infinity;
+  let n = Number(value);
+  if(!Number.isFinite(n)) n = Number(paramDef.fallback || 0) || 0;
+  n = Math.max(min, Math.min(max, n));
+  n = Math.round(n / step) * step;
+  const digits = String(step).includes('.') ? String(step).split('.')[1].length : 0;
+  return Number(n.toFixed(Math.min(6, digits)));
+}
+function buildDefaultWithdrawalParamValues(baseValue, paramDef, count){
+  const desired = Math.max(2, Math.min(5, Number(count) || 3));
+  const base = normalizeWithdrawalParamValue(baseValue, paramDef);
+  const step = Math.max(0.0001, Number(paramDef?.step) || 1);
+  const min = Number.isFinite(Number(paramDef?.min)) ? Number(paramDef.min) : -Infinity;
+  const max = Number.isFinite(Number(paramDef?.max)) ? Number(paramDef.max) : Infinity;
+  const pushUnique = (arr, value)=>{
+    const normalized = normalizeWithdrawalParamValue(value, paramDef);
+    if(!arr.some(v=>Math.abs(v - normalized) < 1e-9)) arr.push(normalized);
+  };
+  const candidates = [];
+  if(paramDef?.unit === '%'){
+    [base - 20, base - 10, base, base + 10, base + 20, 10, 20, 30, 40, 50].forEach(v=>pushUnique(candidates, v));
+  }else{
+    [base - step * 2, base - step, base, base + step, base + step * 2, base + step * 4, 1, 2, 3, 5].forEach(v=>pushUnique(candidates, v));
+  }
+  const filtered = candidates.filter(v=>v >= min - 1e-9 && v <= max + 1e-9).sort((a,b)=>a-b);
+  const out = [];
+  const centered = filtered.slice().sort((a,b)=>Math.abs(a - base) - Math.abs(b - base) || a - b);
+  centered.forEach(v=>{ if(out.length < desired) pushUnique(out, v); });
+  const finalSorted = out.slice().sort((a,b)=>a-b);
+  while(finalSorted.length < desired){
+    pushUnique(finalSorted, normalizeWithdrawalParamValue(base + step * finalSorted.length, paramDef));
+    if(finalSorted.length >= desired) break;
+    pushUnique(finalSorted, normalizeWithdrawalParamValue(Math.max(min, base - step * finalSorted.length), paramDef));
+    if(finalSorted.length > 12) break;
+  }
+  return finalSorted.slice(0, desired).sort((a,b)=>a-b);
+}
+function buildDefaultWithdrawalParamCases(ruleMode, paramKey, count, policy){
+  const paramDef = getWithdrawalParameterDefinition(ruleMode, paramKey);
+  if(!paramDef) return [];
+  const baseValue = getWithdrawalPolicyFieldCurrentValue(policy, paramDef);
+  const values = buildDefaultWithdrawalParamValues(baseValue, paramDef, count);
+  return values.map((value, idx)=>({label:`ケース${idx + 1}`, value:normalizeWithdrawalParamValue(value, paramDef)}));
+}
+function parseWithdrawalCompareCaseJson(){
+  const raw = document.getElementById('withdrawalCompareCaseJson')?.value || '';
+  if(!raw) return [];
+  try{
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  }catch(_err){
+    return [];
+  }
+}
+function writeWithdrawalCompareCaseJson(cases){
+  const hidden = document.getElementById('withdrawalCompareCaseJson');
+  if(hidden) hidden.value = JSON.stringify(Array.isArray(cases) ? cases : []);
+}
+function ensureWithdrawalParameterOptions(){
+  const ruleSelect = document.getElementById('withdrawalCompareParamRule');
+  const paramSelect = document.getElementById('withdrawalCompareParamKey');
+  if(!ruleSelect || !paramSelect) return;
+  const ruleMode = ruleSelect.value || 'current';
+  const defs = getWithdrawalParameterDefinitions(ruleMode);
+  const currentValue = paramSelect.value;
+  paramSelect.innerHTML = defs.map(def=>`<option value="${escapeAttr(def.key)}">${escapeHtml(def.label)}</option>`).join('');
+  const nextValue = defs.some(def=>def.key === currentValue) ? currentValue : (defs[0]?.key || '');
+  paramSelect.value = nextValue;
+}
+function rebuildWithdrawalParameterCases(force=false){
+  const ruleSelect = document.getElementById('withdrawalCompareParamRule');
+  const paramSelect = document.getElementById('withdrawalCompareParamKey');
+  const countSelect = document.getElementById('withdrawalCompareCaseCount');
+  if(!ruleSelect || !paramSelect || !countSelect) return;
+  ensureWithdrawalParameterOptions();
+  const ruleMode = ruleSelect.value || 'current';
+  const paramKey = paramSelect.value || '';
+  const desiredCount = Math.max(2, Math.min(5, Number(countSelect.value) || 3));
+  const paramDef = getWithdrawalParameterDefinition(ruleMode, paramKey);
+  const policy = getScenarioFromDOM()?.withdrawalPolicy || {};
+  let cases = parseWithdrawalCompareCaseJson();
+  const validExisting = !force && cases.length && cases.every(item=>item && typeof item === 'object' && Number.isFinite(Number(item.value)));
+  if(validExisting){
+    cases = cases.slice(0, desiredCount).map((item, idx)=>({label:`ケース${idx + 1}`, value:normalizeWithdrawalParamValue(item.value, paramDef)}));
+    while(cases.length < desiredCount){
+      const fallbackCases = buildDefaultWithdrawalParamCases(ruleMode, paramKey, desiredCount, policy);
+      cases.push(fallbackCases[cases.length] || {label:`ケース${cases.length + 1}`, value:getWithdrawalPolicyFieldCurrentValue(policy, paramDef)});
+    }
+  }else{
+    cases = buildDefaultWithdrawalParamCases(ruleMode, paramKey, desiredCount, policy);
+  }
+  writeWithdrawalCompareCaseJson(cases);
+}
+function renderWithdrawalParameterCaseEditor(){
+  const body = document.getElementById('withdrawalCompareParamCaseBody');
+  const ruleMode = document.getElementById('withdrawalCompareParamRule')?.value || 'current';
+  const paramKey = document.getElementById('withdrawalCompareParamKey')?.value || '';
+  const paramDef = getWithdrawalParameterDefinition(ruleMode, paramKey);
+  if(!body || !paramDef) return;
+  rebuildWithdrawalParameterCases(false);
+  const cases = parseWithdrawalCompareCaseJson();
+  body.innerHTML = cases.map((item, idx)=>{
+    const caseLabel = item.label || ('ケース' + (idx + 1));
+    return `<tr><th>${escapeHtml(caseLabel)}</th><td><div class="input-unit center"><input type="number" class="moneybox" data-withdrawal-param-case-input="1" data-case-index="${idx}" value="${escapeAttr(normalizeWithdrawalParamValue(item.value, paramDef))}" step="${escapeAttr(paramDef.step)}" min="${escapeAttr(paramDef.min)}" max="${escapeAttr(paramDef.max)}"></div></td><td>${escapeHtml(paramDef.unit || '')}</td></tr>`;
+  }).join('');
+}
+function getWithdrawalComparisonCases(cfgBase){
+  const compareMode = getWithdrawalCompareMode();
+  if(compareMode === 'parameter'){
+    const ruleMode = document.getElementById('withdrawalCompareParamRule')?.value || 'current';
+    const paramKey = document.getElementById('withdrawalCompareParamKey')?.value || '';
+    const paramDef = getWithdrawalParameterDefinition(ruleMode, paramKey);
+    const basePolicy = deepClone(cfgBase?.withdrawalPolicy || {});
+    if(!paramDef) return [];
+    rebuildWithdrawalParameterCases(false);
+    return parseWithdrawalCompareCaseJson().map((item, idx)=>{
+      const value = normalizeWithdrawalParamValue(item?.value, paramDef);
+      return {
+        mode:ruleMode,
+        label:item?.label || `ケース${idx + 1}`,
+        fullLabel:`${WITHDRAWAL_PARAMETER_COMPARE_RULES[ruleMode]?.label || ''} / ${paramDef.label} ${paramDef.format ? paramDef.format(value) : value}`,
+        policyOverride:{mode:ruleMode, [paramKey]:value}
+      };
+    });
+  }
+  return WITHDRAWAL_COMPARE_RULES.map(rule=>({
+    mode:rule.mode,
+    label:rule.label,
+    fullLabel:rule.label,
+    policyOverride:getWithdrawalPolicyOverride(rule.mode)
+  }));
+}
+function renderWithdrawalCompareHeader(results){
+  const head = document.getElementById('withdrawalCompareHead');
+  if(!head) return;
+  const cols = (results || []).map(r=>`<th>${escapeHtml(r.label || '')}</th>`).join('');
+  head.innerHTML = `<tr><th>指標</th>${cols}</tr>`;
+}
+function updateWithdrawalCompareModeUI(){
+  const compareMode = getWithdrawalCompareMode();
+  const isParameter = compareMode === 'parameter';
+  document.getElementById('withdrawalCompareParamRuleField')?.classList.toggle('withdrawal-rule-hidden', !isParameter);
+  document.getElementById('withdrawalCompareParamKeyField')?.classList.toggle('withdrawal-rule-hidden', !isParameter);
+  document.getElementById('withdrawalCompareCaseCountField')?.classList.toggle('withdrawal-rule-hidden', !isParameter);
+  document.getElementById('withdrawalCompareParamEditor')?.classList.toggle('withdrawal-rule-hidden', !isParameter);
+  if(isParameter){
+    rebuildWithdrawalParameterCases(false);
+    renderWithdrawalParameterCaseEditor();
+  }
+  const status = document.getElementById('withdrawalCompareStatus');
+  if(status && !withdrawalCompareCache){
+    status.textContent = isParameter
+      ? '比較を実行すると、同一ルール内で選択した 1 パラメータだけを変えた 2〜5 ケースを、同一のモンテカルロ乱数列で比較します。'
+      : '比較を実行すると、3つのルールを同一のモンテカルロ乱数列で比較します。';
+  }
 }
 function percentileFromSorted(sorted, p){
   if(!sorted.length) return 0;
@@ -8684,22 +9144,18 @@ function percentileFromSorted(sorted, p){
   return sorted[low] * (1 - weight) + sorted[high] * weight;
 }
 function buildSharedReturnShocks(cfg, trials){
-  const years = Math.max(1, 121 - Number(cfg.age || 0));
-  const out = [];
-  for(let i=0;i<trials;i++){
-    const arr = [];
-    for(let y=0;y<years;y++) arr.push((Math.random() - 0.5) * 0.30);
-    out.push(arr);
-  }
-  return out;
+  const settings = {...(cfg?.monteCarlo || getMonteCarloSettingsFromDOM()), trials: clampMonteTrials(trials || cfg?.monteCarlo?.trials || 80)};
+  return buildMonteCarloShockTrials(cfg, settings);
 }
 function runWithdrawalComparisonCalculation(){
   const cfgBase = getScenarioFromDOM();
-  const trials = 80;
+  const trials = clampMonteTrials(cfgBase?.monteCarlo?.trials || 80);
+  const cases = getWithdrawalComparisonCases(cfgBase);
+  if(!cases.length) return [];
   const shockTrials = buildSharedReturnShocks(cfgBase, trials);
-  return WITHDRAWAL_COMPARE_RULES.map(rule=>{
+  return cases.map(compareCase=>{
     const cfg = deepClone(cfgBase);
-    cfg.withdrawalPolicy = {...(cfg.withdrawalPolicy || {}), ...getWithdrawalPolicyOverride(rule.mode), mode:rule.mode};
+    cfg.withdrawalPolicy = {...(cfg.withdrawalPolicy || {}), ...(compareCase.policyOverride || {}), mode:compareCase.mode};
     const base = simulate(cfg, false);
     const staticSeries = buildMonteStaticSeries(cfg);
     const lifeIndex = Math.max(0, Math.min(base.labels.length - 1, Number(cfg.lifeExpect || 0) - Number(cfg.age || 0)));
@@ -8713,8 +9169,9 @@ function runWithdrawalComparisonCalculation(){
     }
     const sorted = monteFinals.slice().sort((a,b)=>a-b);
     return {
-      mode: rule.mode,
-      label: rule.label,
+      mode: compareCase.mode,
+      label: compareCase.label,
+      fullLabel: compareCase.fullLabel || compareCase.label,
       bankruptcyProb: fail / trials,
       best: sorted.at(-1) || 0,
       p95: percentileFromSorted(sorted, 0.95),
@@ -8741,6 +9198,7 @@ function formatCompareCellValue(metric, value){
 function renderWithdrawalComparisonTable(results){
   const body = document.getElementById('withdrawalCompareBody');
   if(!body) return;
+  renderWithdrawalCompareHeader(results);
   const rows = [
     {label:'破綻確率', key:'bankruptcyProb'},
     {label:'想定寿命時残高（最高）', key:'best'},
@@ -8796,7 +9254,7 @@ function niceCeil(value, step){
 function renderWithdrawalComparisonChart(results){
   const canvas = document.getElementById('withdrawalCompareChart');
   if(!canvas) return;
-  const palettes = ['#2563eb','#d97706','#15803d'];
+  const palettes = ['#2563eb','#d97706','#15803d','#7c3aed','#db2777'];
   const allFinals = results.flatMap(r => (r.finals || []).map(v=>Number(v) || 0));
   const sharedMin = allFinals.length ? Math.min(...allFinals) : 0;
   const sharedMax = allFinals.length ? Math.max(...allFinals) : 0;
@@ -8856,7 +9314,16 @@ function renderWithdrawalComparisonResults(results){
   renderWithdrawalComparisonTable(results);
   try{
     renderWithdrawalComparisonChart(results);
-    if(status) status.textContent = '同一のモンテカルロ乱数列で 3 ルールを比較しました。95%点 / 5%点で上振れ・下振れも確認できます。';
+    if(status){
+      if(getWithdrawalCompareMode() === 'parameter'){
+        const ruleMode = document.getElementById('withdrawalCompareParamRule')?.value || 'current';
+        const paramKey = document.getElementById('withdrawalCompareParamKey')?.value || '';
+        const paramDef = getWithdrawalParameterDefinition(ruleMode, paramKey);
+        status.textContent = `同一のモンテカルロ乱数列で、${WITHDRAWAL_PARAMETER_COMPARE_RULES[ruleMode]?.label || ''} の ${paramDef?.label || 'パラメータ'} を変えた ${results.length} ケースを比較しました。`;
+      }else{
+        status.textContent = '同一のモンテカルロ乱数列で 3 ルールを比較しました。95%点 / 5%点で上振れ・下振れも確認できます。';
+      }
+    }
   }catch(chartErr){
     console.error(chartErr);
     if(status) status.textContent = `比較表は表示しましたが、分布グラフの描画に失敗しました: ${chartErr && chartErr.message ? chartErr.message : chartErr}`;
@@ -8868,8 +9335,10 @@ function runWithdrawalComparison(){
   const section = document.getElementById('withdrawalCompareSection');
   const body = document.getElementById('withdrawalCompareBody');
   section?.classList.add('show');
+  if(getWithdrawalCompareMode() === 'parameter') rebuildWithdrawalParameterCases(false);
   if(status) status.textContent = '比較計算中です…';
   if(body) body.innerHTML = '';
+  renderWithdrawalCompareHeader([]);
   if(withdrawalCompareChart){ withdrawalCompareChart.destroy(); withdrawalCompareChart = null; }
   setTimeout(()=>{
     try{
@@ -8880,8 +9349,11 @@ function runWithdrawalComparison(){
     }catch(err){
       console.error(err);
       const msg = err && err.message ? err.message : String(err || '不明なエラー');
+      const compareCases = getWithdrawalComparisonCases(getScenarioFromDOM());
+      const colspan = Math.max(1, compareCases.length || 3);
       if(status) status.textContent = `比較計算に失敗しました: ${msg}`;
-      if(body) body.innerHTML = `<tr><th>結果</th><td colspan="3">比較結果を表示できませんでした。エラー内容: ${escapeHtml(msg)}</td></tr>`;
+      renderWithdrawalCompareHeader(compareCases.map(item=>({label:item.label || ''})));
+      if(body) body.innerHTML = `<tr><th>結果</th><td colspan="${colspan}">比較結果を表示できませんでした。エラー内容: ${escapeHtml(msg)}</td></tr>`;
       if(withdrawalCompareChart){ withdrawalCompareChart.destroy(); withdrawalCompareChart = null; }
     }
   }, 10);
@@ -8903,6 +9375,7 @@ function restoreWithdrawalRuleState(state){
     else el.value = val;
   });
   updateWithdrawalRuleModalUI();
+  updateWithdrawalCompareModeUI();
 }
 function renderWithdrawalRuleSummary(){
   const box = document.getElementById('withdrawalRuleSummary');
@@ -8931,7 +9404,70 @@ function updateWithdrawalRuleModalUI(){
   document.getElementById('withdrawalRuleRebalanceSection')?.classList.toggle('withdrawal-rule-hidden', mode !== 'rebalance');
   document.getElementById('withdrawalRuleBucketSection')?.classList.toggle('withdrawal-rule-hidden', mode !== 'bucket');
   renderWithdrawalRuleSummary();
+  updateWithdrawalCompareModeUI();
 }
+function syncMonteSettingsModalFromHidden(){
+  const settings = getMonteCarloSettingsFromDOM();
+  document.getElementById('monteSettingsTrials').value = settings.trials;
+  document.getElementById('monteSettingsDrawPaths').value = settings.drawPaths;
+  document.getElementById('monteSettingsModel').value = settings.model;
+  document.getElementById('monteSettingsUniformRangePct').value = settings.uniformRangePct;
+  document.getElementById('monteSettingsNormalStdPct').value = settings.normalStdPct;
+  document.getElementById('monteSettingsMeanRevStdPct').value = settings.meanRevStdPct;
+  document.getElementById('monteSettingsMeanRevPhi').value = settings.meanRevPhi;
+  document.getElementById('monteSettingsSeedOn').checked = !!settings.seedOn;
+  document.getElementById('monteSettingsSeedValue').value = settings.seedValue;
+}
+function buildMonteSettingsFromModal(){
+  const trials = clampMonteTrials(document.getElementById('monteSettingsTrials')?.value || 80);
+  return {
+    trials,
+    drawPaths: clampMonteDrawPaths(document.getElementById('monteSettingsDrawPaths')?.value || trials, trials),
+    model: normalizeMonteModel(document.getElementById('monteSettingsModel')?.value || 'uniform'),
+    uniformRangePct: clampMonteRatePct(document.getElementById('monteSettingsUniformRangePct')?.value || 15, 15),
+    normalStdPct: clampMonteRatePct(document.getElementById('monteSettingsNormalStdPct')?.value || 15, 15),
+    meanRevStdPct: clampMonteRatePct(document.getElementById('monteSettingsMeanRevStdPct')?.value || 15, 15),
+    meanRevPhi: clampMontePhi(document.getElementById('monteSettingsMeanRevPhi')?.value || 0.35),
+    seedOn: !!document.getElementById('monteSettingsSeedOn')?.checked,
+    seedValue: Math.round(Number(document.getElementById('monteSettingsSeedValue')?.value || 12345) || 12345)
+  };
+}
+function applyMonteSettingsToHidden(settings){
+  document.getElementById('monteTrials').value = String(settings.trials);
+  document.getElementById('monteDrawPaths').value = String(settings.drawPaths);
+  document.getElementById('monteModel').value = settings.model;
+  document.getElementById('monteUniformRangePct').value = String(settings.uniformRangePct);
+  document.getElementById('monteNormalStdPct').value = String(settings.normalStdPct);
+  document.getElementById('monteMeanRevStdPct').value = String(settings.meanRevStdPct);
+  document.getElementById('monteMeanRevPhi').value = String(settings.meanRevPhi);
+  document.getElementById('monteSeedOn').value = settings.seedOn ? 'true' : 'false';
+  document.getElementById('monteSeedValue').value = String(settings.seedValue);
+}
+function updateMonteSettingsModalUI(){
+  const model = normalizeMonteModel(document.getElementById('monteSettingsModel')?.value || 'uniform');
+  document.getElementById('monteSettingsUniformSection')?.classList.toggle('monte-settings-hidden', model !== 'uniform');
+  document.getElementById('monteSettingsNormalSection')?.classList.toggle('monte-settings-hidden', model !== 'normal');
+  document.getElementById('monteSettingsMeanRevertingSection')?.classList.toggle('monte-settings-hidden', model !== 'mean_reverting');
+  document.getElementById('monteSettingsSummary').innerHTML = formatMonteSettingsSummary(buildMonteSettingsFromModal());
+}
+function openMonteSettingsModal(){
+  syncMonteSettingsModalFromHidden();
+  updateMonteSettingsModalUI();
+  document.getElementById('monteCarloSettingsModal')?.classList.add('show');
+}
+function closeMonteSettingsModal(){
+  document.getElementById('monteCarloSettingsModal')?.classList.remove('show');
+}
+function saveMonteSettingsModal(){
+  const settings = buildMonteSettingsFromModal();
+  applyMonteSettingsToHidden(settings);
+  syncCurrentScenarioFromDOM(true);
+  if(monteMode) runMonte();
+  else requestDraw();
+  persistState();
+  closeMonteSettingsModal();
+}
+
 function openWithdrawalRuleModal(){
   withdrawalRuleSnapshot = captureWithdrawalRuleState();
   updateWithdrawalRuleModalUI();
@@ -9019,10 +9555,49 @@ document.getElementById("withdrawalRuleModal")?.addEventListener("click", (e)=>{
 document.getElementById("withdrawalBucketDefenseOn")?.addEventListener("change", ()=>{ withdrawalCompareCache=null; updateWithdrawalRuleModalUI(); });
 ["withdrawalCurrentBufferYears","withdrawalRebalanceBufferYears","withdrawalRebalanceCashPct","withdrawalBucketTargetYears","withdrawalBucketFloorYears","withdrawalBucketDefenseThresholdPct"].forEach(id=>document.getElementById(id)?.addEventListener("input", ()=>{ withdrawalCompareCache=null; renderWithdrawalRuleSummary(); }));
 document.getElementById("withdrawalRuleMode")?.addEventListener("change", ()=>{ withdrawalCompareCache=null; updateWithdrawalRuleModalUI(); });
+document.getElementById("withdrawalCompareMode")?.addEventListener("change", ()=>{ withdrawalCompareCache=null; updateWithdrawalCompareModeUI(); });
+document.getElementById("withdrawalCompareParamRule")?.addEventListener("change", ()=>{ withdrawalCompareCache=null; rebuildWithdrawalParameterCases(true); updateWithdrawalCompareModeUI(); });
+document.getElementById("withdrawalCompareParamKey")?.addEventListener("change", ()=>{ withdrawalCompareCache=null; rebuildWithdrawalParameterCases(true); updateWithdrawalCompareModeUI(); });
+document.getElementById("withdrawalCompareCaseCount")?.addEventListener("change", ()=>{ withdrawalCompareCache=null; rebuildWithdrawalParameterCases(true); updateWithdrawalCompareModeUI(); });
+document.getElementById("withdrawalCompareParamCaseBody")?.addEventListener("input", (e)=>{
+  const input = e.target.closest('[data-withdrawal-param-case-input]');
+  if(!input) return;
+  const ruleMode = document.getElementById('withdrawalCompareParamRule')?.value || 'current';
+  const paramKey = document.getElementById('withdrawalCompareParamKey')?.value || '';
+  const paramDef = getWithdrawalParameterDefinition(ruleMode, paramKey);
+  if(!paramDef) return;
+  const idx = Math.max(0, Number(input.dataset.caseIndex) || 0);
+  const cases = parseWithdrawalCompareCaseJson();
+  while(cases.length <= idx) cases.push({label:`ケース${cases.length + 1}`, value:paramDef.fallback || 0});
+  cases[idx] = {label:`ケース${idx + 1}`, value:normalizeWithdrawalParamValue(input.value, paramDef)};
+  writeWithdrawalCompareCaseJson(cases);
+  input.value = String(cases[idx].value);
+  withdrawalCompareCache = null;
+});
+ensureWithdrawalParameterOptions();
+rebuildWithdrawalParameterCases(true);
+updateWithdrawalCompareModeUI();
 document.getElementById("runMonteBtn").addEventListener("click", ()=>{
+  clearScheduledDraw();
   document.getElementById("graphType").value = "asset";
   runMonte(); persistState();
 });
+document.getElementById("openMonteSettingsBtn")?.addEventListener("click", (e)=>{
+  e.preventDefault();
+  e.stopPropagation();
+  openMonteSettingsModal();
+});
+document.getElementById("cancelMonteSettingsBtn")?.addEventListener("click", closeMonteSettingsModal);
+document.getElementById("saveMonteSettingsBtn")?.addEventListener("click", saveMonteSettingsModal);
+document.getElementById("monteSettingsModel")?.addEventListener("change", updateMonteSettingsModalUI);
+document.getElementById("monteSettingsTrials")?.addEventListener("input", updateMonteSettingsModalUI);
+document.getElementById("monteSettingsDrawPaths")?.addEventListener("input", updateMonteSettingsModalUI);
+document.getElementById("monteSettingsUniformRangePct")?.addEventListener("input", updateMonteSettingsModalUI);
+document.getElementById("monteSettingsNormalStdPct")?.addEventListener("input", updateMonteSettingsModalUI);
+document.getElementById("monteSettingsMeanRevStdPct")?.addEventListener("input", updateMonteSettingsModalUI);
+document.getElementById("monteSettingsMeanRevPhi")?.addEventListener("input", updateMonteSettingsModalUI);
+document.getElementById("monteSettingsSeedOn")?.addEventListener("change", updateMonteSettingsModalUI);
+document.getElementById("monteSettingsSeedValue")?.addEventListener("input", updateMonteSettingsModalUI);
 document.getElementById("copyUrlBtn").addEventListener("click", copyURL);
 document.getElementById("graphType").addEventListener("change", ()=>{ requestDraw(); persistState(); });
 document.getElementById("overlayToggle").addEventListener("change", ()=>{ monteMode ? runMonte() : requestDraw(); persistState(); });
