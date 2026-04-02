@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>資産寿命シミュレータ v213</title>
+<title>資産寿命シミュレータ</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 <style>
@@ -1982,7 +1982,7 @@ const CASHFLOW_TABLE_COLUMNS = [
   {label:"年末の現預金額", path:"cash.endingCash", className:"cashflow-posneg"},
   {label:"年末の総資産額", path:"assets.endingTotal", className:"cashflow-posneg"}
 ];
-const DRAW_DEBOUNCE_MS = 150;
+const DRAW_DEBOUNCE_MS = 50;
 const PERSIST_DEBOUNCE_MS = 300;
 
 let chart = null;
@@ -2898,11 +2898,17 @@ function openInsuranceAssistModal(){
   document.getElementById('insuranceAssistTypeScholarship').checked = true;
   const childValue = scholarshipChildEl?.value || getEnabledChildOptionList(data)[0]?.value || '子1';
   if(insuredEl) insuredEl.value = childValue;
-  document.getElementById('insuranceAssistModal')?.classList.add('show');
+  const insuranceAssistModal = document.getElementById('insuranceAssistModal');
+  insuranceAssistModal?.classList.add('show');
+  insuranceAssistModal?.setAttribute('aria-hidden', 'false');
   syncInsuranceAssistTypeUI(false);
+  applyTabOrder();
 }
 function closeInsuranceAssistModal(){
-  document.getElementById('insuranceAssistModal')?.classList.remove('show');
+  const insuranceAssistModal = document.getElementById('insuranceAssistModal');
+  insuranceAssistModal?.classList.remove('show');
+  insuranceAssistModal?.setAttribute('aria-hidden', 'true');
+  applyTabOrder();
 }
 function isInsurancePayRowBlank(data, index){
   const currentAge = currentAgeValue(data);
@@ -4011,7 +4017,7 @@ function isVisibleForTab(el){
 }
 function isInsideHiddenLayer(el){
   if(!el || !el.closest) return false;
-  return !!el.closest('#tabContextMenu:not(.show), #rowContextMenu:not(.show), #loanDetailModal:not(.show), #incomeCurveModal:not(.show), #pensionHelperModal:not(.show), #educationCopyModal:not(.show), #monteCarloSettingsModal:not(.show), #deleteRowModal:not(.show), #deleteTabModal:not(.show), [hidden], [aria-hidden="true"]');
+  return !!el.closest('#tabContextMenu:not(.show), #rowContextMenu:not(.show), #loanDetailModal:not(.show), #incomeCurveModal:not(.show), #pensionHelperModal:not(.show), #educationDetailModal:not(.show), #educationCopyModal:not(.show), #insuranceAssistModal:not(.show), #withdrawalRuleModal:not(.show), #monteCarloSettingsModal:not(.show), #deleteRowModal:not(.show), #deleteTabModal:not(.show), [hidden], [aria-hidden="true"]');
 }
 function isTabNavigableElement(el){
   if(!el || !el.matches) return false;
@@ -4027,7 +4033,7 @@ function shouldSelectAllOnTabFocus(el){
   return el.matches('input[type="text"], input[type="search"], input[type="url"], input[type="tel"], input[type="email"], input[type="number"], input[data-numeric-ready="1"], textarea');
 }
 function getOpenModal(){
-  return document.querySelector('#loanDetailModal.show, #incomeCurveModal.show, #pensionHelperModal.show, #educationCopyModal.show, #deleteRowModal.show, #deleteTabModal.show');
+  return document.querySelector('#loanDetailModal.show, #incomeCurveModal.show, #pensionHelperModal.show, #educationDetailModal.show, #educationCopyModal.show, #insuranceAssistModal.show, #withdrawalRuleModal.show, #monteCarloSettingsModal.show, #deleteRowModal.show, #deleteTabModal.show');
 }
 function getTabScopeRoot(){
   return getOpenModal() || document.body;
@@ -4054,7 +4060,7 @@ function collectTableFocusables(table){
 function collectFocusableFlow(node, scopeRoot, out, seen){
   if(!node || node.nodeType !== 1 || seen.has(node)) return;
   if(node !== scopeRoot && node.matches){
-    if(node.matches('#tabContextMenu, #rowContextMenu, #loanDetailModal:not(.show), #incomeCurveModal:not(.show), #pensionHelperModal:not(.show), #educationCopyModal:not(.show), #deleteRowModal:not(.show), #deleteTabModal:not(.show), [hidden], [aria-hidden="true"]')) return;
+    if(node.matches('#tabContextMenu, #rowContextMenu, #loanDetailModal:not(.show), #incomeCurveModal:not(.show), #pensionHelperModal:not(.show), #educationDetailModal:not(.show), #educationCopyModal:not(.show), #insuranceAssistModal:not(.show), #withdrawalRuleModal:not(.show), #monteCarloSettingsModal:not(.show), #deleteRowModal:not(.show), #deleteTabModal:not(.show), [hidden], [aria-hidden="true"]')) return;
   }
 
   if(node !== scopeRoot && isTabNavigableElement(node)){
@@ -4087,15 +4093,88 @@ function applyTabOrder(){
   const ordered = getOrderedFocusableElements(scopeRoot);
   const inScope = new Set(ordered);
   const allCandidates = Array.from(document.querySelectorAll('input:not([type="hidden"]), select, button, textarea'));
+  let seq = 1;
   ordered.forEach(el => {
     if(el.dataset.keepNaturalTab === '1') return;
-    el.tabIndex = 0;
+    el.tabIndex = seq++;
   });
   allCandidates.forEach(el => {
     if(el.dataset.keepNaturalTab === '1') return;
     if(!inScope.has(el) || !isTabNavigableElement(el)){
       el.tabIndex = -1;
     }
+  });
+}
+function focusByIdForTab(id){
+  const el = document.getElementById(id);
+  if(!isTabNavigableElement(el)) return false;
+  focusElementForTab(el);
+  return true;
+}
+function getChildAllowanceCheckboxSequence(){
+  return Array.from(document.querySelectorAll('#childAllowanceSummaryWrap input[id^="child"][id$="_allowanceOn"]')).filter(isTabNavigableElement);
+}
+function focusChildAllowanceCheckboxByOffset(currentId, offset){
+  const seq = getChildAllowanceCheckboxSequence();
+  if(!seq.length) return false;
+  if(!currentId){
+    const target = offset < 0 ? seq[seq.length - 1] : seq[0];
+    focusElementForTab(target);
+    return true;
+  }
+  const idx = seq.findIndex(el => el.id === currentId);
+  if(idx < 0) return false;
+  const next = idx + offset;
+  if(next < 0 || next >= seq.length) return false;
+  focusElementForTab(seq[next]);
+  return true;
+}
+function focusNextAllowanceCheckbox(currentId){
+  return focusChildAllowanceCheckboxByOffset(currentId, 1);
+}
+function focusPrevAllowanceCheckbox(currentId){
+  return focusChildAllowanceCheckboxByOffset(currentId, -1);
+}
+function getModalTabSequence(modal){
+  return getOrderedFocusableElements(modal).filter(isTabNavigableElement);
+}
+function trapTabWithinModal(e){
+  const modal = getOpenModal();
+  if(!modal || !modal.contains(e.target)) return false;
+  if(e.altKey || e.ctrlKey || e.metaKey) return false;
+  const ordered = getModalTabSequence(modal);
+  if(!ordered.length) return false;
+  const active = document.activeElement;
+  let idx = ordered.indexOf(active);
+  if(idx < 0) idx = ordered.indexOf(e.target);
+  if(idx < 0) return false;
+  const nextIdx = e.shiftKey ? (idx - 1 + ordered.length) % ordered.length : (idx + 1) % ordered.length;
+  const next = ordered[nextIdx];
+  if(!next) return false;
+  e.preventDefault();
+  e.stopPropagation();
+  focusElementForTab(next);
+  return true;
+}
+function bindSequentialTabNavigation(ids){
+  ids.forEach((id, index)=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('keydown', (e)=>{
+      if(e.key !== 'Tab' || e.altKey || e.ctrlKey || e.metaKey) return;
+      const dir = e.shiftKey ? -1 : 1;
+      let i = index + dir;
+      while(i >= 0 && i < ids.length){
+        const target = document.getElementById(ids[i]);
+        if(isTabNavigableElement(target)){
+          e.preventDefault();
+          e.stopPropagation();
+          focusElementForTab(target);
+          return;
+        }
+        i += dir;
+      }
+    });
   });
 }
 function focusElementForTab(el){
@@ -5599,10 +5678,12 @@ function openEducationCopyModal(){
   }
   syncEducationCopyDraftFromModal();
   document.getElementById('educationCopyModal')?.classList.add('show');
+  applyTabOrder();
 }
 function closeEducationCopyModal(){
   educationCopyDraft = null;
   document.getElementById('educationCopyModal')?.classList.remove('show');
+  applyTabOrder();
 }
 const EDUCATION_SIMPLE_COPY_FIELDS = [
   'preschool_type','preschool_extra','elem_type','elem_extra','junior_type','junior_extra',
@@ -5649,11 +5730,13 @@ function openEducationDetailModal(childIndex){
   educationDetailDraft = getEducationDetailForChildFromData(data, childIndex);
   fillEducationDetailModalFromDraft();
   document.getElementById('educationDetailModal').classList.add('show');
+  applyTabOrder();
 }
 function closeEducationDetailModal(){
   currentEducationDetailChildIndex = null;
   educationDetailDraft = null;
   document.getElementById('educationDetailModal')?.classList.remove('show');
+  applyTabOrder();
 }
 function saveEducationDetailModal(){
   if(!currentEducationDetailChildIndex) return;
@@ -6632,6 +6715,7 @@ function updateChildAllowanceSummary(data = null){
   html += '</tbody></table></div>';
   if(!globalOn) html += '<div class="child-allowance-note">※ 現在は「計算に含める」がOFFのため、表は参考表示です。計算には反映していません。</div>';
   wrap.innerHTML = html;
+  requestAnimationFrame(()=>applyTabOrder());
 }
 
 function parseIncomeCurveJson(raw){
@@ -8649,6 +8733,7 @@ function updatePensionHelperModeUI(){
   const noticeBlock = document.getElementById("pensionHelperNoticeBlock");
   if(directBlock) directBlock.style.display = mode === "direct" ? "" : "none";
   if(noticeBlock) noticeBlock.style.display = mode === "nenkin_notice" ? "" : "none";
+  applyTabOrder();
 }
 function renderPensionHelperComputed(){
   syncPensionHelperDraftFromModal();
@@ -8683,6 +8768,7 @@ function openPensionHelperModal(owner){
   document.getElementById("pensionHelperModal")?.classList.add("show");
   document.getElementById("pensionHelperModal")?.setAttribute("aria-hidden", "false");
   renderPensionHelperModal();
+  applyTabOrder();
 }
 function closePensionHelperModal(){
   activePensionHelperOwner = null;
@@ -8864,6 +8950,7 @@ function openLoanDetailModal(){
   const modal = document.getElementById("loanDetailModal");
   modal?.classList.add("show");
   modal?.setAttribute("aria-hidden", "false");
+  applyTabOrder();
   restoreSimpleLoanInputs(snapshot);
   requestAnimationFrame(()=>restoreSimpleLoanInputs(snapshot));
   setTimeout(()=>restoreSimpleLoanInputs(snapshot), 0);
@@ -8873,6 +8960,7 @@ function closeLoanDetailModal(){
   const modal = document.getElementById("loanDetailModal");
   modal?.classList.remove("show");
   modal?.setAttribute("aria-hidden", "true");
+  applyTabOrder();
 }
 function saveLoanDetailModal(){
   syncLoanDetailDraftFromModal();
@@ -8919,14 +9007,19 @@ function openIncomeCurveModal(owner){
   activeIncomeCurveOwner = owner;
   incomeCurveDraft = getStoredIncomeCurveForOwner(owner);
   document.getElementById("incomeCurveTitle").textContent = `${c.label} 収入カーブ編集`;
-  document.getElementById("incomeCurveModal").classList.add("show");
+  const incomeCurveModal = document.getElementById("incomeCurveModal");
+  incomeCurveModal?.classList.add("show");
+  incomeCurveModal?.setAttribute("aria-hidden", "false");
   renderIncomeCurveModal();
+  applyTabOrder();
 }
 function closeIncomeCurveModal(){
   activeIncomeCurveOwner = null;
   incomeCurveDraft = null;
   if(incomeCurveChart){ incomeCurveChart.destroy(); incomeCurveChart = null; }
-  document.getElementById("incomeCurveModal").classList.remove("show");
+  const incomeCurveModal = document.getElementById("incomeCurveModal");
+  incomeCurveModal?.classList.remove("show");
+  incomeCurveModal?.setAttribute("aria-hidden", "true");
   applyTabOrder();
 }
 function getIncomeCurveModalModes(){
@@ -8965,6 +9058,7 @@ function updateIncomeCurveAutoControlStates(){
   document.getElementById("incomeCurveBonusLinkedPct").disabled = !bonusAuto || modes.bonus !== "custom";
   document.querySelectorAll('#incomeCurveRows input[data-curve-field="salary"]').forEach(el=>{ el.disabled = modes.salary !== "custom" || salaryAuto; });
   document.querySelectorAll('#incomeCurveRows input[data-curve-field="bonus"]').forEach(el=>{ el.disabled = modes.bonus !== "custom" || bonusAuto; });
+  applyTabOrder();
 }
 function syncIncomeCurveDraftFromModal(){
   if(!activeIncomeCurveOwner || !incomeCurveDraft) return;
@@ -9634,10 +9728,16 @@ function updateMonteSettingsModalUI(){
 function openMonteSettingsModal(){
   syncMonteSettingsModalFromHidden();
   updateMonteSettingsModalUI();
-  document.getElementById('monteCarloSettingsModal')?.classList.add('show');
+  const monteSettingsModal = document.getElementById('monteCarloSettingsModal');
+  monteSettingsModal?.classList.add('show');
+  monteSettingsModal?.setAttribute('aria-hidden', 'false');
+  applyTabOrder();
 }
 function closeMonteSettingsModal(){
-  document.getElementById('monteCarloSettingsModal')?.classList.remove('show');
+  const monteSettingsModal = document.getElementById('monteCarloSettingsModal');
+  monteSettingsModal?.classList.remove('show');
+  monteSettingsModal?.setAttribute('aria-hidden', 'true');
+  applyTabOrder();
 }
 function saveMonteSettingsModal(){
   const settings = buildMonteSettingsFromModal();
@@ -9652,11 +9752,17 @@ function saveMonteSettingsModal(){
 function openWithdrawalRuleModal(){
   withdrawalRuleSnapshot = captureWithdrawalRuleState();
   updateWithdrawalRuleModalUI();
-  document.getElementById('withdrawalRuleModal')?.classList.add('show');
+  const withdrawalRuleModal = document.getElementById('withdrawalRuleModal');
+  withdrawalRuleModal?.classList.add('show');
+  withdrawalRuleModal?.setAttribute('aria-hidden', 'false');
   if(withdrawalCompareCache) renderWithdrawalComparisonResults(withdrawalCompareCache);
+  applyTabOrder();
 }
 function closeWithdrawalRuleModal(){
-  document.getElementById('withdrawalRuleModal')?.classList.remove('show');
+  const withdrawalRuleModal = document.getElementById('withdrawalRuleModal');
+  withdrawalRuleModal?.classList.remove('show');
+  withdrawalRuleModal?.setAttribute('aria-hidden', 'true');
+  applyTabOrder();
 }
 function cancelWithdrawalRuleModal(){
   if(withdrawalRuleSnapshot) restoreWithdrawalRuleState(withdrawalRuleSnapshot);
@@ -9735,7 +9841,7 @@ document.getElementById("saveWithdrawalRuleBtn")?.addEventListener("click", save
 document.getElementById("withdrawalRuleModal")?.addEventListener("click", (e)=>{ if(e.target.id === "withdrawalRuleModal") cancelWithdrawalRuleModal(); });
 document.getElementById("withdrawalBucketDefenseOn")?.addEventListener("change", ()=>{ withdrawalCompareCache=null; updateWithdrawalRuleModalUI(); });
 ["withdrawalCurrentBufferYears","withdrawalRebalanceBufferYears","withdrawalRebalanceCashPct","withdrawalBucketTargetYears","withdrawalBucketFloorYears","withdrawalBucketDefenseThresholdPct"].forEach(id=>document.getElementById(id)?.addEventListener("input", ()=>{ withdrawalCompareCache=null; renderWithdrawalRuleSummary(); }));
-document.getElementById("withdrawalRuleMode")?.addEventListener("change", ()=>{ withdrawalCompareCache=null; updateWithdrawalRuleModalUI(); });
+document.getElementById("withdrawalRuleMode")?.addEventListener("change", ()=>{ withdrawalCompareCache=null; updateWithdrawalRuleModalUI(); applyTabOrder(); });
 document.getElementById("withdrawalCompareMode")?.addEventListener("change", ()=>{ withdrawalCompareCache=null; updateWithdrawalCompareModeUI(); });
 document.getElementById("withdrawalCompareParamRule")?.addEventListener("change", ()=>{ withdrawalCompareCache=null; rebuildWithdrawalParameterCases(true); updateWithdrawalCompareModeUI(); });
 document.getElementById("withdrawalCompareParamKey")?.addEventListener("change", ()=>{ withdrawalCompareCache=null; rebuildWithdrawalParameterCases(true); updateWithdrawalCompareModeUI(); });
@@ -9777,6 +9883,72 @@ document.getElementById("monteSettingsEffectiveVolPct")?.addEventListener("input
 document.getElementById("monteSettingsMeanRevPhi")?.addEventListener("input", updateMonteSettingsModalUI);
 document.getElementById("monteSettingsSeedOn")?.addEventListener("change", updateMonteSettingsModalUI);
 document.getElementById("monteSettingsSeedValue")?.addEventListener("input", updateMonteSettingsModalUI);
+document.getElementById("withdrawalRuleMode")?.addEventListener("keydown", (e)=>{
+  if(e.key !== "Tab" || e.shiftKey || e.altKey || e.ctrlKey || e.metaKey) return;
+  const mode = document.getElementById("withdrawalRuleMode")?.value || "current";
+  const nextId = mode === "rebalance" ? "withdrawalRebalanceBufferYears" : (mode === "bucket" ? "withdrawalBucketTargetYears" : "withdrawalCurrentBufferYears");
+  if(focusByIdForTab(nextId)) { e.preventDefault(); e.stopPropagation(); }
+});
+document.getElementById("incomeCurveSalaryGrowthOn")?.addEventListener("keydown", (e)=>{
+  if(e.key !== "Tab" || e.altKey || e.ctrlKey || e.metaKey) return;
+  const nextId = document.getElementById("incomeCurveSalaryGrowthOn")?.checked && !document.getElementById("incomeCurveSalaryGrowthPct")?.disabled
+    ? "incomeCurveSalaryGrowthPct"
+    : "incomeCurveBonusLinkedOn";
+  if(focusByIdForTab(nextId)) { e.preventDefault(); e.stopPropagation(); }
+});
+document.getElementById("incomeCurveSalaryGrowthPct")?.addEventListener("keydown", (e)=>{
+  if(e.key !== "Tab" || e.altKey || e.ctrlKey || e.metaKey) return;
+  const nextId = e.shiftKey ? "incomeCurveSalaryGrowthOn" : "incomeCurveBonusLinkedOn";
+  if(focusByIdForTab(nextId)) { e.preventDefault(); e.stopPropagation(); }
+});
+document.getElementById("incomeCurveBonusLinkedOn")?.addEventListener("keydown", (e)=>{
+  if(e.key !== "Tab" || e.altKey || e.ctrlKey || e.metaKey) return;
+  const nextId = document.getElementById("incomeCurveBonusLinkedOn")?.checked && !document.getElementById("incomeCurveBonusLinkedPct")?.disabled
+    ? "incomeCurveBonusLinkedPct"
+    : (e.shiftKey ? "incomeCurveSalaryGrowthPct" : "cancelIncomeCurveBtn");
+  if(focusByIdForTab(nextId)) { e.preventDefault(); e.stopPropagation(); }
+});
+document.getElementById("incomeCurveBonusLinkedPct")?.addEventListener("keydown", (e)=>{
+  if(e.key !== "Tab" || e.altKey || e.ctrlKey || e.metaKey) return;
+  const prevChecked = document.getElementById("incomeCurveSalaryGrowthOn")?.checked && !document.getElementById("incomeCurveSalaryGrowthPct")?.disabled;
+  const nextId = e.shiftKey ? (prevChecked ? "incomeCurveSalaryGrowthPct" : "incomeCurveBonusLinkedOn") : "cancelIncomeCurveBtn";
+  if(focusByIdForTab(nextId)) { e.preventDefault(); e.stopPropagation(); }
+});
+document.getElementById("pensionHelperModeDirect")?.addEventListener("keydown", (e)=>{
+  if(e.key !== "Tab" || e.shiftKey || e.altKey || e.ctrlKey || e.metaKey) return;
+  if(focusByIdForTab("pensionHelperDirectStartAge")) { e.preventDefault(); e.stopPropagation(); }
+});
+document.getElementById("pensionHelperDirectStartAge")?.addEventListener("keydown", (e)=>{
+  if(e.key !== "Tab" || e.altKey || e.ctrlKey || e.metaKey) return;
+  const nextId = e.shiftKey ? "pensionHelperModeDirect" : "pensionHelperDirectMonth";
+  if(focusByIdForTab(nextId)) { e.preventDefault(); e.stopPropagation(); }
+});
+document.getElementById("pensionHelperDirectMonth")?.addEventListener("keydown", (e)=>{
+  if(e.key !== "Tab" || e.altKey || e.ctrlKey || e.metaKey) return;
+  const nextId = e.shiftKey ? "pensionHelperDirectStartAge" : "cancelPensionHelperBtn";
+  if(focusByIdForTab(nextId)) { e.preventDefault(); e.stopPropagation(); }
+});
+document.getElementById("pensionHelperModeNotice")?.addEventListener("keydown", (e)=>{
+  if(e.key !== "Tab" || e.shiftKey || e.altKey || e.ctrlKey || e.metaKey) return;
+  if(focusByIdForTab("pensionHelperNoticeStartAge")) { e.preventDefault(); e.stopPropagation(); }
+});
+bindSequentialTabNavigation(["homeBuyYear","homeBuyMonth","homeDown","homePayMonth","homeYears","homeDetailOn","homeDetailBtn"]);
+document.getElementById("childAllowanceOn")?.addEventListener("keydown", (e)=>{
+  if(e.key !== "Tab" || e.altKey || e.ctrlKey || e.metaKey) return;
+  const ok = e.shiftKey ? false : focusNextAllowanceCheckbox("");
+  if(ok){ e.preventDefault(); e.stopPropagation(); }
+});
+document.getElementById("childAllowanceSummaryWrap")?.addEventListener("keydown", (e)=>{
+  const input = e.target.closest('input[id^="child"][id$="_allowanceOn"]');
+  if(!input || e.key !== "Tab" || e.altKey || e.ctrlKey || e.metaKey) return;
+  const ok = e.shiftKey ? focusPrevAllowanceCheckbox(input.id) : focusNextAllowanceCheckbox(input.id);
+  if(ok){ e.preventDefault(); e.stopPropagation(); }
+});
+document.addEventListener("keydown", (e)=>{
+  if(e.key !== "Tab") return;
+  if(e.altKey || e.ctrlKey || e.metaKey) return;
+  if(trapTabWithinModal(e)) return;
+}, true);
 document.getElementById("copyUrlBtn").addEventListener("click", copyURL);
 document.getElementById("graphType").addEventListener("change", ()=>{ requestDraw(); persistState(); });
 document.getElementById("overlayToggle").addEventListener("change", ()=>{ monteMode ? runMonte() : requestDraw(); persistState(); });
@@ -9981,11 +10153,29 @@ document.addEventListener("input", (e)=>{
   if(shouldRefreshChildAllowanceSummaryForElement(el)) updateChildAllowanceSummary();
   updateLoanSummary();
 });
+function getMainInputSnapshotValue(el){
+  if(!el) return "";
+  if(el.type === "checkbox") return el.checked ? "1" : "0";
+  if(el.tagName === "SELECT") return String(el.value ?? "");
+  if(el.type === "number" || el.dataset.numericReady === "1") return sanitizeNumericText(el.value, true);
+  return String(el.value ?? "");
+}
+function rememberMainInputSnapshot(el){
+  if(!(el instanceof HTMLElement)) return;
+  if(!(el.matches("input") || el.matches("select"))) return;
+  el.dataset.mainInputSnapshot = getMainInputSnapshotValue(el);
+}
+function mainInputSnapshotUnchanged(el){
+  if(!(el instanceof HTMLElement)) return false;
+  return (el.dataset.mainInputSnapshot ?? "") === getMainInputSnapshotValue(el);
+}
 function commitMainInputChange(e){
   const el = e.target;
   if(!(el.matches("input") || el.matches("select"))) return;
   if(["graphType","overlayToggle","fixedScale","fixedScaleMin","fixedScaleMax","xAxisMin","xAxisMax"].includes(el.id)) return;
   if(el.closest && el.closest("#loanDetailModal")) return;
+  if(e?.type === "focusout" && (el.id === "childAllowanceOn" || /^child\d+_allowanceOn$/.test(el.id))) return;
+  if(e?.type === "focusout" && mainInputSnapshotUnchanged(el)) return;
   if(/^(reginc|inc|rent|homeMaint|life|period|extra)\d+_timeUnit$/.test(el.id)){
     const match = el.id.match(/^(reginc|inc|rent|homeMaint|life|period|extra)(\d+)_timeUnit$/);
     if(match){
@@ -10026,6 +10216,14 @@ function commitMainInputChange(e){
   requestDraw();
   persistState();
 }
+document.addEventListener("focusin", (e)=>{
+  const el = e.target;
+  if(!(el instanceof HTMLElement)) return;
+  if(!(el.matches("input") || el.matches("select"))) return;
+  if(["graphType","overlayToggle","fixedScale","fixedScaleMin","fixedScaleMax","xAxisMin","xAxisMax"].includes(el.id)) return;
+  if(el.closest && el.closest("#loanDetailModal")) return;
+  rememberMainInputSnapshot(el);
+}, true);
 document.addEventListener("change", commitMainInputChange);
 document.addEventListener("focusout", commitMainInputChange, true);
 
@@ -10312,6 +10510,14 @@ document.getElementById("incomeCurveModal")?.addEventListener("input", (e)=>{
 document.getElementById("cancelPensionHelperBtn")?.addEventListener("click", closePensionHelperModal);
 document.getElementById("savePensionHelperBtn")?.addEventListener("click", savePensionHelperModal);
 document.querySelector("#pensionHelperModal .pension-helper-modal")?.addEventListener("click", (e)=>e.stopPropagation());
+document.querySelector("#withdrawalRuleModal .withdrawal-rule-modal")?.addEventListener("click", (e)=>e.stopPropagation());
+["mousedown","mouseup","pointerdown","pointerup","touchstart","touchend"].forEach(evt=>{
+  document.querySelector("#withdrawalRuleModal .withdrawal-rule-modal")?.addEventListener(evt, (e)=>e.stopPropagation());
+});
+document.querySelector("#monteCarloSettingsModal .monte-settings-modal")?.addEventListener("click", (e)=>e.stopPropagation());
+["mousedown","mouseup","pointerdown","pointerup","touchstart","touchend"].forEach(evt=>{
+  document.querySelector("#monteCarloSettingsModal .monte-settings-modal")?.addEventListener(evt, (e)=>e.stopPropagation());
+});
 ["mousedown","mouseup","dblclick","selectstart"].forEach(evt=>{
   document.querySelector("#pensionHelperModal .pension-helper-modal")?.addEventListener(evt, (e)=>e.stopPropagation());
 });
