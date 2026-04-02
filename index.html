@@ -3441,7 +3441,6 @@ function shouldForceFullSelectionForInput(el){
   if(!el || document.activeElement !== el || !shouldSelectAllOnTabFocus(el)) return false;
   if(shouldKeepFullSelection(el)) return true;
   if(pendingSelectAllOnTabFocus && (!pendingSelectAllTarget || pendingSelectAllTarget === el)) return true;
-  if(pendingPointerSelectAll && pendingPointerSelectAll.el === el && !pendingPointerSelectAll.moved) return true;
   return false;
 }
 function formatNumericInputDisplay(el, finalize = false){
@@ -3507,7 +3506,8 @@ function enhanceNumericInputs(root = document){
     el.setAttribute("enterkeyhint", "done");
     el.addEventListener("focus", ()=>{
       activeNumericInput = el;
-      if(!shouldForceFullSelectionForInput(el)) formatNumericInputDisplay(el, false);
+      const recentPointerFocus = (Date.now() - lastPointerDownAt) <= 400;
+      if(!shouldForceFullSelectionForInput(el) && !recentPointerFocus) formatNumericInputDisplay(el, false);
     });
     el.addEventListener("input", ()=>{
       activeNumericInput = el;
@@ -3935,7 +3935,6 @@ function updatePeriodDisplays(){
 
 let pendingSelectAllOnTabFocus = false;
 let pendingSelectAllTarget = null;
-let pendingPointerSelectAll = null;
 let lastPointerDownAt = 0;
 let lastFocusedEditableForAutoSelect = null;
 let selectAllRetryTimers = new WeakMap();
@@ -9845,28 +9844,10 @@ document.addEventListener("keydown", (e)=>{
 }, true);
 document.addEventListener("pointerdown", (e)=>{
   lastPointerDownAt = Date.now();
-  const el = e.target?.closest?.('input:not([type="hidden"]), textarea');
-  if(el && shouldSelectAllOnTabFocus(el)){
-    pendingPointerSelectAll = {
-      el,
-      x: Number.isFinite(e.clientX) ? e.clientX : 0,
-      y: Number.isFinite(e.clientY) ? e.clientY : 0,
-      moved: false
-    };
-  }else{
-    pendingPointerSelectAll = null;
-  }
   clearPendingSelectAll();
   clearSelectionLock();
 }, true);
-document.addEventListener("pointermove", (e)=>{
-  if(!pendingPointerSelectAll) return;
-  const dx = Math.abs((Number.isFinite(e.clientX) ? e.clientX : 0) - pendingPointerSelectAll.x);
-  const dy = Math.abs((Number.isFinite(e.clientY) ? e.clientY : 0) - pendingPointerSelectAll.y);
-  if(dx > 6 || dy > 6) pendingPointerSelectAll.moved = true;
-}, true);
 document.addEventListener("pointerup", ()=>{}, true);
-document.addEventListener("pointercancel", ()=>{ pendingPointerSelectAll = null; }, true);
 document.addEventListener("focusout", (e)=>{
   const el = e.target;
   if(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement){
@@ -9919,21 +9900,6 @@ document.addEventListener("input", (e)=>{
   const el = e.target;
   if(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) clearSelectionLock(el);
 }, true);
-document.addEventListener("click", (e)=>{
-  const el = e.target?.closest?.('input:not([type="hidden"]), textarea');
-  if(el && shouldSelectAllOnTabFocus(el)){
-    const canSelectAll = !pendingPointerSelectAll || (pendingPointerSelectAll.el === el && !pendingPointerSelectAll.moved);
-    if(canSelectAll) scheduleSelectAllForElement(el);
-  }
-  pendingPointerSelectAll = null;
-}, true);
-document.addEventListener("mouseup", (e)=>{
-  const el = e.target?.closest?.('input:not([type="hidden"]), textarea');
-  if(!el || !shouldSelectAllOnTabFocus(el)) return;
-  const canSelectAll = !pendingPointerSelectAll || (pendingPointerSelectAll.el === el && !pendingPointerSelectAll.moved);
-  if(canSelectAll) scheduleSelectAllForElement(el);
-}, true);
-
 document.addEventListener("click", (e)=>{
   const addBtn = e.target.closest("[data-add-row]");
   if(addBtn){
