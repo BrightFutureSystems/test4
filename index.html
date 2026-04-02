@@ -3443,7 +3443,8 @@ function formatNumericInputDisplay(el, finalize = false){
   const valueBefore = String(el.value ?? "");
   const start = typeof el.selectionStart === "number" ? el.selectionStart : valueBefore.length;
   const end = typeof el.selectionEnd === "number" ? el.selectionEnd : start;
-  const hadFullSelection = wasActive && start === 0 && end === valueBefore.length && valueBefore.length > 0;
+  const shouldPreserveFullSelection = shouldKeepFullSelection(el);
+  const hadFullSelection = shouldPreserveFullSelection || (wasActive && start === 0 && end === valueBefore.length && valueBefore.length > 0);
   const rawIndex = getNumericRawIndex(el.value, start);
   const formatted = formatNumericText(el.value, finalize, {useGrouping: shouldUseGroupingForInput(el)});
   el.value = formatted;
@@ -3930,6 +3931,9 @@ let pendingSelectAllTarget = null;
 let pendingPointerSelectAll = null;
 let lastPointerDownAt = 0;
 let lastFocusedEditableForAutoSelect = null;
+let selectAllRetryTimers = new WeakMap();
+let selectionLockTarget = null;
+let selectionLockUntil = 0;
 function clearPendingSelectAll(){
   pendingSelectAllOnTabFocus = false;
   pendingSelectAllTarget = null;
@@ -3938,15 +3942,59 @@ function requestSelectAllOnNextFocus(el){
   pendingSelectAllOnTabFocus = true;
   pendingSelectAllTarget = el || null;
 }
-function selectAllIfActive(el){
-  if(!el || document.activeElement !== el || !shouldSelectAllOnTabFocus(el)) return;
-  try{ el.select(); }catch(_e){}
+function clearSelectAllRetryTimers(el){
+  const timers = selectAllRetryTimers.get(el);
+  if(timers){
+    timers.forEach(id=>clearTimeout(id));
+    selectAllRetryTimers.delete(el);
+  }
 }
-function scheduleSelectAllForElement(el){
+function clearSelectionLock(el = null){
+  if(!selectionLockTarget) return;
+  if(el && selectionLockTarget !== el) return;
+  selectionLockTarget = null;
+  selectionLockUntil = 0;
+}
+function shouldKeepFullSelection(el){
+  return !!(el && selectionLockTarget === el && Date.now() < selectionLockUntil && document.activeElement === el && shouldSelectAllOnTabFocus(el));
+}
+function lockFullSelection(el, durationMs = 700){
+  if(!el || !shouldSelectAllOnTabFocus(el)) return;
+  selectionLockTarget = el;
+  selectionLockUntil = Date.now() + durationMs;
+}
+function unlockSelectionForEditing(el){
+  clearSelectionLock(el || null);
+  clearSelectAllRetryTimers(el || null);
+}
+function selectAllIfActive(el){
+  if(!el || document.activeElement !== el || !shouldSelectAllOnTabFocus(el)) return false;
+  try{
+    if(typeof el.focus === "function") el.focus({preventScroll:true});
+  }catch(_e){}
+  try{ el.select(); }catch(_e){}
+  const len = String(el.value ?? "").length;
+  try{
+    if(typeof el.setSelectionRange === "function") el.setSelectionRange(0, len);
+  }catch(_e){}
+  return true;
+}
+function scheduleSelectAllForElement(el, opts = {}){
   if(!shouldSelectAllOnTabFocus(el)) return;
+  clearSelectAllRetryTimers(el);
+  if(opts.lock !== false) lockFullSelection(el, opts.lockDurationMs || 700);
+  const timers = [];
+  const run = ()=>{
+    if(!selectAllIfActive(el)) clearSelectAllRetryTimers(el);
+  };
   requestAnimationFrame(()=>{
-    requestAnimationFrame(()=>{ selectAllIfActive(el); });
+    requestAnimationFrame(run);
   });
+  [0, 24, 80, 160, 280, 420, 620].forEach(delay=>{
+    const id = setTimeout(run, delay);
+    timers.push(id);
+  });
+  selectAllRetryTimers.set(el, timers);
 }
 function isVisibleForTab(el){
   if(!el || !el.getClientRects || !el.getClientRects().length) return false;
@@ -9745,6 +9793,7 @@ document.addEventListener("pointerdown", (e)=>{
     pendingPointerSelectAll = null;
   }
   clearPendingSelectAll();
+  clearSelectionLock();
 }, true);
 document.addEventListener("pointermove", (e)=>{
   if(!pendingPointerSelectAll) return;
@@ -9754,6 +9803,13 @@ document.addEventListener("pointermove", (e)=>{
 }, true);
 document.addEventListener("pointerup", ()=>{}, true);
 document.addEventListener("pointercancel", ()=>{ pendingPointerSelectAll = null; }, true);
+document.addEventListener("focusout", (e)=>{
+  const el = e.target;
+  if(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement){
+    clearSelectAllRetryTimers(el);
+    clearSelectionLock(el);
+  }
+}, true);
 document.addEventListener("focusin", (e)=>{
   const el = e.target;
   if(!(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement)) return;
@@ -9770,6 +9826,35 @@ document.addEventListener("focusin", (e)=>{
     lastFocusedEditableForAutoSelect = null;
   }
 });
+document.addEventListener("selectionchange", ()=>{
+  const el = selectionLockTarget;
+  if(!shouldKeepFullSelection(el)) return;
+  const active = document.activeElement;
+  if(active !== el) return;
+  const len = String(el.value ?? "").length;
+  const start = typeof el.selectionStart === "number" ? el.selectionStart : -1;
+  const end = typeof el.selectionEnd === "number" ? el.selectionEnd : -1;
+  if(start === 0 && end === len) return;
+  requestAnimationFrame(()=>{
+    if(shouldKeepFullSelection(el)) selectAllIfActive(el);
+  });
+}, true);
+document.addEventListener("keydown", (e)=>{
+  const el = document.activeElement;
+  if(!(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement)) return;
+  if(!shouldKeepFullSelection(el)) return;
+  if(e.key === "Tab") return;
+  if(e.key.startsWith("Arrow") || e.key === "Home" || e.key === "End"){
+    clearSelectionLock(el);
+    return;
+  }
+  if(e.key === "Shift" || e.key === "Control" || e.key === "Alt" || e.key === "Meta") return;
+  clearSelectionLock(el);
+}, true);
+document.addEventListener("input", (e)=>{
+  const el = e.target;
+  if(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) clearSelectionLock(el);
+}, true);
 document.addEventListener("click", (e)=>{
   const el = e.target?.closest?.('input:not([type="hidden"]), textarea');
   if(el && shouldSelectAllOnTabFocus(el)){
@@ -9777,6 +9862,12 @@ document.addEventListener("click", (e)=>{
     if(canSelectAll) scheduleSelectAllForElement(el);
   }
   pendingPointerSelectAll = null;
+}, true);
+document.addEventListener("mouseup", (e)=>{
+  const el = e.target?.closest?.('input:not([type="hidden"]), textarea');
+  if(!el || !shouldSelectAllOnTabFocus(el)) return;
+  const canSelectAll = !pendingPointerSelectAll || (pendingPointerSelectAll.el === el && !pendingPointerSelectAll.moved);
+  if(canSelectAll) scheduleSelectAllForElement(el);
 }, true);
 
 document.addEventListener("click", (e)=>{
