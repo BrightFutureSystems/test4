@@ -399,15 +399,17 @@
   .child-date-table th:nth-child(3), .child-date-table td:nth-child(3){width:252px;min-width:252px;}
   .child-date-table th:nth-child(4), .child-date-table td:nth-child(4){width:96px;min-width:96px;}
   .child-date-table td:nth-child(3){text-align:center;}
+  .basic-children-pane{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .basic-children-pane .child-date-table{min-width:478px;}
   .income-table td:nth-child(2) .input-unit{
     display:inline-flex;
     width:190px;
     justify-content:flex-start;
     margin:0 auto;
   }
-  #eduBody .edu-cell-inner{display:flex;flex-direction:column;align-items:flex-start;width:154px;margin:0 auto;}
-  #eduBody select{width:154px;display:block;margin:0;}
-  #eduBody .input-unit{justify-content:flex-start;width:154px;padding-left:0;}
+  #eduBody .edu-cell-inner{display:flex;flex-direction:column;align-items:flex-start;width:180px;margin:0 auto;}
+  #eduBody select{width:180px;display:block;margin:0;}
+  #eduBody .input-unit{justify-content:flex-start;width:180px;padding-left:0;}
   #eduBody .moneybox{width:78px !important;}
   .loan-wrap{overflow-x:auto;}
   .loan-table{min-width:520px;}
@@ -745,6 +747,12 @@
     display:flex;
     justify-content:flex-end;
     gap:8px;
+  }
+.modal-actions button:focus,
+  .modal-actions button:focus-visible{
+    outline:2px solid var(--blue);
+    outline-offset:2px;
+    box-shadow:0 0 0 3px rgba(37,99,235,.18);
   }
   .danger-btn{
     background:#dc2626;
@@ -1202,9 +1210,9 @@
         <div id="educationDetailUniversityBlock" class="edu-detail-section edu-detail-block">
           <label class="edu-detail-block-toggle"><input id="eduDetailUniversityEnabled" type="checkbox"> 大学詳細を使用する</label>
           <div class="edu-detail-fields">
-            <div class="edu-detail-field"><label for="eduDetailUniversitySchoolType">学校種別</label><select id="eduDetailUniversitySchoolType"><option value="junior_college">短大</option><option value="national_public">国公立</option><option value="national_public_medical">国公立医歯系</option><option value="private_liberal">私立文系</option><option value="private_science">私立理系</option><option value="private_medical">私立医歯系</option></select></div>
+            <div class="edu-detail-field"><label for="eduDetailUniversitySchoolType">学校種別</label><select id="eduDetailUniversitySchoolType"><option value="junior_college">短大</option><option value="vocational_2">専門学校2年</option><option value="vocational_3">専門学校3年</option><option value="vocational_4">専門学校4年</option><option value="national_public">国公立</option><option value="national_public_medical">国公立医歯系</option><option value="private_liberal">私立文系</option><option value="private_science">私立理系</option><option value="private_medical">私立医歯系</option></select></div>
             <div class="edu-detail-field"><label for="eduDetailUniversityLiving">通学形態</label><select id="eduDetailUniversityLiving"><option value="home">自宅</option><option value="away">自宅外</option></select></div>
-            <div class="edu-detail-field"><label for="eduDetailUniversityYears">在学年数</label><select id="eduDetailUniversityYears"><option value="2">2</option><option value="4">4</option><option value="6">6</option></select></div>
+            <div class="edu-detail-field"><label for="eduDetailUniversityYears">在学年数</label><select id="eduDetailUniversityYears"><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="6">6</option></select></div>
             <div class="edu-detail-pairs">
               <div class="edu-detail-field"><label>標準入学一時金</label><div id="eduDetailUniversityStandardEntrance" class="edu-detail-static">0 万円</div></div>
               <div class="edu-detail-field"><label for="eduDetailUniversityEntranceCost">入学一時金（編集可）</label><div class="input-unit"><input id="eduDetailUniversityEntranceCost" type="number" class="moneybox" value="0" step="1"><span class="suffix">万円</span></div></div>
@@ -1575,7 +1583,7 @@
             <tr><td>基準年月日</td><td><div class="basic-date-only"><input id="baseDate" type="date" class="datebox" value="2026-03-29"><input id="currentBaseYear" type="hidden" value="2026"></div></td></tr>
           </table>
         </div>
-        <div>
+        <div class="basic-children-pane">
           <table class="center-table basic-table child-date-table">
             <tr><th>子</th><th>有無</th><th>生年月日</th><th>学校</th></tr>
             <tbody id="childRows"></tbody>
@@ -1993,6 +2001,49 @@ let monteMode = false;
 let educationDetailDraft = null;
 let currentEducationDetailChildIndex = null;
 let educationCopyDraft = null;
+let lastFocusedElementInOpenModal = null;
+const NORMAL_SIM_CACHE_LIMIT = 120;
+const normalSimCache = new Map();
+
+function pruneNormalSimCacheIfNeeded(){
+  if(normalSimCache.size > NORMAL_SIM_CACHE_LIMIT) normalSimCache.clear();
+}
+function makeNormalSimCacheKeyFromData(data){
+  try{
+    return JSON.stringify(data || {});
+  }catch(_e){
+    return "";
+  }
+}
+function getNormalSimCacheByData(data){
+  const key = makeNormalSimCacheKeyFromData(data);
+  if(!key) return null;
+  return normalSimCache.get(key) || null;
+}
+function setNormalSimCacheByData(data, cfg, sim){
+  const key = makeNormalSimCacheKeyFromData(data);
+  const entry = {key, cfg, sim};
+  if(key){
+    normalSimCache.set(key, entry);
+    pruneNormalSimCacheIfNeeded();
+  }
+  return entry;
+}
+function getOrBuildNormalScenarioCache(scenario, currentScenario, currentCfg, currentSim){
+  if(!scenario) return {cfg: currentCfg, sim: currentSim};
+  const cached = getNormalSimCacheByData(scenario.data);
+  if(cached) return cached;
+  if(scenario === currentScenario && currentCfg && currentSim){
+    return setNormalSimCacheByData(scenario.data, currentCfg, currentSim);
+  }
+  const focusState = captureActiveInputState();
+  setAllInputs(scenario.data);
+  const cfg = getScenarioFromDOM();
+  const sim = simulate(cfg, false);
+  if(currentScenario?.data) setAllInputs(currentScenario.data);
+  restoreActiveInputState(focusState);
+  return setNormalSimCacheByData(scenario.data, cfg, sim);
+}
 
 function defaultScenarioName(index){ return `条件${index+1}`; }
 function isDefaultScenarioName(name, index){ return String(name || "") === defaultScenarioName(index); }
@@ -2370,13 +2421,120 @@ function closeRowContextMenu(){
   menu.classList.remove("show");
   menu.setAttribute("aria-hidden", "true");
 }
+function focusDeleteConfirmButton(modalId){
+  const modal = document.getElementById(modalId);
+  if(!modal || !modal.classList.contains("show")) return;
+  const btn = modal.querySelector('.danger-btn, #confirmDeleteRowBtn, #confirmDeleteTabBtn');
+  if(!btn || btn.disabled) return;
+  requestAnimationFrame(()=>{
+    if(modal.classList.contains("show")) btn.focus({preventScroll:true});
+  });
+}
+const STANDARD_ACTION_MODAL_CONFIG = {
+  withdrawalRuleModal: {primarySelector:'#saveWithdrawalRuleBtn', cancelSelector:'#cancelWithdrawalRuleBtn'},
+  monteCarloSettingsModal: {primarySelector:'#saveMonteSettingsBtn', cancelSelector:'#cancelMonteSettingsBtn'},
+  incomeCurveModal: {primarySelector:'#saveIncomeCurveBtn', cancelSelector:'#cancelIncomeCurveBtn'},
+  pensionHelperModal: {primarySelector:'#savePensionHelperBtn', cancelSelector:'#cancelPensionHelperBtn'},
+  insuranceAssistModal: {primarySelector:'#saveInsuranceAssistBtn', cancelSelector:'#cancelInsuranceAssistBtn'},
+  loanDetailModal: {primarySelector:'#saveLoanDetailBtn', cancelSelector:'#cancelLoanDetailBtn'},
+  educationDetailModal: {primarySelector:'#saveEducationDetailBtn', cancelSelector:'#cancelEducationDetailBtn'},
+  educationCopyModal: {primarySelector:'#confirmEducationCopyBtn', cancelSelector:'#cancelEducationCopyBtn'}
+};
+function focusModalPrimaryActionButton(modalId){
+  const modal = document.getElementById(modalId);
+  const config = STANDARD_ACTION_MODAL_CONFIG[modalId];
+  if(!modal || !config || !modal.classList.contains('show')) return;
+  const btn = modal.querySelector(config.primarySelector);
+  if(!btn || btn.disabled) return;
+  requestAnimationFrame(()=>{
+    if(modal.classList.contains('show')) btn.focus({preventScroll:true});
+  });
+}
+function getStandardActionModalButtons(modal){
+  if(!modal) return {buttons:[], cancelBtn:null, primaryBtn:null};
+  const config = STANDARD_ACTION_MODAL_CONFIG[modal.id] || {};
+  const primaryBtn = config.primarySelector ? modal.querySelector(config.primarySelector) : null;
+  const cancelBtn = config.cancelSelector ? modal.querySelector(config.cancelSelector) : null;
+  const buttons = Array.from(modal.querySelectorAll('.modal-actions button')).filter(btn=>!btn.disabled && isTabNavigableElement(btn));
+  return {buttons, cancelBtn, primaryBtn};
+}
+function handleStandardActionModalKeydown(e){
+  const modal = e.currentTarget;
+  if(!modal || !modal.classList.contains('show')) return;
+  const {buttons, cancelBtn, primaryBtn} = getStandardActionModalButtons(modal);
+  if(e.key === 'Escape'){
+    if(!cancelBtn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    cancelBtn.click();
+    return;
+  }
+  if(e.key === 'ArrowLeft' || e.key === 'ArrowRight'){
+    const active = document.activeElement;
+    const idx = buttons.indexOf(active);
+    if(idx < 0 || buttons.length < 2) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const nextIdx = e.key === 'ArrowRight' ? (idx + 1) % buttons.length : (idx - 1 + buttons.length) % buttons.length;
+    buttons[nextIdx]?.focus({preventScroll:true});
+    return;
+  }
+  if(e.key === 'Enter' && !e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey && !e.isComposing){
+    const active = document.activeElement;
+    if(active && active.tagName === 'TEXTAREA') return;
+    if(!primaryBtn || primaryBtn.disabled) return;
+    e.preventDefault();
+    e.stopPropagation();
+    primaryBtn.click();
+  }
+}
+function handleDeleteModalKeydown(e){
+  const modal = e.currentTarget;
+  if(!modal || !modal.classList.contains('show')) return;
+  const cancelBtn = modal.querySelector('#cancelDeleteRowBtn, #cancelDeleteTabBtn');
+  const confirmBtn = modal.querySelector('#confirmDeleteRowBtn, #confirmDeleteTabBtn, .danger-btn');
+  if(e.key === 'Escape'){
+    e.preventDefault();
+    e.stopPropagation();
+    if(modal.id === 'deleteRowModal') closeDeleteRowModal();
+    else if(modal.id === 'deleteTabModal') closeDeleteTabModal();
+    return;
+  }
+  if(e.key === 'ArrowLeft' || e.key === 'ArrowRight'){
+    const active = document.activeElement;
+    const inTargets = active === cancelBtn || active === confirmBtn;
+    if(!inTargets) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if(active === confirmBtn) cancelBtn?.focus({preventScroll:true});
+    else confirmBtn?.focus({preventScroll:true});
+    return;
+  }
+  if(e.key === 'Enter'){
+    const active = document.activeElement;
+    if(active === cancelBtn){
+      e.preventDefault();
+      e.stopPropagation();
+      cancelBtn.click();
+      return;
+    }
+    if(active === confirmBtn){
+      e.preventDefault();
+      e.stopPropagation();
+      confirmBtn.click();
+    }
+  }
+}
 function openDeleteRowModal(type, index){
   const data = migrateLegacyData(getAllInputs());
   pendingDeleteRow = {type, index};
   document.getElementById("deleteRowMessage").textContent = `「${getRowLabel(data, type, index)}」を削除します。元に戻せませんが実行しますか？`;
-  document.getElementById("deleteRowModal").classList.add("show");
+  const modal = document.getElementById("deleteRowModal");
+  modal?.classList.add("show");
+  modal?.setAttribute("aria-hidden", "false");
+  focusDeleteConfirmButton('deleteRowModal');
 }
-function closeDeleteRowModal(){ pendingDeleteRow = null; document.getElementById("deleteRowModal").classList.remove("show"); }
+function closeDeleteRowModal(){ pendingDeleteRow = null; const modal = document.getElementById("deleteRowModal"); modal?.classList.remove("show"); modal?.setAttribute("aria-hidden", "true"); }
 function confirmDeleteRow(){ if(!pendingDeleteRow) return; const {type,index}=pendingDeleteRow; closeDeleteRowModal(); deleteDynamicRow(type,index); }
 
 function inferCount(data, type){
@@ -2903,6 +3061,7 @@ function openInsuranceAssistModal(){
   insuranceAssistModal?.setAttribute('aria-hidden', 'false');
   syncInsuranceAssistTypeUI(false);
   applyTabOrder();
+  focusModalPrimaryActionButton('insuranceAssistModal');
 }
 function closeInsuranceAssistModal(){
   const insuranceAssistModal = document.getElementById('insuranceAssistModal');
@@ -3209,6 +3368,12 @@ function mapSimpleUniversityTypeToDetail(simpleType){
   switch(String(simpleType || '')){
     case '短大（自宅）': return {schoolType:'junior_college', living:'home'};
     case '短大（自宅外）': return {schoolType:'junior_college', living:'away'};
+    case '専門学校2年（自宅）': return {schoolType:'vocational_2', living:'home'};
+    case '専門学校2年（自宅外）': return {schoolType:'vocational_2', living:'away'};
+    case '専門学校3年（自宅）': return {schoolType:'vocational_3', living:'home'};
+    case '専門学校3年（自宅外）': return {schoolType:'vocational_3', living:'away'};
+    case '専門学校4年（自宅）': return {schoolType:'vocational_4', living:'home'};
+    case '専門学校4年（自宅外）': return {schoolType:'vocational_4', living:'away'};
     case '国公立大（自宅外）': return {schoolType:'national_public', living:'away'};
     case '私立大（自宅）': return {schoolType:'private_liberal', living:'home'};
     case '私立大（自宅外）': return {schoolType:'private_liberal', living:'away'};
@@ -3309,7 +3474,7 @@ function buildEducationGrid(data = {}){
   if(!body) return;
   const preschoolOptions = ["なし","標準","高め"];
   const schoolOptions = ["公立","私立"];
-  const uniOptions = ["なし","短大（自宅）","短大（自宅外）","国公立大（自宅）","国公立大（自宅外）","私立大（自宅）","私立大（自宅外）"];
+  const uniOptions = ["なし","短大（自宅）","短大（自宅外）","専門学校2年（自宅）","専門学校2年（自宅外）","専門学校3年（自宅）","専門学校3年（自宅外）","専門学校4年（自宅）","専門学校4年（自宅外）","国公立大（自宅）","国公立大（自宅外）","私立大（自宅）","私立大（自宅外）"];
   const gradOptions = ["なし","修士（自宅）","修士（自宅外）","博士（自宅）","博士（自宅外）"];
   const abroadOptions = ["なし","あり"];
   let html = "";
@@ -4140,20 +4305,63 @@ function getModalTabSequence(modal){
 }
 function trapTabWithinModal(e){
   const modal = getOpenModal();
-  if(!modal || !modal.contains(e.target)) return false;
+  if(!modal) return false;
   if(e.altKey || e.ctrlKey || e.metaKey) return false;
   const ordered = getModalTabSequence(modal);
   if(!ordered.length) return false;
   const active = document.activeElement;
+  const target = e.target;
+  if(!modal.contains(target) || !modal.contains(active)){
+    e.preventDefault();
+    e.stopPropagation();
+    focusElementForTab(e.shiftKey ? ordered[ordered.length - 1] : ordered[0]);
+    return true;
+  }
   let idx = ordered.indexOf(active);
-  if(idx < 0) idx = ordered.indexOf(e.target);
-  if(idx < 0) return false;
+  if(idx < 0) idx = ordered.indexOf(target);
+  if(idx < 0){
+    e.preventDefault();
+    e.stopPropagation();
+    focusElementForTab(e.shiftKey ? ordered[ordered.length - 1] : ordered[0]);
+    return true;
+  }
   const nextIdx = e.shiftKey ? (idx - 1 + ordered.length) % ordered.length : (idx + 1) % ordered.length;
   const next = ordered[nextIdx];
   if(!next) return false;
   e.preventDefault();
   e.stopPropagation();
   focusElementForTab(next);
+  return true;
+}
+function rememberFocusInsideOpenModal(target){
+  const modal = getOpenModal();
+  if(!modal || !target || !modal.contains(target) || !isTabNavigableElement(target)) return;
+  lastFocusedElementInOpenModal = target;
+}
+function enforceFocusWithinOpenModal(preferred = null){
+  const modal = getOpenModal();
+  if(!modal) return false;
+  const ordered = getModalTabSequence(modal);
+  if(!ordered.length) return false;
+  const target = (preferred && modal.contains(preferred) && isTabNavigableElement(preferred))
+    ? preferred
+    : (lastFocusedElementInOpenModal && modal.contains(lastFocusedElementInOpenModal) && isTabNavigableElement(lastFocusedElementInOpenModal)
+        ? lastFocusedElementInOpenModal
+        : ordered[0]);
+  focusElementForTab(target);
+  return true;
+}
+function focusFirstElementInModal(modalId, fallbackSelector = ''){
+  const modal = document.getElementById(modalId);
+  if(!modal || !modal.classList.contains('show')) return false;
+  const preferred = fallbackSelector ? modal.querySelector(fallbackSelector) : null;
+  const ordered = getModalTabSequence(modal);
+  const target = isTabNavigableElement(preferred) ? preferred : (ordered[0] || null);
+  if(!target) return false;
+  requestAnimationFrame(()=>{
+    if(!modal.classList.contains('show')) return;
+    focusElementForTab(target);
+  });
   return true;
 }
 function bindSequentialTabNavigation(ids){
@@ -4804,11 +5012,16 @@ function openDeleteTabModal(tabIndex = currentTab){
   if(!scenarios.length || tabIndex < 0 || !scenarios[tabIndex]) return;
   pendingDeleteTabIndex = tabIndex;
   document.getElementById("deleteTabMessage").textContent = `「${scenarios[tabIndex].name}」を削除します。元に戻せませんが実行しますか？`;
-  document.getElementById("deleteTabModal").classList.add("show");
+  const modal = document.getElementById("deleteTabModal");
+  modal?.classList.add("show");
+  modal?.setAttribute("aria-hidden", "false");
+  focusDeleteConfirmButton('deleteTabModal');
 }
 function closeDeleteTabModal(){
   pendingDeleteTabIndex = null;
-  document.getElementById("deleteTabModal").classList.remove("show");
+  const modal = document.getElementById("deleteTabModal");
+  modal?.classList.remove("show");
+  modal?.setAttribute("aria-hidden", "true");
 }
 function confirmDeleteCurrentTab(){
   if(pendingDeleteTabIndex == null || !scenarios[pendingDeleteTabIndex]){
@@ -5240,7 +5453,7 @@ function getEducationSimpleSummaryItems(childIndex){
   ];
 }
 function getEducationOneTimeStageOptions(){
-  return ["", "0歳", "1歳", "2歳", "3歳", "4歳", "5歳", "年少未満", "年少相当", "年中相当", "年長相当", "小1", "小2", "小3", "小4", "小5", "小6", "中1", "中2", "中3", "高1", "高2", "高3", "短大1", "短大2", "大1", "大2", "大3", "大4", "修士1", "修士2", "博士1", "博士2", "博士3"];
+  return ["", "0歳", "1歳", "2歳", "3歳", "4歳", "5歳", "年少未満", "年少相当", "年中相当", "年長相当", "小1", "小2", "小3", "小4", "小5", "小6", "中1", "中2", "中3", "高1", "高2", "高3", "短大1", "短大2", "専門1", "専門2", "専門3", "専門4", "大1", "大2", "大3", "大4", "修士1", "修士2", "博士1", "博士2", "博士3"];
 }
 function formatEduDetailMoneyDisplay(value, suffix){
   return `${Number(value || 0).toLocaleString("ja-JP")} 万円${suffix ? ` / ${suffix}` : ""}`;
@@ -5283,6 +5496,9 @@ function getLowerSchoolDetailStandardValues(stage, schoolType){
 function getUniversityDetailStandardValues(schoolType){
   switch(schoolType){
     case "junior_college": return {years:2, annual:80, entrance:25, awayMonthly:12};
+    case "vocational_2": return {years:2, annual:90, entrance:25, awayMonthly:12};
+    case "vocational_3": return {years:3, annual:95, entrance:25, awayMonthly:12};
+    case "vocational_4": return {years:4, annual:100, entrance:30, awayMonthly:12};
     case "national_public": return {years:4, annual:54, entrance:30, awayMonthly:12};
     case "national_public_medical": return {years:6, annual:60, entrance:40, awayMonthly:12};
     case "private_liberal": return {years:4, annual:97, entrance:25, awayMonthly:12};
@@ -5371,8 +5587,15 @@ function renderEducationDetailSimpleSummary(childIndex){
 function syncEducationDetailBlockStates(){
   [['educationDetailPreschoolBlock','eduDetailPreschoolEnabled'],['educationDetailElementaryBlock','eduDetailElementaryEnabled'],['educationDetailJuniorBlock','eduDetailJuniorEnabled'],['educationDetailHighBlock','eduDetailHighEnabled'],['educationDetailUniversityBlock','eduDetailUniversityEnabled'],['educationDetailGraduateBlock','eduDetailGraduateEnabled'],['educationDetailAbroadBlock','eduDetailAbroadEnabled']].forEach(([blockId,checkId])=>{
     const block = document.getElementById(blockId);
-    const on = !!document.getElementById(checkId)?.checked;
+    const toggle = document.getElementById(checkId);
+    const on = !!toggle?.checked;
     if(block) block.classList.toggle('disabled', !on);
+    if(block){
+      block.querySelectorAll('input, select, textarea, button').forEach(el=>{
+        if(toggle && el === toggle) return;
+        el.disabled = !on;
+      });
+    }
   });
   const univAwayField = document.getElementById('eduDetailUniversityAwayMonthly');
   if(univAwayField){
@@ -5506,6 +5729,28 @@ function applyGraduateDetailTypeDefaults(oldType, newType){
   if(approxEqualNumber(numInput('eduDetailGraduateMedicalEntranceCost', oldStd.medicalEntrance || 0), oldStd.medicalEntrance || 0)) setNumericInputValue('eduDetailGraduateMedicalEntranceCost', newStd.medicalEntrance || 0);
   if(approxEqualNumber(numInput('eduDetailGraduateExtraMonthly', 0), 0)) setNumericInputValue('eduDetailGraduateExtraMonthly', 0);
 }
+function applyUniversityLivingDefaults(oldLiving, newLiving){
+  const schoolType = document.getElementById('eduDetailUniversitySchoolType')?.value || 'national_public';
+  const std = getUniversityDetailStandardValues(schoolType);
+  const awayId = 'eduDetailUniversityAwayMonthly';
+  const current = numInput(awayId, 0);
+  if(newLiving === 'home'){
+    setNumericInputValue(awayId, 0);
+    return;
+  }
+  if(oldLiving !== 'away' || approxEqualNumber(current, 0)) setNumericInputValue(awayId, std.awayMonthly || 0);
+}
+function applyGraduateLivingDefaults(oldLiving, newLiving){
+  const degreeType = document.getElementById('eduDetailGraduateDegreeType')?.value || 'none';
+  const std = getGraduateDetailStandardValues(degreeType);
+  const awayId = 'eduDetailGraduateAwayMonthly';
+  const current = numInput(awayId, 0);
+  if(newLiving === 'home'){
+    setNumericInputValue(awayId, 0);
+    return;
+  }
+  if(oldLiving !== 'away' || approxEqualNumber(current, 0)) setNumericInputValue(awayId, std.awayMonthly || 0);
+}
 function fillEducationDetailModalFromDraft(){
   const d = normalizeEducationDetail(educationDetailDraft);
   document.getElementById('eduDetailPreschoolEnabled').checked = !!d.preschool.enabled;
@@ -5537,6 +5782,7 @@ function fillEducationDetailModalFromDraft(){
   document.getElementById('eduDetailUniversitySchoolType').value = d.university.schoolType || 'national_public';
   document.getElementById('eduDetailUniversitySchoolType').dataset.prevType = d.university.schoolType || 'national_public';
   document.getElementById('eduDetailUniversityLiving').value = d.university.living || 'home';
+  document.getElementById('eduDetailUniversityLiving').dataset.prevLiving = d.university.living || 'home';
   document.getElementById('eduDetailUniversityYears').value = String(d.university.years || univStd.years || 4);
   setNumericInputValue('eduDetailUniversityAnnualCost', d.university.annualCost ?? univStd.annual ?? 0);
   setNumericInputValue('eduDetailUniversityEntranceCost', d.university.entranceCost ?? univStd.entrance ?? 0);
@@ -5546,6 +5792,7 @@ function fillEducationDetailModalFromDraft(){
   document.getElementById('eduDetailGraduateDegreeType').value = d.graduate.degreeType || 'none';
   document.getElementById('eduDetailGraduateDegreeType').dataset.prevType = d.graduate.degreeType || 'none';
   document.getElementById('eduDetailGraduateLiving').value = d.graduate.living || 'home';
+  document.getElementById('eduDetailGraduateLiving').dataset.prevLiving = d.graduate.living || 'home';
   setNumericInputValue('eduDetailGraduateYears', d.graduate.years ?? gradStd.years ?? 2);
   setNumericInputValue('eduDetailGraduateAnnualCost', d.graduate.annualCost ?? gradStd.annual ?? 0);
   setNumericInputValue('eduDetailGraduateAwayMonthly', (d.graduate.living || 'home') === 'away' ? (d.graduate.awayMonthly ?? gradStd.awayMonthly ?? 0) : 0);
@@ -5677,12 +5924,17 @@ function openEducationCopyModal(){
     return;
   }
   syncEducationCopyDraftFromModal();
-  document.getElementById('educationCopyModal')?.classList.add('show');
+  const modal = document.getElementById('educationCopyModal');
+  modal?.classList.add('show');
+  modal?.setAttribute('aria-hidden', 'false');
   applyTabOrder();
+  focusModalPrimaryActionButton('educationCopyModal');
 }
 function closeEducationCopyModal(){
   educationCopyDraft = null;
-  document.getElementById('educationCopyModal')?.classList.remove('show');
+  const modal = document.getElementById('educationCopyModal');
+  modal?.classList.remove('show');
+  modal?.setAttribute('aria-hidden', 'true');
   applyTabOrder();
 }
 const EDUCATION_SIMPLE_COPY_FIELDS = [
@@ -5729,13 +5981,20 @@ function openEducationDetailModal(childIndex){
   renderEducationDetailSimpleSummary(childIndex);
   educationDetailDraft = getEducationDetailForChildFromData(data, childIndex);
   fillEducationDetailModalFromDraft();
-  document.getElementById('educationDetailModal').classList.add('show');
+  const modal = document.getElementById('educationDetailModal');
+  modal?.classList.add('show');
+  modal?.setAttribute('aria-hidden', 'false');
   applyTabOrder();
+  lastFocusedElementInOpenModal = null;
+  focusModalPrimaryActionButton('educationDetailModal');
 }
 function closeEducationDetailModal(){
   currentEducationDetailChildIndex = null;
   educationDetailDraft = null;
-  document.getElementById('educationDetailModal')?.classList.remove('show');
+  lastFocusedElementInOpenModal = null;
+  const modal = document.getElementById('educationDetailModal');
+  modal?.classList.remove('show');
+  modal?.setAttribute('aria-hidden', 'true');
   applyTabOrder();
 }
 function saveEducationDetailModal(){
@@ -5759,7 +6018,13 @@ function getStageFromGrade(grade){
 function getSimpleUniversityYearsFromType(type){
   switch(String(type || '')){
     case '短大（自宅）':
-    case '短大（自宅外）': return 2;
+    case '短大（自宅外）':
+    case '専門学校2年（自宅）':
+    case '専門学校2年（自宅外）': return 2;
+    case '専門学校3年（自宅）':
+    case '専門学校3年（自宅外）': return 3;
+    case '専門学校4年（自宅）':
+    case '専門学校4年（自宅外）':
     case '国公立大（自宅）':
     case '国公立大（自宅外）':
     case '私立大（自宅）':
@@ -5812,6 +6077,12 @@ function getBaseEduCost(grade, type, childEdu = null){
     switch(type){
       case "短大（自宅）": return 80;
       case "短大（自宅外）": return 224;
+      case "専門学校2年（自宅）": return 90;
+      case "専門学校2年（自宅外）": return 234;
+      case "専門学校3年（自宅）": return 95;
+      case "専門学校3年（自宅外）": return 239;
+      case "専門学校4年（自宅）": return 100;
+      case "専門学校4年（自宅外）": return 244;
       case "国公立大（自宅）": return 54;
       case "国公立大（自宅外）": return 198;
       case "私立大（自宅）": return 97;
@@ -5839,7 +6110,13 @@ function getBaseEduEntranceCost(grade, type, childEdu = null){
   if(ranges.uniStart != null && grade === ranges.uniStart){
     switch(type){
       case "短大（自宅）":
-      case "短大（自宅外）": return 25;
+      case "短大（自宅外）":
+      case "専門学校2年（自宅）":
+      case "専門学校2年（自宅外）":
+      case "専門学校3年（自宅）":
+      case "専門学校3年（自宅外）": return 25;
+      case "専門学校4年（自宅）":
+      case "専門学校4年（自宅外）":
       case "国公立大（自宅）":
       case "国公立大（自宅外）": return 30;
       case "私立大（自宅）":
@@ -5962,7 +6239,8 @@ function getEducationStageLabelsForGrade(grade, childEdu, detail){
       const yearNo = grade - effectiveUni.startGrade + 1;
       const schoolType = detail?.university?.enabled ? (detail.university.schoolType || 'national_public') : (simpleRanges.uniType || 'none');
       if((schoolType === 'junior_college' || schoolType.startsWith('短大')) && yearNo <= 2) labels.push(`短大${yearNo}`);
-      if(yearNo >= 1 && yearNo <= 6) labels.push(`大${yearNo}`);
+      if((schoolType === 'vocational_2' || schoolType === 'vocational_3' || schoolType === 'vocational_4' || schoolType.startsWith('専門学校')) && yearNo >= 1 && yearNo <= 4) labels.push(`専門${yearNo}`);
+      if(!(schoolType === 'vocational_2' || schoolType === 'vocational_3' || schoolType === 'vocational_4' || schoolType.startsWith('専門学校')) && yearNo >= 1 && yearNo <= 6) labels.push(`大${yearNo}`);
     }
     if(effectiveGrad && grade >= effectiveGrad.startGrade && grade <= effectiveGrad.endGrade){
       const offset = grade - effectiveGrad.startGrade;
@@ -8380,24 +8658,11 @@ function restoreActiveInputState(state){
   }
 }
 function getScenarioConfigAndSimForDrawing(scenario, currentScenario, currentCfg, currentSim){
-  if(scenario === currentScenario) return {cfg: currentCfg, sim: currentSim};
-  const focusState = captureActiveInputState();
-  setAllInputs(scenario.data);
-  const cfg = getScenarioFromDOM();
-  const sim = simulate(cfg, false);
-  setAllInputs(currentScenario.data);
-  restoreActiveInputState(focusState);
-  return {cfg, sim};
+  return getOrBuildNormalScenarioCache(scenario, currentScenario, currentCfg, currentSim);
 }
 function getScenarioMonteBaseForDrawing(scenario, currentScenario, currentCfg, currentBase){
-  if(scenario === currentScenario) return {cfg: currentCfg, base: currentBase};
-  const focusState = captureActiveInputState();
-  setAllInputs(scenario.data);
-  const cfg = getScenarioFromDOM();
-  const base = simulate(cfg, false);
-  setAllInputs(currentScenario.data);
-  restoreActiveInputState(focusState);
-  return {cfg, base};
+  const cached = getOrBuildNormalScenarioCache(scenario, currentScenario, currentCfg, currentBase);
+  return {cfg: cached.cfg, base: cached.sim};
 }
 
 function draw(){
@@ -8408,8 +8673,10 @@ function draw(){
   const currentScenario = scenarios[currentTab];
   const targets = overlay ? scenarios : [currentScenario];
 
-  const currentCfg = getScenarioFromDOM();
-  const currentSim = simulate(currentCfg, false);
+  const currentCfgFromDom = getScenarioFromDOM();
+  const currentCache = getOrBuildNormalScenarioCache(currentScenario, currentScenario, currentCfgFromDom, null);
+  const currentCfg = currentCache.cfg;
+  const currentSim = currentCache.sim;
 
   let datasets = [];
   let yData = [];
@@ -8769,6 +9036,7 @@ function openPensionHelperModal(owner){
   document.getElementById("pensionHelperModal")?.setAttribute("aria-hidden", "false");
   renderPensionHelperModal();
   applyTabOrder();
+  focusModalPrimaryActionButton('pensionHelperModal');
 }
 function closePensionHelperModal(){
   activePensionHelperOwner = null;
@@ -8951,6 +9219,7 @@ function openLoanDetailModal(){
   modal?.classList.add("show");
   modal?.setAttribute("aria-hidden", "false");
   applyTabOrder();
+  focusModalPrimaryActionButton('loanDetailModal');
   restoreSimpleLoanInputs(snapshot);
   requestAnimationFrame(()=>restoreSimpleLoanInputs(snapshot));
   setTimeout(()=>restoreSimpleLoanInputs(snapshot), 0);
@@ -9012,6 +9281,7 @@ function openIncomeCurveModal(owner){
   incomeCurveModal?.setAttribute("aria-hidden", "false");
   renderIncomeCurveModal();
   applyTabOrder();
+  focusModalPrimaryActionButton('incomeCurveModal');
 }
 function closeIncomeCurveModal(){
   activeIncomeCurveOwner = null;
@@ -9732,6 +10002,7 @@ function openMonteSettingsModal(){
   monteSettingsModal?.classList.add('show');
   monteSettingsModal?.setAttribute('aria-hidden', 'false');
   applyTabOrder();
+  focusModalPrimaryActionButton('monteCarloSettingsModal');
 }
 function closeMonteSettingsModal(){
   const monteSettingsModal = document.getElementById('monteCarloSettingsModal');
@@ -9757,6 +10028,7 @@ function openWithdrawalRuleModal(){
   withdrawalRuleModal?.setAttribute('aria-hidden', 'false');
   if(withdrawalCompareCache) renderWithdrawalComparisonResults(withdrawalCompareCache);
   applyTabOrder();
+  focusModalPrimaryActionButton('withdrawalRuleModal');
 }
 function closeWithdrawalRuleModal(){
   const withdrawalRuleModal = document.getElementById('withdrawalRuleModal');
@@ -9817,8 +10089,13 @@ document.getElementById("confirmDeleteTabBtn").addEventListener("click", ()=>{
 document.getElementById("deleteTabModal").addEventListener("click", (e)=>{
   if(e.target.id === "deleteTabModal") closeDeleteTabModal();
 });
+document.getElementById("deleteTabModal")?.addEventListener("keydown", handleDeleteModalKeydown, true);
 document.getElementById("deleteRowModal")?.addEventListener("click", (e)=>{
   if(e.target.id === "deleteRowModal") closeDeleteRowModal();
+});
+document.getElementById("deleteRowModal")?.addEventListener("keydown", handleDeleteModalKeydown, true);
+Object.keys(STANDARD_ACTION_MODAL_CONFIG).forEach((modalId)=>{
+  document.getElementById(modalId)?.addEventListener('keydown', handleStandardActionModalKeydown, true);
 });
 document.addEventListener("click", (e)=>{
   const menu = document.getElementById("tabContextMenu");
@@ -9948,6 +10225,16 @@ document.addEventListener("keydown", (e)=>{
   if(e.key !== "Tab") return;
   if(e.altKey || e.ctrlKey || e.metaKey) return;
   if(trapTabWithinModal(e)) return;
+}, true);
+document.addEventListener("focusin", (e)=>{
+  const modal = getOpenModal();
+  if(!modal) return;
+  const target = e.target;
+  if(modal.contains(target)){
+    rememberFocusInsideOpenModal(target);
+    return;
+  }
+  setTimeout(()=>{ enforceFocusWithinOpenModal(); }, 0);
 }, true);
 document.getElementById("copyUrlBtn").addEventListener("click", copyURL);
 document.getElementById("graphType").addEventListener("change", ()=>{ requestDraw(); persistState(); });
@@ -10423,6 +10710,10 @@ document.getElementById('eduCopyFrom')?.addEventListener('change', ()=>{
 document.getElementById('educationCopyModal')?.addEventListener('click', (e)=>{
   if(e.target === e.currentTarget) closeEducationCopyModal();
 });
+document.querySelector('#educationCopyModal .edu-copy-modal')?.addEventListener('click', (e)=>e.stopPropagation());
+['mousedown','mouseup','dblclick','selectstart'].forEach(evt=>{
+  document.querySelector('#educationCopyModal .edu-copy-modal')?.addEventListener(evt, (e)=>e.stopPropagation());
+});
 document.getElementById('cancelEducationDetailBtn')?.addEventListener('click', closeEducationDetailModal);
 document.getElementById('saveEducationDetailBtn')?.addEventListener('click', saveEducationDetailModal);
 document.getElementById('eduDetailPreschoolBody')?.addEventListener('change', (e)=>{
@@ -10439,6 +10730,16 @@ document.getElementById('eduDetailPreschoolBody')?.addEventListener('change', (e
 });
 ['eduDetailPreschoolEnabled','eduDetailElementaryEnabled','eduDetailJuniorEnabled','eduDetailHighEnabled','eduDetailUniversityEnabled','eduDetailGraduateEnabled','eduDetailAbroadEnabled','eduDetailUniversityLiving','eduDetailGraduateLiving','eduDetailElementarySchoolType','eduDetailJuniorSchoolType','eduDetailHighSchoolType','eduDetailUniversitySchoolType','eduDetailGraduateDegreeType'].forEach(id=>{
   document.getElementById(id)?.addEventListener('change', ()=>{
+    if(id === 'eduDetailUniversityLiving'){
+      const el = document.getElementById(id);
+      applyUniversityLivingDefaults(el?.dataset.prevLiving || 'home', el?.value || 'home');
+      if(el) el.dataset.prevLiving = el.value || 'home';
+    }
+    if(id === 'eduDetailGraduateLiving'){
+      const el = document.getElementById(id);
+      applyGraduateLivingDefaults(el?.dataset.prevLiving || 'home', el?.value || 'home');
+      if(el) el.dataset.prevLiving = el.value || 'home';
+    }
     if(id === 'eduDetailElementarySchoolType'){
       const el = document.getElementById(id);
       applyLowerSchoolDetailTypeDefaults('elem', el?.dataset.prevType || 'public', el?.value || 'public');
