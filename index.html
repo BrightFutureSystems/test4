@@ -1471,33 +1471,37 @@
     <div class="modal-card monte-settings-modal" role="dialog" aria-modal="true" aria-labelledby="monteCarloSettingsTitle">
       <div id="monteCarloSettingsTitle" class="modal-text" style="font-weight:bold;margin-bottom:10px;">モンテカルロ設定</div>
       <div class="monte-settings-grid">
-        <div class="monte-settings-note">※ 「確率計算」本体クリックでは、ここで保存した設定を使って即実行します。将来別ファイル化しやすいよう、設定・乱数生成・描画は分離しやすい構成で実装しています。</div>
+        <div class="monte-settings-note">※ 「確率計算」本体クリックでは、ここで保存した設定を使って即実行します。3モデルは「実効ボラ（年次標準偏差）」を共通尺度として比較できるよう正規化しています。将来別ファイル化しやすいよう、設定・乱数生成・描画は分離しやすい構成です。</div>
         <div class="monte-settings-section">
           <div class="monte-settings-section-title">基本設定</div>
           <div class="monte-settings-fields">
             <div class="monte-settings-field"><label for="monteSettingsTrials">試行回数</label><div class="input-unit"><input id="monteSettingsTrials" type="number" class="agebox" value="80" min="10" max="5000" step="10"><span class="suffix">回</span></div></div>
             <div class="monte-settings-field"><label for="monteSettingsDrawPaths">描画本数</label><div class="input-unit"><input id="monteSettingsDrawPaths" type="number" class="agebox" value="80" min="10" max="500" step="10"><span class="suffix">本</span></div></div>
-            <div class="monte-settings-field"><label for="monteSettingsModel">利回りモデル</label><select id="monteSettingsModel"><option value="uniform">簡易（一様分布）</option><option value="normal">正規分布</option><option value="mean_reverting">平均回帰</option></select></div>
+            <div class="monte-settings-field"><label for="monteSettingsModel">利回りモデル</label><select id="monteSettingsModel"><option value="uniform">一様分布（簡易モデル）</option><option value="normal" selected>正規分布（標準モデル）</option><option value="mean_reverting">平均回帰（上級モデル）</option></select></div>
+            <div class="monte-settings-field"><label for="monteSettingsEffectiveVolPct">実効ボラ（年次標準偏差）</label><div class="input-unit"><input id="monteSettingsEffectiveVolPct" type="number" class="ratebox" value="10" min="0" step="0.1"><span class="suffix">%ポイント</span></div></div>
             <div class="monte-settings-field"><label class="inline-check"><input id="monteSettingsSeedOn" type="checkbox"> 乱数シードを固定する</label><div class="input-unit"><input id="monteSettingsSeedValue" type="number" class="moneybox" value="12345" step="1"><span class="suffix">seed</span></div></div>
           </div>
         </div>
         <div id="monteSettingsUniformSection" class="monte-settings-section">
-          <div class="monte-settings-section-title">簡易（一様分布）</div>
+          <div class="monte-settings-section-title">一様分布（簡易モデル）</div>
           <div class="monte-settings-fields">
-            <div class="monte-settings-field"><label for="monteSettingsUniformRangePct">年次変動幅</label><div class="input-unit"><span class="prefix">±</span><input id="monteSettingsUniformRangePct" type="number" class="ratebox" value="15" min="0" step="0.1"><span class="suffix">%ポイント</span></div></div>
+            <div class="monte-settings-field"><label>内部変動幅</label><div id="monteSettingsUniformDerived" class="monte-settings-summary">±17.3%ポイント</div></div>
+            <div class="monte-settings-field monte-settings-field-wide"><div class="monte-settings-note">※ 実効ボラを基準に、一様分布の半幅を内部で自動計算します。実効ボラ 10% のとき、内部変動幅は ±17.3%ポイントです。</div></div>
           </div>
         </div>
         <div id="monteSettingsNormalSection" class="monte-settings-section monte-settings-hidden">
-          <div class="monte-settings-section-title">正規分布</div>
+          <div class="monte-settings-section-title">正規分布（標準モデル）</div>
           <div class="monte-settings-fields">
-            <div class="monte-settings-field"><label for="monteSettingsNormalStdPct">年次標準偏差</label><div class="input-unit"><input id="monteSettingsNormalStdPct" type="number" class="ratebox" value="15" min="0" step="0.1"><span class="suffix">%ポイント</span></div></div>
+            <div class="monte-settings-field"><label>内部標準偏差</label><div id="monteSettingsNormalDerived" class="monte-settings-summary">10.0%ポイント</div></div>
+            <div class="monte-settings-field monte-settings-field-wide"><div class="monte-settings-note">※ 実効ボラ（年次標準偏差）をそのまま使います。現時点の標準推奨モデルです。</div></div>
           </div>
         </div>
         <div id="monteSettingsMeanRevertingSection" class="monte-settings-section monte-settings-hidden">
-          <div class="monte-settings-section-title">平均回帰</div>
+          <div class="monte-settings-section-title">平均回帰（上級モデル）</div>
           <div class="monte-settings-fields">
-            <div class="monte-settings-field"><label for="monteSettingsMeanRevStdPct">長期標準偏差</label><div class="input-unit"><input id="monteSettingsMeanRevStdPct" type="number" class="ratebox" value="15" min="0" step="0.1"><span class="suffix">%ポイント</span></div></div>
-            <div class="monte-settings-field"><label for="monteSettingsMeanRevPhi">平均回帰の強さ</label><div class="input-unit"><input id="monteSettingsMeanRevPhi" type="number" class="ratebox" value="0.35" min="0" max="0.99" step="0.01"><span class="suffix">0〜0.99</span></div></div>
+            <div class="monte-settings-field"><label for="monteSettingsMeanRevPhi">持続性</label><div class="input-unit"><input id="monteSettingsMeanRevPhi" type="number" class="ratebox" value="0.35" min="0" max="0.99" step="0.01"><span class="suffix">0〜0.99</span></div></div>
+            <div class="monte-settings-field"><label>内部ノイズ標準偏差</label><div id="monteSettingsMeanRevDerived" class="monte-settings-summary">9.4%ポイント</div></div>
+            <div class="monte-settings-field monte-settings-field-wide"><div class="monte-settings-note">※ 実効ボラ（定常状態の年次標準偏差）が正規分布モデルと揃うように、内部ノイズ標準偏差を自動調整します。持続性が高いほど、内部ノイズは小さくても連続する好況・不況が起こりやすくなります。</div></div>
           </div>
         </div>
         <div class="monte-settings-section">
@@ -1513,8 +1517,9 @@
   </div>
   <input id="monteTrials" type="hidden" value="80">
   <input id="monteDrawPaths" type="hidden" value="80">
-  <input id="monteModel" type="hidden" value="uniform">
-  <input id="monteUniformRangePct" type="hidden" value="10">
+  <input id="monteModel" type="hidden" value="normal">
+  <input id="monteEffectiveVolPct" type="hidden" value="10">
+  <input id="monteUniformRangePct" type="hidden" value="17.3205">
   <input id="monteNormalStdPct" type="hidden" value="10">
   <input id="monteMeanRevStdPct" type="hidden" value="10">
   <input id="monteMeanRevPhi" type="hidden" value="0.35">
@@ -3435,11 +3440,18 @@ function getFormattedCaretPos(formattedValue, rawIndex){
 function formatNumericInputDisplay(el, finalize = false){
   if(!el) return;
   const wasActive = document.activeElement === el;
-  const start = typeof el.selectionStart === "number" ? el.selectionStart : String(el.value ?? "").length;
+  const valueBefore = String(el.value ?? "");
+  const start = typeof el.selectionStart === "number" ? el.selectionStart : valueBefore.length;
+  const end = typeof el.selectionEnd === "number" ? el.selectionEnd : start;
+  const hadFullSelection = wasActive && start === 0 && end === valueBefore.length && valueBefore.length > 0;
   const rawIndex = getNumericRawIndex(el.value, start);
   const formatted = formatNumericText(el.value, finalize, {useGrouping: shouldUseGroupingForInput(el)});
   el.value = formatted;
   if(wasActive && typeof el.setSelectionRange === "function"){
+    if(hadFullSelection){
+      try{ el.setSelectionRange(0, formatted.length); }catch(_e){}
+      return;
+    }
     const pos = getFormattedCaretPos(formatted, rawIndex);
     try{ el.setSelectionRange(pos, pos); }catch(_e){}
   }
@@ -3914,6 +3926,28 @@ function updatePeriodDisplays(){
 
 
 let pendingSelectAllOnTabFocus = false;
+let pendingSelectAllTarget = null;
+let pendingPointerSelectAll = null;
+let lastPointerDownAt = 0;
+let lastFocusedEditableForAutoSelect = null;
+function clearPendingSelectAll(){
+  pendingSelectAllOnTabFocus = false;
+  pendingSelectAllTarget = null;
+}
+function requestSelectAllOnNextFocus(el){
+  pendingSelectAllOnTabFocus = true;
+  pendingSelectAllTarget = el || null;
+}
+function selectAllIfActive(el){
+  if(!el || document.activeElement !== el || !shouldSelectAllOnTabFocus(el)) return;
+  try{ el.select(); }catch(_e){}
+}
+function scheduleSelectAllForElement(el){
+  if(!shouldSelectAllOnTabFocus(el)) return;
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{ selectAllIfActive(el); });
+  });
+}
 function isVisibleForTab(el){
   if(!el || !el.getClientRects || !el.getClientRects().length) return false;
   const style = window.getComputedStyle(el);
@@ -4010,7 +4044,7 @@ function applyTabOrder(){
 }
 function focusElementForTab(el){
   if(!el) return;
-  pendingSelectAllOnTabFocus = true;
+  requestSelectAllOnNextFocus(el);
   try{ el.focus({preventScroll:false}); }catch(_e){ try{ el.focus(); }catch(__e){} }
 }
 function moveFocusByTabDirection(backward){
@@ -6742,17 +6776,45 @@ function clampMonteTrials(v){ return Math.max(10, Math.min(5000, Math.round(Numb
 function clampMonteDrawPaths(v, trials){ return Math.max(10, Math.min(Math.max(10, Number(trials) || 80), Math.round(Number(v) || 80))); }
 function clampMonteRatePct(v, fallback){ const n = Number(v); return Number.isFinite(n) ? Math.max(0, n) : fallback; }
 function clampMontePhi(v){ const n = Number(v); if(!Number.isFinite(n)) return 0.35; return Math.max(0, Math.min(0.99, n)); }
-function normalizeMonteModel(v){ return ["uniform","normal","mean_reverting"].includes(String(v || "")) ? String(v) : "uniform"; }
+function normalizeMonteModel(v){ return ["uniform","normal","mean_reverting"].includes(String(v || "")) ? String(v) : "normal"; }
+function monteEffectiveVolToUniformRangePct(effectiveVolPct){
+  return clampMonteRatePct((Number(effectiveVolPct || 0) || 0) * Math.sqrt(3), 10);
+}
+function monteEffectiveVolToNormalStdPct(effectiveVolPct){
+  return clampMonteRatePct(effectiveVolPct, 10);
+}
+function monteEffectiveVolToMeanRevInnovationStdPct(effectiveVolPct, phi){
+  const sigma = (Number(effectiveVolPct || 0) || 0) / 100;
+  const p = clampMontePhi(phi);
+  return clampMonteRatePct(Math.sqrt(Math.max(0, 1 - p * p)) * sigma * 100, 10);
+}
+function inferMonteEffectiveVolPctFromLegacy(model, uniformRangePct, normalStdPct, meanRevStdPct){
+  if(model === 'uniform'){
+    return clampMonteRatePct((Number(uniformRangePct || 0) || 0) / Math.sqrt(3), 10);
+  }
+  if(model === 'mean_reverting'){
+    return clampMonteRatePct(meanRevStdPct, 10);
+  }
+  return clampMonteRatePct(normalStdPct, 10);
+}
 function getMonteCarloSettingsFromDOM(){
   const trials = clampMonteTrials(document.getElementById('monteTrials')?.value || 80);
+  const model = normalizeMonteModel(document.getElementById('monteModel')?.value || 'normal');
+  const legacyUniformRangePct = clampMonteRatePct(document.getElementById('monteUniformRangePct')?.value || 10, 10);
+  const legacyNormalStdPct = clampMonteRatePct(document.getElementById('monteNormalStdPct')?.value || 10, 10);
+  const legacyMeanRevStdPct = clampMonteRatePct(document.getElementById('monteMeanRevStdPct')?.value || 10, 10);
+  const effectiveVolPct = clampMonteRatePct(document.getElementById('monteEffectiveVolPct')?.value || inferMonteEffectiveVolPctFromLegacy(model, legacyUniformRangePct, legacyNormalStdPct, legacyMeanRevStdPct), 10);
+  const meanRevPhi = clampMontePhi(document.getElementById('monteMeanRevPhi')?.value || 0.35);
   return {
     trials,
     drawPaths: clampMonteDrawPaths(document.getElementById('monteDrawPaths')?.value || trials, trials),
-    model: normalizeMonteModel(document.getElementById('monteModel')?.value || 'uniform'),
-    uniformRangePct: clampMonteRatePct(document.getElementById('monteUniformRangePct')?.value || 10, 10),
-    normalStdPct: clampMonteRatePct(document.getElementById('monteNormalStdPct')?.value || 10, 10),
-    meanRevStdPct: clampMonteRatePct(document.getElementById('monteMeanRevStdPct')?.value || 10, 10),
-    meanRevPhi: clampMontePhi(document.getElementById('monteMeanRevPhi')?.value || 0.35),
+    model,
+    effectiveVolPct,
+    uniformRangePct: monteEffectiveVolToUniformRangePct(effectiveVolPct),
+    normalStdPct: monteEffectiveVolToNormalStdPct(effectiveVolPct),
+    meanRevStdPct: clampMonteRatePct(effectiveVolPct, 10),
+    meanRevInnovationStdPct: monteEffectiveVolToMeanRevInnovationStdPct(effectiveVolPct, meanRevPhi),
+    meanRevPhi,
     seedOn: String(document.getElementById('monteSeedOn')?.value || 'false') === 'true',
     seedValue: Math.round(Number(document.getElementById('monteSeedValue')?.value || 12345) || 12345)
   };
@@ -6786,9 +6848,8 @@ function buildMonteCarloShockTrials(cfg, settings){
         delta = randomNormalFromRng(rng) * ((Number(settings.normalStdPct || 0) || 0) / 100);
       }else if(settings?.model === 'mean_reverting'){
         const phi = clampMontePhi(settings.meanRevPhi);
-        const sigma = (Number(settings.meanRevStdPct || 0) || 0) / 100;
-        const epsilonStd = sigma * Math.sqrt(Math.max(0, 1 - phi * phi));
-        delta = phi * prevDelta + randomNormalFromRng(rng) * epsilonStd;
+        const innovationStd = (Number(settings.meanRevInnovationStdPct || 0) || 0) / 100;
+        delta = phi * prevDelta + randomNormalFromRng(rng) * innovationStd;
         prevDelta = delta;
       }else{
         delta = (rng() - 0.5) * 2 * ((Number(settings.uniformRangePct || 0) || 0) / 100);
@@ -6829,12 +6890,12 @@ function buildMontePlotSeries(cfg, labels, series){
 function formatMonteSettingsSummary(settings){
   if(!settings) return '';
   if(settings.model === 'normal'){
-    return `<strong>正規分布</strong><br>試行回数 ${settings.trials} 回、描画本数 ${settings.drawPaths} 本、年次標準偏差 ${settings.normalStdPct}%ポイントです。`;
+    return `<strong>正規分布（標準モデル）</strong><br>試行回数 ${settings.trials} 回、描画本数 ${settings.drawPaths} 本、実効ボラ（年次標準偏差） ${settings.effectiveVolPct}%ポイントです。`;
   }
   if(settings.model === 'mean_reverting'){
-    return `<strong>平均回帰</strong><br>試行回数 ${settings.trials} 回、描画本数 ${settings.drawPaths} 本、長期標準偏差 ${settings.meanRevStdPct}%ポイント、平均回帰の強さ ${settings.meanRevPhi} です。`;
+    return `<strong>平均回帰（上級モデル）</strong><br>試行回数 ${settings.trials} 回、描画本数 ${settings.drawPaths} 本、実効ボラ（年次標準偏差） ${settings.effectiveVolPct}%ポイント、持続性 ${settings.meanRevPhi}、内部ノイズ標準偏差 ${settings.meanRevInnovationStdPct.toFixed(1)}%ポイントです。`;
   }
-  return `<strong>簡易（一様分布）</strong><br>試行回数 ${settings.trials} 回、描画本数 ${settings.drawPaths} 本、年次変動幅 ±${settings.uniformRangePct}%ポイントです。`;
+  return `<strong>一様分布（簡易モデル）</strong><br>試行回数 ${settings.trials} 回、描画本数 ${settings.drawPaths} 本、実効ボラ（年次標準偏差） ${settings.effectiveVolPct}%ポイント、内部変動幅 ±${settings.uniformRangePct.toFixed(1)}%ポイントです。`;
 }
 function getPublicPensionDeductionByAge(age, cfg){
   const tax = cfg?.tax || {};
@@ -9411,23 +9472,26 @@ function syncMonteSettingsModalFromHidden(){
   document.getElementById('monteSettingsTrials').value = settings.trials;
   document.getElementById('monteSettingsDrawPaths').value = settings.drawPaths;
   document.getElementById('monteSettingsModel').value = settings.model;
-  document.getElementById('monteSettingsUniformRangePct').value = settings.uniformRangePct;
-  document.getElementById('monteSettingsNormalStdPct').value = settings.normalStdPct;
-  document.getElementById('monteSettingsMeanRevStdPct').value = settings.meanRevStdPct;
+  document.getElementById('monteSettingsEffectiveVolPct').value = settings.effectiveVolPct;
   document.getElementById('monteSettingsMeanRevPhi').value = settings.meanRevPhi;
   document.getElementById('monteSettingsSeedOn').checked = !!settings.seedOn;
   document.getElementById('monteSettingsSeedValue').value = settings.seedValue;
 }
 function buildMonteSettingsFromModal(){
   const trials = clampMonteTrials(document.getElementById('monteSettingsTrials')?.value || 80);
+  const model = normalizeMonteModel(document.getElementById('monteSettingsModel')?.value || 'normal');
+  const effectiveVolPct = clampMonteRatePct(document.getElementById('monteSettingsEffectiveVolPct')?.value || 10, 10);
+  const meanRevPhi = clampMontePhi(document.getElementById('monteSettingsMeanRevPhi')?.value || 0.35);
   return {
     trials,
     drawPaths: clampMonteDrawPaths(document.getElementById('monteSettingsDrawPaths')?.value || trials, trials),
-    model: normalizeMonteModel(document.getElementById('monteSettingsModel')?.value || 'uniform'),
-    uniformRangePct: clampMonteRatePct(document.getElementById('monteSettingsUniformRangePct')?.value || 15, 15),
-    normalStdPct: clampMonteRatePct(document.getElementById('monteSettingsNormalStdPct')?.value || 15, 15),
-    meanRevStdPct: clampMonteRatePct(document.getElementById('monteSettingsMeanRevStdPct')?.value || 15, 15),
-    meanRevPhi: clampMontePhi(document.getElementById('monteSettingsMeanRevPhi')?.value || 0.35),
+    model,
+    effectiveVolPct,
+    uniformRangePct: monteEffectiveVolToUniformRangePct(effectiveVolPct),
+    normalStdPct: monteEffectiveVolToNormalStdPct(effectiveVolPct),
+    meanRevStdPct: clampMonteRatePct(effectiveVolPct, 10),
+    meanRevInnovationStdPct: monteEffectiveVolToMeanRevInnovationStdPct(effectiveVolPct, meanRevPhi),
+    meanRevPhi,
     seedOn: !!document.getElementById('monteSettingsSeedOn')?.checked,
     seedValue: Math.round(Number(document.getElementById('monteSettingsSeedValue')?.value || 12345) || 12345)
   };
@@ -9436,6 +9500,7 @@ function applyMonteSettingsToHidden(settings){
   document.getElementById('monteTrials').value = String(settings.trials);
   document.getElementById('monteDrawPaths').value = String(settings.drawPaths);
   document.getElementById('monteModel').value = settings.model;
+  document.getElementById('monteEffectiveVolPct').value = String(settings.effectiveVolPct);
   document.getElementById('monteUniformRangePct').value = String(settings.uniformRangePct);
   document.getElementById('monteNormalStdPct').value = String(settings.normalStdPct);
   document.getElementById('monteMeanRevStdPct').value = String(settings.meanRevStdPct);
@@ -9444,11 +9509,18 @@ function applyMonteSettingsToHidden(settings){
   document.getElementById('monteSeedValue').value = String(settings.seedValue);
 }
 function updateMonteSettingsModalUI(){
-  const model = normalizeMonteModel(document.getElementById('monteSettingsModel')?.value || 'uniform');
+  const settings = buildMonteSettingsFromModal();
+  const model = settings.model;
   document.getElementById('monteSettingsUniformSection')?.classList.toggle('monte-settings-hidden', model !== 'uniform');
   document.getElementById('monteSettingsNormalSection')?.classList.toggle('monte-settings-hidden', model !== 'normal');
   document.getElementById('monteSettingsMeanRevertingSection')?.classList.toggle('monte-settings-hidden', model !== 'mean_reverting');
-  document.getElementById('monteSettingsSummary').innerHTML = formatMonteSettingsSummary(buildMonteSettingsFromModal());
+  const uniformEl = document.getElementById('monteSettingsUniformDerived');
+  const normalEl = document.getElementById('monteSettingsNormalDerived');
+  const meanRevEl = document.getElementById('monteSettingsMeanRevDerived');
+  if(uniformEl) uniformEl.textContent = `±${settings.uniformRangePct.toFixed(1)}%ポイント`;
+  if(normalEl) normalEl.textContent = `${settings.normalStdPct.toFixed(1)}%ポイント`;
+  if(meanRevEl) meanRevEl.textContent = `${settings.meanRevInnovationStdPct.toFixed(1)}%ポイント`;
+  document.getElementById('monteSettingsSummary').innerHTML = formatMonteSettingsSummary(settings);
 }
 function openMonteSettingsModal(){
   syncMonteSettingsModalFromHidden();
@@ -9592,9 +9664,7 @@ document.getElementById("saveMonteSettingsBtn")?.addEventListener("click", saveM
 document.getElementById("monteSettingsModel")?.addEventListener("change", updateMonteSettingsModalUI);
 document.getElementById("monteSettingsTrials")?.addEventListener("input", updateMonteSettingsModalUI);
 document.getElementById("monteSettingsDrawPaths")?.addEventListener("input", updateMonteSettingsModalUI);
-document.getElementById("monteSettingsUniformRangePct")?.addEventListener("input", updateMonteSettingsModalUI);
-document.getElementById("monteSettingsNormalStdPct")?.addEventListener("input", updateMonteSettingsModalUI);
-document.getElementById("monteSettingsMeanRevStdPct")?.addEventListener("input", updateMonteSettingsModalUI);
+document.getElementById("monteSettingsEffectiveVolPct")?.addEventListener("input", updateMonteSettingsModalUI);
 document.getElementById("monteSettingsMeanRevPhi")?.addEventListener("input", updateMonteSettingsModalUI);
 document.getElementById("monteSettingsSeedOn")?.addEventListener("change", updateMonteSettingsModalUI);
 document.getElementById("monteSettingsSeedValue")?.addEventListener("input", updateMonteSettingsModalUI);
@@ -9602,10 +9672,14 @@ document.getElementById("copyUrlBtn").addEventListener("click", copyURL);
 document.getElementById("graphType").addEventListener("change", ()=>{ requestDraw(); persistState(); });
 document.getElementById("overlayToggle").addEventListener("change", ()=>{ monteMode ? runMonte() : requestDraw(); persistState(); });
 document.getElementById("fixedScale").addEventListener("change", ()=>{ monteMode ? runMonte() : requestDraw(); persistState(); });
-document.getElementById("fixedScaleMin").addEventListener("input", ()=>{ monteMode ? runMonte() : requestDraw(); persistState(); });
-document.getElementById("fixedScaleMax").addEventListener("input", ()=>{ monteMode ? runMonte() : requestDraw(); persistState(); });
-document.getElementById("xAxisMin").addEventListener("input", ()=>{ monteMode ? runMonte() : requestDraw(); persistState(); });
-document.getElementById("xAxisMax").addEventListener("input", ()=>{ monteMode ? runMonte() : requestDraw(); persistState(); });
+function commitAxisControlChange(e){
+  const el = e?.target;
+  if(!el || !["fixedScaleMin","fixedScaleMax","xAxisMin","xAxisMax"].includes(el.id)) return;
+  monteMode ? runMonte() : requestDraw();
+  persistState();
+}
+document.addEventListener("change", commitAxisControlChange);
+document.addEventListener("focusout", commitAxisControlChange, true);
 
 document.addEventListener("mousedown", (e)=>{
   const rowLabel = e.target.closest("[data-row-menu]");
@@ -9657,18 +9731,53 @@ document.addEventListener("keydown", (e)=>{
   const handled = moveFocusByTabDirection(!!e.shiftKey);
   if(handled) e.preventDefault();
 }, true);
-["mousedown","pointerdown","touchstart"].forEach(evt=>{
-  document.addEventListener(evt, ()=>{ pendingSelectAllOnTabFocus = false; }, true);
-});
+document.addEventListener("pointerdown", (e)=>{
+  lastPointerDownAt = Date.now();
+  const el = e.target?.closest?.('input:not([type="hidden"]), textarea');
+  if(el && shouldSelectAllOnTabFocus(el)){
+    pendingPointerSelectAll = {
+      el,
+      x: Number.isFinite(e.clientX) ? e.clientX : 0,
+      y: Number.isFinite(e.clientY) ? e.clientY : 0,
+      moved: false
+    };
+  }else{
+    pendingPointerSelectAll = null;
+  }
+  clearPendingSelectAll();
+}, true);
+document.addEventListener("pointermove", (e)=>{
+  if(!pendingPointerSelectAll) return;
+  const dx = Math.abs((Number.isFinite(e.clientX) ? e.clientX : 0) - pendingPointerSelectAll.x);
+  const dy = Math.abs((Number.isFinite(e.clientY) ? e.clientY : 0) - pendingPointerSelectAll.y);
+  if(dx > 6 || dy > 6) pendingPointerSelectAll.moved = true;
+}, true);
+document.addEventListener("pointerup", ()=>{}, true);
+document.addEventListener("pointercancel", ()=>{ pendingPointerSelectAll = null; }, true);
 document.addEventListener("focusin", (e)=>{
   const el = e.target;
-  if(!pendingSelectAllOnTabFocus || !shouldSelectAllOnTabFocus(el)) return;
-  requestAnimationFrame(()=>{
-    if(document.activeElement !== el) return;
-    try{ el.select(); }catch(_e){}
-    pendingSelectAllOnTabFocus = false;
-  });
+  if(!(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement)) return;
+  const shouldAutoSelectFromFocusTravel = shouldSelectAllOnTabFocus(el) && !!lastFocusedEditableForAutoSelect && lastFocusedEditableForAutoSelect !== el && (Date.now() - lastPointerDownAt > 250);
+  if(pendingSelectAllOnTabFocus && shouldSelectAllOnTabFocus(el) && (!pendingSelectAllTarget || pendingSelectAllTarget === el)){
+    scheduleSelectAllForElement(el);
+    clearPendingSelectAll();
+  }else if(shouldAutoSelectFromFocusTravel){
+    scheduleSelectAllForElement(el);
+  }
+  if(shouldSelectAllOnTabFocus(el)){
+    lastFocusedEditableForAutoSelect = el;
+  }else{
+    lastFocusedEditableForAutoSelect = null;
+  }
 });
+document.addEventListener("click", (e)=>{
+  const el = e.target?.closest?.('input:not([type="hidden"]), textarea');
+  if(el && shouldSelectAllOnTabFocus(el)){
+    const canSelectAll = !pendingPointerSelectAll || (pendingPointerSelectAll.el === el && !pendingPointerSelectAll.moved);
+    if(canSelectAll) scheduleSelectAllForElement(el);
+  }
+  pendingPointerSelectAll = null;
+}, true);
 
 document.addEventListener("click", (e)=>{
   const addBtn = e.target.closest("[data-add-row]");
