@@ -3437,13 +3437,20 @@ function getFormattedCaretPos(formattedValue, rawIndex){
   }
   return formattedValue.length;
 }
+function shouldForceFullSelectionForInput(el){
+  if(!el || document.activeElement !== el || !shouldSelectAllOnTabFocus(el)) return false;
+  if(shouldKeepFullSelection(el)) return true;
+  if(pendingSelectAllOnTabFocus && (!pendingSelectAllTarget || pendingSelectAllTarget === el)) return true;
+  if(pendingPointerSelectAll && pendingPointerSelectAll.el === el && !pendingPointerSelectAll.moved) return true;
+  return false;
+}
 function formatNumericInputDisplay(el, finalize = false){
   if(!el) return;
   const wasActive = document.activeElement === el;
   const valueBefore = String(el.value ?? "");
   const start = typeof el.selectionStart === "number" ? el.selectionStart : valueBefore.length;
   const end = typeof el.selectionEnd === "number" ? el.selectionEnd : start;
-  const shouldPreserveFullSelection = shouldKeepFullSelection(el);
+  const shouldPreserveFullSelection = shouldForceFullSelectionForInput(el);
   const hadFullSelection = shouldPreserveFullSelection || (wasActive && start === 0 && end === valueBefore.length && valueBefore.length > 0);
   const rawIndex = getNumericRawIndex(el.value, start);
   const formatted = formatNumericText(el.value, finalize, {useGrouping: shouldUseGroupingForInput(el)});
@@ -3500,7 +3507,7 @@ function enhanceNumericInputs(root = document){
     el.setAttribute("enterkeyhint", "done");
     el.addEventListener("focus", ()=>{
       activeNumericInput = el;
-      formatNumericInputDisplay(el, false);
+      if(!shouldForceFullSelectionForInput(el)) formatNumericInputDisplay(el, false);
     });
     el.addEventListener("input", ()=>{
       activeNumericInput = el;
@@ -3934,6 +3941,8 @@ let lastFocusedEditableForAutoSelect = null;
 let selectAllRetryTimers = new WeakMap();
 let selectionLockTarget = null;
 let selectionLockUntil = 0;
+let lastHandledTabMoveAt = 0;
+const TAB_MOVE_THROTTLE_MS = 180;
 function clearPendingSelectAll(){
   pendingSelectAllOnTabFocus = false;
   pendingSelectAllTarget = null;
@@ -8254,12 +8263,70 @@ function buildChartOptions(graphType, cfg, yData, overlay=false, extra={}){
   return options;
 }
 
+
+function captureActiveInputState(){
+  const el = document.activeElement;
+  if(!(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement || el instanceof HTMLSelectElement)) return null;
+  if(!el.id) return null;
+  return {
+    id: el.id,
+    tag: el.tagName,
+    value: String(el.value ?? ""),
+    selectionStart: typeof el.selectionStart === "number" ? el.selectionStart : null,
+    selectionEnd: typeof el.selectionEnd === "number" ? el.selectionEnd : null,
+    shouldSelectAll: (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) && shouldSelectAllOnTabFocus(el) && typeof el.selectionStart === "number" && typeof el.selectionEnd === "number" && el.selectionStart === 0 && el.selectionEnd === String(el.value ?? "").length
+  };
+}
+function restoreActiveInputState(state){
+  if(!state || !state.id) return;
+  const el = document.getElementById(state.id);
+  if(!(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement || el instanceof HTMLSelectElement)) return;
+  try{ el.focus({preventScroll:true}); }catch(_e){ try{ el.focus(); }catch(__e){} }
+  if((el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) && typeof el.setSelectionRange === "function"){
+    const len = String(el.value ?? "").length;
+    try{
+      if(state.shouldSelectAll){
+        el.setSelectionRange(0, len);
+        lockFullSelection(el, 700);
+      }else if(state.selectionStart != null && state.selectionEnd != null){
+        const start = Math.max(0, Math.min(len, state.selectionStart));
+        const end = Math.max(0, Math.min(len, state.selectionEnd));
+        el.setSelectionRange(start, end);
+      }
+    }catch(_e){}
+  }
+}
+function getScenarioConfigAndSimForDrawing(scenario, currentScenario, currentCfg, currentSim){
+  if(scenario === currentScenario) return {cfg: currentCfg, sim: currentSim};
+  const focusState = captureActiveInputState();
+  setAllInputs(scenario.data);
+  const cfg = getScenarioFromDOM();
+  const sim = simulate(cfg, false);
+  setAllInputs(currentScenario.data);
+  restoreActiveInputState(focusState);
+  return {cfg, sim};
+}
+function getScenarioMonteBaseForDrawing(scenario, currentScenario, currentCfg, currentBase){
+  if(scenario === currentScenario) return {cfg: currentCfg, base: currentBase};
+  const focusState = captureActiveInputState();
+  setAllInputs(scenario.data);
+  const cfg = getScenarioFromDOM();
+  const base = simulate(cfg, false);
+  setAllInputs(currentScenario.data);
+  restoreActiveInputState(focusState);
+  return {cfg, base};
+}
+
 function draw(){
   monteMode = false;
   ensureScenarioSaved();
   const graphType = document.getElementById("graphType").value;
   const overlay = document.getElementById("overlayToggle").checked;
-  const targets = overlay ? scenarios : [scenarios[currentTab]];
+  const currentScenario = scenarios[currentTab];
+  const targets = overlay ? scenarios : [currentScenario];
+
+  const currentCfg = getScenarioFromDOM();
+  const currentSim = simulate(currentCfg, false);
 
   let datasets = [];
   let yData = [];
@@ -8267,9 +8334,7 @@ function draw(){
   let baseSim = null;
 
   targets.forEach((s, idx)=>{
-    setAllInputs(s.data);
-    const cfg = getScenarioFromDOM();
-    const sim = simulate(cfg, false);
+    const {cfg, sim} = getScenarioConfigAndSimForDrawing(s, currentScenario, currentCfg, currentSim);
     if(idx===0){
       firstCfg = cfg;
       baseSim = sim;
@@ -8285,9 +8350,7 @@ function draw(){
     };
     yData.push(...(arrays[graphType] || [0]));
   });
-  setAllInputs(scenarios[currentTab].data);
-  const currentCfg = getScenarioFromDOM();
-  const currentSim = simulate(currentCfg, false);
+
   updateResultCards(currentCfg, currentSim);
   renderCashflowTable(currentSim);
 
@@ -8305,7 +8368,10 @@ function runMonte(){
   monteMode = true;
   ensureScenarioSaved();
   const overlay = document.getElementById("overlayToggle").checked;
-  const targets = overlay ? scenarios : [scenarios[currentTab]];
+  const currentScenario = scenarios[currentTab];
+  const targets = overlay ? scenarios : [currentScenario];
+  const currentCfg = getScenarioFromDOM();
+  const currentBaseSim = simulate(currentCfg, false);
   let datasets = [];
   let yData = [];
   let firstCfg = null;
@@ -8313,11 +8379,9 @@ function runMonte(){
   let monteInfo = null;
 
   targets.forEach((s, idx)=>{
-    setAllInputs(s.data);
-    const cfg = getScenarioFromDOM();
+    const {cfg, base} = getScenarioMonteBaseForDrawing(s, currentScenario, currentCfg, currentBaseSim);
     const monteSettings = cfg.monteCarlo || getMonteCarloSettingsFromDOM();
     const trials = clampMonteTrials(monteSettings.trials || 80);
-    const base = simulate(cfg, false);
     if(idx===0){
       firstCfg = cfg;
       baseSim = base;
@@ -8372,9 +8436,7 @@ function runMonte(){
         : {prob, legendItems:[{text:`グレー: 全試行（表示 ${displayResults.length} 本 / 計算 ${trials} 回）`, color:"#6b7280"},{text:"緑: ベスト", color:"green"},{text:"黒: 固定利率", color:"black"},{text:"赤: ワースト", color:"red"},{text:summaryText, color:"#2563eb"}, ...(allSame ? [{text:"全試行が固定利率と同一です（リスク資産や利回り設定を確認）", color:"#6b7280"}] : [])]};
     }
   });
-  setAllInputs(scenarios[currentTab].data);
-  const currentCfg = getScenarioFromDOM();
-  const currentSim = simulate(currentCfg, false);
+  const currentSim = currentBaseSim;
   updateResultCards(currentCfg, currentSim);
   renderCashflowTable(currentSim);
 
@@ -9776,8 +9838,10 @@ document.addEventListener("keydown", (e)=>{
   if(e.altKey || e.ctrlKey || e.metaKey) return;
   const active = document.activeElement;
   if(active && active.matches && active.matches('textarea') && !active.readOnly && !active.disabled) return;
-  const handled = moveFocusByTabDirection(!!e.shiftKey);
-  if(handled) e.preventDefault();
+  pendingSelectAllOnTabFocus = true;
+  pendingSelectAllTarget = null;
+  const now = Date.now();
+  lastHandledTabMoveAt = now;
 }, true);
 document.addEventListener("pointerdown", (e)=>{
   lastPointerDownAt = Date.now();
