@@ -1580,7 +1580,7 @@
             <tr><td>想定寿命</td><td><div class="input-unit center"><input id="lifeExpect" type="number" class="agebox" value="90"><span class="suffix">歳</span></div></td></tr>
             <tr><td>為替レート</td><td><div class="input-unit center"><input id="usdRate" type="number" class="agebox" value="150" step="0.1"><span class="suffix">円 / ドル</span></div></td></tr>
             <tr><td>インフレ率</td><td><div class="input-unit center"><input id="inflRate" type="number" class="ratebox" step="0.1" value="1.0"><span class="suffix">%</span></div></td></tr>
-            <tr><td>基準年月日</td><td><div class="basic-date-only"><input id="baseDate" type="date" class="datebox" value="2026-03-29"><input id="currentBaseYear" type="hidden" value="2026"></div></td></tr>
+            <tr><td>基準年月日</td><td><div class="basic-date-only"><input id="baseDate" type="date" class="datebox" value=""><input id="currentBaseYear" type="hidden" value=""></div></td></tr>
           </table>
         </div>
         <div class="basic-children-pane">
@@ -1998,6 +1998,7 @@ let drawDebounceTimer = null;
 let scenarios = [];
 let currentTab = 0;
 let monteMode = false;
+let defaultScenarioTemplate = null;
 let educationDetailDraft = null;
 let currentEducationDetailChildIndex = null;
 let educationCopyDraft = null;
@@ -2300,12 +2301,16 @@ function getDefaultBirthDateForAge(baseDateValue, targetAge){
   return formatDateParts(baseYear - Math.max(0, Number(targetAge) || 0), 1, 1);
 }
 function applyDefaultScalarInputs(){
-  const baseDateValue = document.getElementById("baseDate")?.value || formatDateParts(new Date().getFullYear(), 3, 29);
+  const baseDateValue = document.getElementById("baseDate")?.value || getTodayDateString();
   const selfBirthInput = document.getElementById("selfBirthDate");
   const spouseBirthInput = document.getElementById("spouseBirthDate");
   const inflRateInput = document.getElementById("inflRate");
   const selfAgeHidden = document.getElementById("age");
   const spouseAgeHidden = document.getElementById("spouseAge");
+  const baseDateInput = document.getElementById("baseDate");
+  const currentBaseYearInput = document.getElementById("currentBaseYear");
+  if(baseDateInput) baseDateInput.value = baseDateValue;
+  if(currentBaseYearInput) currentBaseYearInput.value = String(parseDateInput(baseDateValue)?.year || new Date().getFullYear());
   if(selfBirthInput) selfBirthInput.value = getDefaultBirthDateForAge(baseDateValue, 40);
   if(spouseBirthInput) spouseBirthInput.value = getDefaultBirthDateForAge(baseDateValue, 35);
   if(selfAgeHidden) selfAgeHidden.value = "40";
@@ -2319,6 +2324,12 @@ function createDefaultScenarioData(){
   syncAllBirthDateDerivedFields();
   updatePeriodDisplays();
   return migrateLegacyData(getAllInputs());
+}
+function getDefaultScenarioTemplate(){
+  if(!defaultScenarioTemplate){
+    defaultScenarioTemplate = deepClone(createDefaultScenarioData());
+  }
+  return deepClone(defaultScenarioTemplate);
 }
 
 function buildSchoolSelect(id, value){
@@ -2815,8 +2826,7 @@ function migrateLegacyData(data){
   if(!data) return {};
   data = {...data};
   if(!data.baseDate){
-    const baseYear = Number(data.currentBaseYear || new Date().getFullYear()) || new Date().getFullYear();
-    data.baseDate = formatDateParts(baseYear, 3, 29);
+    data.baseDate = getTodayDateString();
   }
   if(data.socialVoluntaryAnnual == null || data.socialVoluntaryAnnual === ""){
     const legacyVol = data.social_self_voluntaryAnnual ?? data.social_sp_voluntaryAnnual;
@@ -3939,6 +3949,10 @@ function pad2(n){ return String(Math.max(0, Number(n) || 0)).padStart(2, "0"); }
 function formatDateParts(year, month, day){
   if(!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day)) return "";
   return `${Math.round(year)}-${pad2(month)}-${pad2(day)}`;
+}
+function getTodayDateString(){
+  const now = new Date();
+  return formatDateParts(now.getFullYear(), now.getMonth() + 1, now.getDate());
 }
 function parseDateInput(value){
   const m = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
@@ -5214,7 +5228,7 @@ function updateInputsVisibility(){
 }
 function addTab(){
   ensureScenarioSaved();
-  const baseData = createDefaultScenarioData();
+  const baseData = getDefaultScenarioTemplate();
   scenarios.push({name:defaultScenarioName(scenarios.length), custom:false, data:deepClone(baseData)});
   normalizeScenarioNames();
   currentTab = scenarios.length - 1;
@@ -7619,7 +7633,7 @@ function buildMonteDistributionDataset(cfg, finalsAtLife, opts={}){
     fill:false,
     tension:0.25,
     yAxisID:opts.yAxisID,
-    order:opts.order ?? 30,
+    order:opts.order ?? 1,
     spanGaps:true,
     medianMarker:{
       x:medianScaledX,
@@ -9127,22 +9141,22 @@ function runMonte(){
     if(overlay){
       displayPlots.forEach(plot=>{
         datasets.push(makeLineDataset("", plot.labels, plot.values, {
-          borderColor:color + "33", borderWidth:1
+          borderColor:color + "33", borderWidth:1, order:100
         }));
       });
-      datasets.push(makeLineDataset(`${s.name} ベスト`, bestPlot.labels, bestPlot.values, {borderColor:color, borderWidth:2}));
-      datasets.push(makeLineDataset(`${s.name} 固定利率`, basePlot.labels, basePlot.values, {borderColor:color, borderWidth:3}));
-      datasets.push(makeLineDataset(`${s.name} ワースト`, worstPlot.labels, worstPlot.values, {borderColor:color, borderDash:[5,4], borderWidth:2}));
+      datasets.push(makeLineDataset(`${s.name} ワースト`, worstPlot.labels, worstPlot.values, {borderColor:color, borderDash:[5,4], borderWidth:2, order:4}));
+      datasets.push(makeLineDataset(`${s.name} ベスト`, bestPlot.labels, bestPlot.values, {borderColor:color, borderWidth:2, order:3}));
+      datasets.push(makeLineDataset(`${s.name} 固定利率`, basePlot.labels, basePlot.values, {borderColor:color, borderWidth:3, order:2}));
     }else{
       displayPlots.forEach(plot=>{
         datasets.push(makeLineDataset("", plot.labels, plot.values, {
-          borderColor:"rgba(156,163,175,0.30)", borderWidth:1
+          borderColor:"rgba(156,163,175,0.30)", borderWidth:1, order:100
         }));
       });
-      datasets.push(makeLineDataset("ベスト", bestPlot.labels, bestPlot.values, {borderColor:"green", borderWidth:2}));
-      datasets.push(makeLineDataset("固定利率", basePlot.labels, basePlot.values, {borderColor:"black", borderWidth:2.5}));
-      datasets.push(makeLineDataset("ワースト", worstPlot.labels, worstPlot.values, {borderColor:"red", borderWidth:2}));
-      if(distributionDataset) datasets.push(distributionDataset);
+      datasets.push(makeLineDataset("ワースト", worstPlot.labels, worstPlot.values, {borderColor:"red", borderWidth:2, order:4}));
+      datasets.push(makeLineDataset("ベスト", bestPlot.labels, bestPlot.values, {borderColor:"green", borderWidth:2, order:3}));
+      datasets.push(makeLineDataset("固定利率", basePlot.labels, basePlot.values, {borderColor:"black", borderWidth:2.5, order:2}));
+      if(distributionDataset) datasets.push({...distributionDataset, order:1});
     }
     displayPlots.forEach(plot=> yData.push(...getVisibleSeriesValues(plot.labels, plot.values, cfg.xAxisMax)));
     yData.push(...getVisibleSeriesValues(basePlot.labels, basePlot.values, cfg.xAxisMax));
@@ -11338,6 +11352,12 @@ document.getElementById("pensionHelperModal")?.addEventListener("input", (e)=>{
 });
 
 window.addEventListener("load", ()=>{
+  const today = getTodayDateString();
+  const baseDateInput = document.getElementById("baseDate");
+  const currentBaseYearInput = document.getElementById("currentBaseYear");
+  if(baseDateInput && !baseDateInput.value) baseDateInput.value = today;
+  if(currentBaseYearInput && !currentBaseYearInput.value) currentBaseYearInput.value = String(parseDateInput(today)?.year || new Date().getFullYear());
+  defaultScenarioTemplate = deepClone(createDefaultScenarioData());
   seedLoanDetailHiddenFromSimpleIfNeeded();
   updateHomeDetailUIState();
   if(!loadFromURL() && !loadFromLocal()) addTab();
