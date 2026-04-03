@@ -2003,14 +2003,51 @@ let currentEducationDetailChildIndex = null;
 let educationCopyDraft = null;
 let lastFocusedElementInOpenModal = null;
 const NORMAL_SIM_CACHE_LIMIT = 120;
+const MONTE_RUN_CACHE_LIMIT = 24;
+const MONTE_COMPARE_CACHE_LIMIT = 12;
+const MONTE_STATIC_SERIES_CACHE_LIMIT = 48;
+const MONTE_SHARED_SHOCK_CACHE_LIMIT = 32;
 const normalSimCache = new Map();
+const monteRunCache = new Map();
+const monteCompareResultCache = new Map();
+const monteStaticSeriesCache = new Map();
+const monteSharedShockCache = new Map();
+const DISPLAY_ONLY_INPUT_IDS = new Set(["graphType","overlayToggle","fixedScale","fixedScaleMin","fixedScaleMax","xAxisMin","xAxisMax"]);
+const MONTE_SETTING_INPUT_IDS = new Set(["monteTrials","monteDrawPaths","monteModel","monteEffectiveVolPct","monteUniformRangePct","monteNormalStdPct","monteMeanRevStdPct","monteMeanRevPhi","monteSeedOn","monteSeedValue"]);
+
+function cloneWithoutKeysDeep(value, shouldOmit){
+  if(Array.isArray(value)) return value.map(item=>cloneWithoutKeysDeep(item, shouldOmit));
+  if(!value || typeof value !== "object") return value;
+  const out = {};
+  Object.entries(value).forEach(([key, val])=>{
+    if(shouldOmit(key)) return;
+    out[key] = cloneWithoutKeysDeep(val, shouldOmit);
+  });
+  return out;
+}
+function sanitizeSimulationInputData(data, options={}){
+  const includeMonteSettings = options.includeMonteSettings === true;
+  return cloneWithoutKeysDeep(data || {}, key=>{
+    if(DISPLAY_ONLY_INPUT_IDS.has(key)) return true;
+    if(!includeMonteSettings && MONTE_SETTING_INPUT_IDS.has(key)) return true;
+    return false;
+  });
+}
+function mergeDisplaySettingsIntoCfg(baseCfg, displayCfg){
+  const merged = deepClone(baseCfg || {});
+  const src = displayCfg || {};
+  ["fixedScale","fixedScaleMin","fixedScaleMax","xAxisMin","xAxisMax"].forEach(key=>{
+    if(Object.prototype.hasOwnProperty.call(src, key)) merged[key] = src[key];
+  });
+  return merged;
+}
 
 function pruneNormalSimCacheIfNeeded(){
   if(normalSimCache.size > NORMAL_SIM_CACHE_LIMIT) normalSimCache.clear();
 }
 function makeNormalSimCacheKeyFromData(data){
   try{
-    return JSON.stringify(data || {});
+    return JSON.stringify(sanitizeSimulationInputData(data, {includeMonteSettings:false}));
   }catch(_e){
     return "";
   }
@@ -2030,11 +2067,14 @@ function setNormalSimCacheByData(data, cfg, sim){
   return entry;
 }
 function getOrBuildNormalScenarioCache(scenario, currentScenario, currentCfg, currentSim){
-  if(!scenario) return {cfg: currentCfg, sim: currentSim};
+  if(!scenario) return {cfg: mergeDisplaySettingsIntoCfg(currentCfg, currentCfg), sim: currentSim};
   const cached = getNormalSimCacheByData(scenario.data);
-  if(cached) return cached;
+  if(cached){
+    return {cfg: mergeDisplaySettingsIntoCfg(cached.cfg, currentCfg), sim: cached.sim};
+  }
   if(scenario === currentScenario && currentCfg && currentSim){
-    return setNormalSimCacheByData(scenario.data, currentCfg, currentSim);
+    const stored = setNormalSimCacheByData(scenario.data, currentCfg, currentSim);
+    return {cfg: mergeDisplaySettingsIntoCfg(stored.cfg, currentCfg), sim: stored.sim};
   }
   const focusState = captureActiveInputState();
   setAllInputs(scenario.data);
@@ -2042,7 +2082,204 @@ function getOrBuildNormalScenarioCache(scenario, currentScenario, currentCfg, cu
   const sim = simulate(cfg, false);
   if(currentScenario?.data) setAllInputs(currentScenario.data);
   restoreActiveInputState(focusState);
-  return setNormalSimCacheByData(scenario.data, cfg, sim);
+  const stored = setNormalSimCacheByData(scenario.data, cfg, sim);
+  return {cfg: mergeDisplaySettingsIntoCfg(stored.cfg, currentCfg), sim: stored.sim};
+}
+
+function pruneMonteRunCacheIfNeeded(){
+  if(monteRunCache.size > MONTE_RUN_CACHE_LIMIT) monteRunCache.clear();
+}
+function pruneMonteCompareCacheIfNeeded(){
+  if(monteCompareResultCache.size > MONTE_COMPARE_CACHE_LIMIT) monteCompareResultCache.clear();
+}
+function pruneMonteStaticSeriesCacheIfNeeded(){
+  if(monteStaticSeriesCache.size > MONTE_STATIC_SERIES_CACHE_LIMIT) monteStaticSeriesCache.clear();
+}
+function pruneMonteSharedShockCacheIfNeeded(){
+  if(monteSharedShockCache.size > MONTE_SHARED_SHOCK_CACHE_LIMIT) monteSharedShockCache.clear();
+}
+function buildMonteCacheSettingsSignature(settings){
+  const src = settings || {};
+  return {
+    trials: clampMonteTrials(src.trials || 80),
+    model: String(src.model || 'normal'),
+    effectiveVolPct: Number(src.effectiveVolPct || 0) || 0,
+    uniformRangePct: Number(src.uniformRangePct || 0) || 0,
+    normalStdPct: Number(src.normalStdPct || 0) || 0,
+    meanRevStdPct: Number(src.meanRevStdPct || 0) || 0,
+    meanRevInnovationStdPct: Number(src.meanRevInnovationStdPct || 0) || 0,
+    meanRevPhi: Number(src.meanRevPhi || 0) || 0,
+    seedOn: !!src.seedOn,
+    seedValue: Math.round(Number(src.seedValue || 0) || 0)
+  };
+}
+function makeMonteStaticSeriesCacheKey(data){
+  try{
+    return JSON.stringify({type:'monte_static_series', data:sanitizeSimulationInputData(data, {includeMonteSettings:false})});
+  }catch(_e){
+    return '';
+  }
+}
+function makeMonteSharedShockCacheKey(data, settings){
+  try{
+    return JSON.stringify({type:'monte_shared_shocks', data:sanitizeSimulationInputData(data, {includeMonteSettings:false}), settings:buildMonteCacheSettingsSignature(settings)});
+  }catch(_e){
+    return '';
+  }
+}
+function getMonteStaticSeriesCacheEntry(data){
+  const key = makeMonteStaticSeriesCacheKey(data);
+  if(!key) return null;
+  return monteStaticSeriesCache.get(key) || null;
+}
+function setMonteStaticSeriesCacheEntry(data, rows){
+  const key = makeMonteStaticSeriesCacheKey(data);
+  if(!key) return rows;
+  const entry = {key, rows};
+  monteStaticSeriesCache.set(key, entry);
+  pruneMonteStaticSeriesCacheIfNeeded();
+  return entry;
+}
+function getMonteSharedShockCacheEntry(data, settings){
+  const key = makeMonteSharedShockCacheKey(data, settings);
+  if(!key) return null;
+  return monteSharedShockCache.get(key) || null;
+}
+function setMonteSharedShockCacheEntry(data, settings, shocks){
+  const key = makeMonteSharedShockCacheKey(data, settings);
+  if(!key) return shocks;
+  const entry = {key, shocks};
+  monteSharedShockCache.set(key, entry);
+  pruneMonteSharedShockCacheIfNeeded();
+  return entry;
+}
+function makeMonteRunCacheKey(data, settings){
+  try{
+    return JSON.stringify({type:'monte_run', data:sanitizeSimulationInputData(data, {includeMonteSettings:false}), settings:buildMonteCacheSettingsSignature(settings)});
+  }catch(_e){
+    return '';
+  }
+}
+function makeMonteCompareCacheKey(cfgBase, cases, settings){
+  try{
+    return JSON.stringify({type:'monte_compare', data:sanitizeSimulationInputData(cfgBase, {includeMonteSettings:false}), settings:buildMonteCacheSettingsSignature(settings), cases:cases || []});
+  }catch(_e){
+    return '';
+  }
+}
+function getMonteRunCacheEntry(data, settings){
+  const key = makeMonteRunCacheKey(data, settings);
+  if(!key) return null;
+  return monteRunCache.get(key) || null;
+}
+function setMonteRunCacheEntry(data, settings, value){
+  const key = makeMonteRunCacheKey(data, settings);
+  if(!key) return value;
+  const entry = {key, value};
+  monteRunCache.set(key, entry);
+  pruneMonteRunCacheIfNeeded();
+  return entry;
+}
+function getMonteCompareCacheEntry(cfgBase, cases, settings){
+  const key = makeMonteCompareCacheKey(cfgBase, cases, settings);
+  if(!key) return null;
+  return monteCompareResultCache.get(key) || null;
+}
+function setMonteCompareCacheEntry(cfgBase, cases, settings, results){
+  const key = makeMonteCompareCacheKey(cfgBase, cases, settings);
+  if(!key) return results;
+  const entry = {key, results};
+  monteCompareResultCache.set(key, entry);
+  pruneMonteCompareCacheIfNeeded();
+  return entry;
+}
+function getOrBuildMonteStaticSeries(data, cfg){
+  const cached = getMonteStaticSeriesCacheEntry(data);
+  if(cached?.rows) return cached.rows;
+  const rows = buildMonteStaticSeries(cfg);
+  setMonteStaticSeriesCacheEntry(data, rows);
+  return rows;
+}
+function buildMonteRunResult(cfg, base, monteSettings, scenarioDataOverride){
+  const trials = clampMonteTrials(monteSettings?.trials || 80);
+  const scenarioData = scenarioDataOverride || cfg || {};
+  const staticSeries = getOrBuildMonteStaticSeries(scenarioData, cfg);
+  const shockTrials = buildSharedReturnShocks(cfg, trials, scenarioData, monteSettings);
+  const lifeIndex = Math.max(0, Math.min((base?.labels?.length || 1) - 1, Number(cfg.lifeExpect || 0) - Number(cfg.age || 0)));
+  const finalsAtLife = [];
+  let fail = 0;
+  let bestIndex = 0;
+  let worstIndex = 0;
+  for(let i=0;i<trials;i++){
+    const finalSim = simulateMonteFinalOnly(cfg, staticSeries, shockTrials[i], lifeIndex);
+    const finalValue = Number(finalSim?.finalAtLife || 0) || 0;
+    finalsAtLife.push(finalValue);
+    if(finalValue <= 0) fail++;
+    if(i === 0) continue;
+    if(finalValue > (Number(finalsAtLife[bestIndex]) || 0)) bestIndex = i;
+    if(finalValue < (Number(finalsAtLife[worstIndex]) || 0)) worstIndex = i;
+  }
+  const prob = Math.round(fail / Math.max(1, trials) * 100);
+  return {
+    lifeIndex,
+    fail,
+    prob,
+    finalsAtLife,
+    bestIndex,
+    worstIndex,
+    trials,
+    displayCache:{},
+    fixedFinalAtLife:Number(base?.totalAssets?.[lifeIndex] ?? base?.totalAssets?.at?.(-1) ?? 0) || 0
+  };
+}
+function buildMonteDisplayBundleFromRun(monteRun, cfg, base, monteSettings, scenarioDataOverride){
+  const run = monteRun || {};
+  const trials = Math.max(1, Number(run.trials || 0) || clampMonteTrials(monteSettings?.trials || 80));
+  const drawPaths = Math.max(1, Math.min(trials, Math.round(Number(monteSettings?.drawPaths) || trials)));
+  if(!run.displayCache) run.displayCache = {};
+  const cacheKey = String(drawPaths);
+  if(run.displayCache[cacheKey]) return run.displayCache[cacheKey];
+  const scenarioData = scenarioDataOverride || cfg || {};
+  const staticSeries = getOrBuildMonteStaticSeries(scenarioData, cfg);
+  const shockTrials = buildSharedReturnShocks(cfg, trials, scenarioData, monteSettings);
+  const displayIndices = pickMonteDisplayIndices(trials, drawPaths);
+  const trialSeriesCache = new Map();
+  const getSeries = (trialIndex)=>{
+    const safeIndex = Math.max(0, Math.min(trials - 1, Number(trialIndex) || 0));
+    const key = String(safeIndex);
+    if(trialSeriesCache.has(key)) return trialSeriesCache.get(key);
+    const sim = simulate(cfg, true, {compact:true, staticSeries, returnShocks:shockTrials[safeIndex]});
+    const series = Array.isArray(sim?.totalAssets) ? sim.totalAssets : [];
+    trialSeriesCache.set(key, series);
+    return series;
+  };
+  const displayResults = displayIndices.map(getSeries);
+  const best = getSeries(run.bestIndex || 0);
+  const worst = getSeries(run.worstIndex || 0);
+  const baseSeries = Array.isArray(base?.totalAssets) ? base.totalAssets : [];
+  const allFinalsSameAsFixed = Array.isArray(run.finalsAtLife)
+    ? run.finalsAtLife.every(v => Math.abs((Number(v) || 0) - (Number(run.fixedFinalAtLife || 0) || 0)) < 1e-9)
+    : false;
+  const allVisibleSame = [best, worst, ...displayResults].every(r => r.length === baseSeries.length && r.every((v, i)=>Math.abs((Number(v) || 0) - (Number(baseSeries[i]) || 0)) < 1e-9));
+  const bundle = {
+    drawPaths,
+    displayIndices,
+    displayResults,
+    best,
+    worst,
+    allSame: allFinalsSameAsFixed && allVisibleSame
+  };
+  run.displayCache[cacheKey] = bundle;
+  return bundle;
+}
+function getOrBuildMonteRunCache(scenario, cfg, base, monteSettingsOverride){
+  const data = scenario?.data || cfg || {};
+  const monteSettings = monteSettingsOverride || cfg?.monteCarlo || getMonteCarloSettingsFromDOM();
+  const cached = getMonteRunCacheEntry(data, monteSettings);
+  if(cached?.value) return cached.value;
+  const value = buildMonteRunResult(cfg, base, monteSettings, data);
+  setMonteRunCacheEntry(data, monteSettings, value);
+  return value;
 }
 
 function defaultScenarioName(index){ return `条件${index+1}`; }
@@ -7289,6 +7526,17 @@ function pickMonteDisplayPaths(results, drawPaths){
   }
   return out;
 }
+function pickMonteDisplayIndices(totalTrials, drawPaths){
+  const total = Math.max(1, Math.round(Number(totalTrials) || 0));
+  const maxPaths = Math.max(1, Math.min(total, Math.round(Number(drawPaths) || total)));
+  if(total <= maxPaths) return Array.from({length: total}, (_, i)=>i);
+  const out = [];
+  for(let i=0;i<maxPaths;i++){
+    const idx = Math.round(i * (total - 1) / Math.max(1, maxPaths - 1));
+    out.push(idx);
+  }
+  return out;
+}
 function getMonteChartStartTotal(cfg){
   const deposits = Array.isArray(cfg?.deposits) ? cfg.deposits : [];
   const investments = Array.isArray(cfg?.investments) ? cfg.investments : [];
@@ -7304,6 +7552,81 @@ function buildMontePlotSeries(cfg, labels, series){
   if(!safeLabels.length) return {labels:safeLabels, values:safeSeries};
   const startTotal = getMonteChartStartTotal(cfg);
   return {labels:safeLabels, values:[startTotal, ...safeSeries.slice(0, Math.max(0, safeLabels.length - 1))]};
+}
+function getMonteDistributionAxisMax(cfg){
+  const currentMax = Number(cfg?.xAxisMax);
+  const life = Number(cfg?.lifeExpect || 0);
+  const baseMax = Number.isFinite(currentMax) ? currentMax : life;
+  return Math.max(baseMax, life + 8);
+}
+function buildMonteDistributionDataset(cfg, finalsAtLife, opts={}){
+  const finals = Array.isArray(finalsAtLife) ? finalsAtLife.map(v=>Number(v)).filter(v=>Number.isFinite(v)) : [];
+  if(finals.length < 2) return null;
+  const histogram = buildHistogramSeries(finals, 28);
+  const points = Array.isArray(histogram?.points) ? histogram.points : [];
+  if(!points.length) return null;
+  const minAsset = Number.isFinite(histogram.min) ? histogram.min : Math.min(...finals);
+  const maxAsset = Number.isFinite(histogram.max) ? histogram.max : Math.max(...finals);
+  const peakProb = Math.max(...points.map(p=>Number(p?.y) || 0), 0);
+  if(!(peakProb > 0)) return null;
+  const sortedFinals = finals.slice().sort((a,b)=>a-b);
+  const medianAsset = percentileFromSorted(sortedFinals, 0.50);
+  const life = Number(cfg?.lifeExpect || 0);
+  const axisMax = getMonteDistributionAxisMax(cfg);
+  const availableSpan = Math.max(3, axisMax - life);
+  const rightSpan = availableSpan * 0.82;
+  const data = [{x:life, y:minAsset}];
+  points.forEach(point=>{
+    const prob = Math.max(0, Number(point?.y) || 0);
+    const asset = Number(point?.x) || 0;
+    const scaledX = life + (prob / peakProb) * rightSpan;
+    data.push({x:scaledX, y:asset});
+  });
+  data.push({x:life, y:maxAsset});
+
+  let medianProb = 0;
+  if(points.length === 1){
+    medianProb = Math.max(0, Number(points[0]?.y) || 0);
+  }else if(medianAsset <= (Number(points[0]?.x) || 0)){
+    medianProb = Math.max(0, Number(points[0]?.y) || 0);
+  }else if(medianAsset >= (Number(points[points.length - 1]?.x) || 0)){
+    medianProb = Math.max(0, Number(points[points.length - 1]?.y) || 0);
+  }else{
+    for(let i=0; i<points.length - 1; i++){
+      const leftAsset = Number(points[i]?.x) || 0;
+      const rightAsset = Number(points[i+1]?.x) || 0;
+      if(medianAsset >= leftAsset && medianAsset <= rightAsset){
+        const leftProb = Math.max(0, Number(points[i]?.y) || 0);
+        const rightProb = Math.max(0, Number(points[i+1]?.y) || 0);
+        const span = Math.max(1e-9, rightAsset - leftAsset);
+        const t = (medianAsset - leftAsset) / span;
+        medianProb = leftProb + (rightProb - leftProb) * t;
+        break;
+      }
+    }
+  }
+  const medianScaledX = life + (Math.max(0, medianProb) / peakProb) * rightSpan;
+  return {
+    type:'line',
+    label:opts.label || '想定寿命時の総資産確率分布',
+    data,
+    parsing:false,
+    borderColor:opts.borderColor || '#f59e0b',
+    backgroundColor:opts.backgroundColor || '#f59e0b',
+    borderWidth:opts.borderWidth ?? 2,
+    pointRadius:0,
+    pointHoverRadius:0,
+    fill:false,
+    tension:0.25,
+    yAxisID:opts.yAxisID,
+    order:opts.order ?? 30,
+    spanGaps:true,
+    medianMarker:{
+      x:medianScaledX,
+      y:medianAsset,
+      label:`中央値：${Math.round(medianAsset).toLocaleString("ja-JP")}万円`
+    }
+  };
 }
 function formatMonteSettingsSummary(settings){
   if(!settings) return '';
@@ -8037,17 +8360,22 @@ function buildMonteStaticSeries(cfg){
     const extra = getPointValue(cfg.extraIncome, age, cfg.inflRate, yearIndex);
     const childAllowance = getChildAllowanceForYear(cfg, yearIndex);
     const insurance = getInsuranceReceiveForYear(cfg, age, yearIndex);
+    const incomeParts = {self:selfWork, spouse:spouseWork, pension, regular, extra, childAllowance, insurance};
     const baseIncomeTotal = selfWork + spouseWork + pension + regular + extra + childAllowance + insurance;
     const expenseObj = getExpenseForYear(cfg, age, yearIndex);
-    const baseIncomeObj = {total:baseIncomeTotal, parts:{self:selfWork, spouse:spouseWork, pension, regular, extra, childAllowance, insurance, retirePay:0, interest:0}};
+    const baseIncomeObj = {total:baseIncomeTotal, parts:{...incomeParts, retirePay:0, interest:0}};
     const socialTaxObj = estimateSocialAndTaxForYear(cfg, age, yearIndex, baseIncomeObj);
+    const annualNeedBase = annualCashBufferNeed(expenseObj.parts) + (socialTaxObj.social?.total || 0) + (socialTaxObj.tax?.total || 0);
     rows[yearIndex] = {
       age,
       yearIndex,
-      incomeParts:{self:selfWork, spouse:spouseWork, pension, regular, extra, childAllowance, insurance},
+      incomeParts,
+      baseIncomeTotal,
+      baseIncomeObj,
       expenseObj,
       socialObj:socialTaxObj.social,
-      taxObj:socialTaxObj.tax
+      taxObj:socialTaxObj.tax,
+      annualNeedBase
     };
   }
   return rows;
@@ -8055,6 +8383,8 @@ function buildMonteStaticSeries(cfg){
 
 function simulate(cfg, random=false, opts={}){
   const compact = !!opts.compact;
+  const finalOnly = !!opts.finalOnly;
+  const finalLifeIndex = Math.max(0, Number(opts.lifeIndex) || 0);
   const staticSeries = Array.isArray(opts.staticSeries) ? opts.staticSeries : null;
   const deposits = deepClone(cfg.deposits);
   if(!deposits.length) deposits.push({name:"預貯金1", amount:0, rate:0});
@@ -8064,9 +8394,11 @@ function simulate(cfg, random=false, opts={}){
   (cfg.sumInvestments || []).forEach(plan=>investments.push(makeInvestmentEntryFromPlan(plan, 0)));
   let liability = 0;
   const receiptState = ensureReceiptState();
+  const withdrawalPolicy = getWithdrawalPolicyConfig(cfg);
 
-  const labels = [];
-  const totalAssets = [];
+  const labels = finalOnly ? null : [];
+  const totalAssets = finalOnly ? null : [];
+  let finalAtLife = null;
   const totalDeposits = compact ? null : [];
   const totalInvestments = compact ? null : [];
   const totalSafeAssets = compact ? null : [];
@@ -8121,15 +8453,17 @@ function simulate(cfg, random=false, opts={}){
     let expenseObj;
     let socialObj;
     let taxObj;
+    let annualNeed;
     if(staticSeries && staticSeries[yearIndex]){
       const cached = staticSeries[yearIndex];
       expenseObj = cached.expenseObj;
       socialObj = cached.socialObj;
       taxObj = cached.taxObj;
+      annualNeed = cached.annualNeedBase || 0;
       const retirePay = (receiptState && investments) ? processReceiptIncomeForYear(cfg, age, investments, receiptState) : 0;
       incomeObj = {
         parts:{...cached.incomeParts, retirePay, interest:0},
-        total:(cached.incomeParts.self || 0) + (cached.incomeParts.spouse || 0) + (cached.incomeParts.pension || 0) + (cached.incomeParts.regular || 0) + (cached.incomeParts.extra || 0) + (cached.incomeParts.childAllowance || 0) + (cached.incomeParts.insurance || 0) + retirePay
+        total:(cached.baseIncomeTotal || 0) + retirePay
       };
     }else{
       incomeObj = getIncomeForYear(cfg, age, yearIndex, investments, receiptState);
@@ -8137,6 +8471,7 @@ function simulate(cfg, random=false, opts={}){
       const socialTaxObj = estimateSocialAndTaxForYear(cfg, age, yearIndex, incomeObj);
       socialObj = socialTaxObj.social;
       taxObj = socialTaxObj.tax;
+      annualNeed = annualCashBufferNeed(expenseObj.parts) + (socialObj.total || 0) + (taxObj.total || 0);
     }
     const safeAssetObj = processSafeAssetsForYear(cfg, age, safeAssets, deposits);
     incomeObj.parts.interest = safeAssetObj.interestIncome || 0;
@@ -8162,11 +8497,9 @@ function simulate(cfg, random=false, opts={}){
     }else{
       const shortageNeed = consumeDepositsForNeed(-net, deposits);
       if(shortageNeed > 0.0001){
-        const withdrawalRule = getWithdrawalPolicyConfig(cfg);
-        const annualNeed = annualCashBufferNeed(expenseObj.parts) + (socialObj.total || 0) + (taxObj.total || 0);
         const annualInvestmentReturn = getInvestmentReturnForYear(annualState, investments);
-        const ruleNeeds = calculateWithdrawalNeeds(cfg, withdrawalRule, annualNeed, deposits.reduce((s,d)=>s + (Number(d.amount) || 0), 0), investments.reduce((s,i)=>s + (Number(i.amount) || 0), 0), liability, annualInvestmentReturn);
-        ruleNeeds.mode = withdrawalRule.mode;
+        const ruleNeeds = calculateWithdrawalNeeds(cfg, withdrawalPolicy, annualNeed, deposits.reduce((s,d)=>s + (Number(d.amount) || 0), 0), investments.reduce((s,i)=>s + (Number(i.amount) || 0), 0), liability, annualInvestmentReturn);
+        ruleNeeds.mode = withdrawalPolicy.mode;
         const liabilityRef = {value:liability};
         applyWithdrawalRule(cfg, age, deposits, investments, liabilityRef, annualNeed, shortageNeed, annualState, ruleNeeds);
         liability = Math.max(0, Number(liabilityRef.value) || 0);
@@ -8175,18 +8508,16 @@ function simulate(cfg, random=false, opts={}){
 
     processScheduledInvestments(cfg, age, yearIndex, deposits, investments, annualState);
 
-    const withdrawalRule = getWithdrawalPolicyConfig(cfg);
-    const annualNeed = annualCashBufferNeed(expenseObj.parts) + (socialObj.total || 0) + (taxObj.total || 0);
     const annualInvestmentReturn = getInvestmentReturnForYear(annualState, investments);
-    const ruleNeeds = calculateWithdrawalNeeds(cfg, withdrawalRule, annualNeed, deposits.reduce((s,d)=>s + (Number(d.amount) || 0), 0), investments.reduce((s,i)=>s + (Number(i.amount) || 0), 0), liability, annualInvestmentReturn);
-    ruleNeeds.mode = withdrawalRule.mode;
+    const ruleNeeds = calculateWithdrawalNeeds(cfg, withdrawalPolicy, annualNeed, deposits.reduce((s,d)=>s + (Number(d.amount) || 0), 0), investments.reduce((s,i)=>s + (Number(i.amount) || 0), 0), liability, annualInvestmentReturn);
+    ruleNeeds.mode = withdrawalPolicy.mode;
     if(ruleNeeds.targetBuffer > 0 || ruleNeeds.floorBuffer > 0){
       const liabilityRef = {value:liability};
       applyWithdrawalRule(cfg, age, deposits, investments, liabilityRef, annualNeed, 0, annualState, ruleNeeds);
       liability = liabilityRef.value;
     }
 
-    if(!annualState.withdrawalRuleInfo){ annualState.withdrawalRuleInfo = {mode:getWithdrawalPolicyConfig(cfg).mode, floorBuffer:0, targetBuffer:0, defensive:false, annualNeed:0}; }
+    if(!annualState.withdrawalRuleInfo){ annualState.withdrawalRuleInfo = {mode:withdrawalPolicy.mode, floorBuffer:0, targetBuffer:0, defensive:false, annualNeed:0}; }
     const depTotal = deposits.reduce((s,d)=>s+d.amount,0);
     const invTotal = investments.reduce((s,i)=>s+i.amount,0);
     const safeTotal = safeAssetObj.totalSafeAssets || 0;
@@ -8195,9 +8526,12 @@ function simulate(cfg, random=false, opts={}){
     if(retireAsset === null && age >= cfg.incomeSelf.retireAge) retireAsset = total;
     if(total <= 0 && depletionAge === null) depletionAge = age;
 
-    labels.push(age);
-    totalAssets.push(total);
-    if(!compact){
+    if(!finalOnly){
+      labels.push(age);
+      totalAssets.push(total);
+    }
+    if(yearIndex === finalLifeIndex) finalAtLife = total;
+    if(!compact && !finalOnly){
       totalDeposits.push(depTotal);
       totalInvestments.push(invTotal);
       totalSafeAssets.push(safeTotal);
@@ -8232,6 +8566,15 @@ function simulate(cfg, random=false, opts={}){
     }
   }
 
+  if(finalOnly){
+    return {
+      finalAtLife: Number.isFinite(finalAtLife) ? finalAtLife : 0,
+      depletionAge,
+      retireAsset: Number.isFinite(retireAsset) ? retireAsset : 0,
+      totalIncomeSum,
+      totalExpenseSum
+    };
+  }
   if(retireAsset === null) retireAsset = totalAssets[0] ?? 0;
   if(compact){
     return {labels,totalAssets,depletionAge,retireAsset,totalIncomeSum,totalExpenseSum};
@@ -8562,6 +8905,30 @@ function pluginLines(cfg, sim, monteInfo=null){
           ctx.fillStyle = item.color;
           ctx.fillText(item.text, tx, ty + 28 + idx*16);
         });
+
+        const medianMarker = monteInfo.distributionMedian;
+        if(medianMarker && Number.isFinite(medianMarker.x) && Number.isFinite(medianMarker.y)){
+          const markerX = x.getPixelForValue(medianMarker.x);
+          const markerY = y.getPixelForValue(medianMarker.y);
+          if(Number.isFinite(markerX) && Number.isFinite(markerY)){
+            ctx.save();
+            ctx.fillStyle = "#f59e0b";
+            ctx.strokeStyle = "#fff";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(markerX, markerY, 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            ctx.font = "bold 13px Arial";
+            ctx.textAlign = "left";
+            ctx.textBaseline = "middle";
+            const labelX = Math.min(markerX + 10, x.right - 170);
+            const labelY = Math.max(y.top + 12, Math.min(markerY - 12, y.bottom - 12));
+            ctx.fillStyle = "#f59e0b";
+            ctx.fillText(medianMarker.label || "中央値", labelX, labelY);
+            ctx.restore();
+          }
+        }
       }
       ctx.restore();
     }
@@ -8673,8 +9040,8 @@ function draw(){
   const currentScenario = scenarios[currentTab];
   const targets = overlay ? scenarios : [currentScenario];
 
-  const currentCfgFromDom = getScenarioFromDOM();
-  const currentCache = getOrBuildNormalScenarioCache(currentScenario, currentScenario, currentCfgFromDom, null);
+  const currentDisplayCfg = getScenarioFromDOM();
+  const currentCache = getOrBuildNormalScenarioCache(currentScenario, currentScenario, currentDisplayCfg, null);
   const currentCfg = currentCache.cfg;
   const currentSim = currentCache.sim;
 
@@ -8720,8 +9087,11 @@ function runMonte(){
   const overlay = document.getElementById("overlayToggle").checked;
   const currentScenario = scenarios[currentTab];
   const targets = overlay ? scenarios : [currentScenario];
-  const currentCfg = getScenarioFromDOM();
-  const currentBaseSim = simulate(currentCfg, false);
+  const currentDisplayCfg = getScenarioFromDOM();
+  const currentBaseCache = getOrBuildNormalScenarioCache(currentScenario, currentScenario, currentDisplayCfg, null);
+  const currentCfg = currentBaseCache.cfg;
+  const currentBaseSim = currentBaseCache.sim;
+  const currentMonteSettings = getMonteCarloSettingsFromDOM();
   let datasets = [];
   let yData = [];
   let firstCfg = null;
@@ -8730,33 +9100,29 @@ function runMonte(){
 
   targets.forEach((s, idx)=>{
     const {cfg, base} = getScenarioMonteBaseForDrawing(s, currentScenario, currentCfg, currentBaseSim);
-    const monteSettings = cfg.monteCarlo || getMonteCarloSettingsFromDOM();
+    const monteSettings = currentMonteSettings;
     const trials = clampMonteTrials(monteSettings.trials || 80);
     if(idx===0){
       firstCfg = cfg;
       baseSim = base;
     }
 
-    const staticSeries = buildMonteStaticSeries(cfg);
-    const shockTrials = buildSharedReturnShocks(cfg, trials);
-    const results = [];
-    for(let i=0;i<trials;i++){
-      results.push(simulate(cfg, true, {compact:true, staticSeries, returnShocks:shockTrials[i]}).totalAssets);
-    }
-    const displayResults = pickMonteDisplayPaths(results, monteSettings.drawPaths || trials);
-    const lifeIndex = Math.max(0, Math.min(base.labels.length-1, cfg.lifeExpect - cfg.age));
-    const fail = results.filter(r => (r[lifeIndex] ?? r[r.length-1]) <= 0).length;
-    const prob = Math.round(fail / trials * 100);
-    const finalsAtLife = results.map(r => (r[lifeIndex] ?? r.at(-1) ?? 0));
-    const best = results[finalsAtLife.indexOf(Math.max(...finalsAtLife))];
-    const worst = results[finalsAtLife.indexOf(Math.min(...finalsAtLife))];
+    const monteRun = getOrBuildMonteRunCache(s, cfg, base, currentMonteSettings);
+    const displayBundle = buildMonteDisplayBundleFromRun(monteRun, cfg, base, monteSettings, s?.data || cfg);
+    const displayResults = displayBundle.displayResults || [];
+    const lifeIndex = monteRun.lifeIndex;
+    const fail = monteRun.fail;
+    const prob = monteRun.prob;
+    const best = displayBundle.best || [];
+    const worst = displayBundle.worst || [];
     const color = TAB_COLORS[idx % TAB_COLORS.length];
-    const allSame = results.every(r => r.length === base.totalAssets.length && r.every((v, i)=>Math.abs((Number(v) || 0) - (Number(base.totalAssets[i]) || 0)) < 1e-9));
+    const allSame = !!displayBundle.allSame;
     const plotLabels = Array.isArray(base.labels) ? base.labels.slice() : [];
     const basePlot = buildMontePlotSeries(cfg, plotLabels, base.totalAssets);
     const displayPlots = displayResults.map(r => buildMontePlotSeries(cfg, plotLabels, r));
     const bestPlot = buildMontePlotSeries(cfg, plotLabels, best);
     const worstPlot = buildMontePlotSeries(cfg, plotLabels, worst);
+    const distributionDataset = !overlay ? buildMonteDistributionDataset(cfg, monteRun.finalsAtLife, {label:'想定寿命時の総資産確率分布'}) : null;
 
     if(overlay){
       displayPlots.forEach(plot=>{
@@ -8776,14 +9142,18 @@ function runMonte(){
       datasets.push(makeLineDataset("ベスト", bestPlot.labels, bestPlot.values, {borderColor:"green", borderWidth:2}));
       datasets.push(makeLineDataset("固定利率", basePlot.labels, basePlot.values, {borderColor:"black", borderWidth:2.5}));
       datasets.push(makeLineDataset("ワースト", worstPlot.labels, worstPlot.values, {borderColor:"red", borderWidth:2}));
+      if(distributionDataset) datasets.push(distributionDataset);
     }
     displayPlots.forEach(plot=> yData.push(...getVisibleSeriesValues(plot.labels, plot.values, cfg.xAxisMax)));
     yData.push(...getVisibleSeriesValues(basePlot.labels, basePlot.values, cfg.xAxisMax));
+    if(distributionDataset){
+      distributionDataset.data.forEach(point=>{ if(Number.isFinite(point?.y)) yData.push(Number(point.y) || 0); });
+    }
     if(idx===0){
       const summaryText = formatMonteSettingsSummary(monteSettings).replace(/<br>/g, ' ').replace(/<[^>]+>/g, '');
       monteInfo = overlay
         ? {prob, legendItems:[{text:`各ケースの試行 / ベスト / 固定利率 / ワースト（${summaryText}）`, color:TAB_COLORS[0]}, ...(allSame ? [{text:"全試行が固定利率と同一です（リスク資産や利回り設定を確認）", color:"#6b7280"}] : [])]}
-        : {prob, legendItems:[{text:`グレー: 全試行（表示 ${displayResults.length} 本 / 計算 ${trials} 回）`, color:"#6b7280"},{text:"緑: ベスト", color:"green"},{text:"黒: 固定利率", color:"black"},{text:"赤: ワースト", color:"red"},{text:summaryText, color:"#2563eb"}, ...(allSame ? [{text:"全試行が固定利率と同一です（リスク資産や利回り設定を確認）", color:"#6b7280"}] : [])]};
+        : {prob, distributionMedian:distributionDataset?.medianMarker || null, legendItems:[{text:`グレー: 全試行（表示 ${displayResults.length} 本 / 計算 ${trials} 回）`, color:"#6b7280"},{text:"緑: ベスト", color:"green"},{text:"黒: 固定利率", color:"black"},{text:"赤: ワースト", color:"red"},{text:"オレンジ: 想定寿命時の総資産確率分布", color:"#f59e0b"},{text:summaryText, color:"#2563eb"}, ...(allSame ? [{text:"全試行が固定利率と同一です（リスク資産や利回り設定を確認）", color:"#6b7280"}] : [])]};
     }
   });
   const currentSim = currentBaseSim;
@@ -8803,7 +9173,7 @@ function runMonte(){
         return !!item.text && (!!ds ? ds.data.some(p=>Number.isFinite(p?.y) && Math.abs(p.y) > 1e-9) : true);
       }}}},
       scales:{
-        x:{type:"linear", min:Math.min(firstCfg.xAxisMin ?? firstCfg.age, firstCfg.xAxisMax), max:firstCfg.xAxisMax, offset:false, bounds:"ticks", ticks:{stepSize:5}, title:{display:true,text:"年齢（歳）"}},
+        x:{type:"linear", min:Math.min(firstCfg.xAxisMin ?? firstCfg.age, getMonteDistributionAxisMax(firstCfg)), max:getMonteDistributionAxisMax(firstCfg), offset:false, bounds:"ticks", ticks:{stepSize:5}, title:{display:true,text:"年齢（歳）"}},
         y:{title:{display:true,text:"総資産（万円）"}, ...getAxisBounds(yData, firstCfg, false)}
       }
     },
@@ -9677,27 +10047,150 @@ function percentileFromSorted(sorted, p){
   const weight = pos - low;
   return sorted[low] * (1 - weight) + sorted[high] * weight;
 }
-function buildSharedReturnShocks(cfg, trials){
-  const settings = {...(cfg?.monteCarlo || getMonteCarloSettingsFromDOM()), trials: clampMonteTrials(trials || cfg?.monteCarlo?.trials || 80)};
-  return buildMonteCarloShockTrials(cfg, settings);
+function buildSharedReturnShocks(cfg, trials, scenarioDataOverride, monteSettingsOverride){
+  const settings = {...(monteSettingsOverride || cfg?.monteCarlo || getMonteCarloSettingsFromDOM()), trials: clampMonteTrials(trials || monteSettingsOverride?.trials || cfg?.monteCarlo?.trials || 80)};
+  const cacheData = scenarioDataOverride || cfg || {};
+  const cached = getMonteSharedShockCacheEntry(cacheData, settings);
+  if(cached?.shocks) return cached.shocks;
+  const shocks = buildMonteCarloShockTrials(cfg, settings);
+  setMonteSharedShockCacheEntry(cacheData, settings, shocks);
+  return shocks;
 }
-function runWithdrawalComparisonCalculation(){
-  const cfgBase = getScenarioFromDOM();
-  const trials = clampMonteTrials(cfgBase?.monteCarlo?.trials || 80);
-  const cases = getWithdrawalComparisonCases(cfgBase);
-  if(!cases.length) return [];
-  const shockTrials = buildSharedReturnShocks(cfgBase, trials);
-  return cases.map(compareCase=>{
+function simulateMonteFinalOnlyCore(cfg, staticSeries, returnShocks, lifeIndex){
+  const finalLifeIndex = Math.max(0, Number(lifeIndex) || 0);
+  const deposits = deepClone(cfg.deposits);
+  if(!deposits.length) deposits.push({name:"預貯金1", amount:0, rate:0});
+  const investments = deepClone(cfg.investments);
+  const safeAssets = initializeSafeAssetState(cfg);
+  (cfg.futureInvestments || []).forEach(plan=>investments.push(makeInvestmentEntryFromPlan(plan, 0)));
+  (cfg.sumInvestments || []).forEach(plan=>investments.push(makeInvestmentEntryFromPlan(plan, 0)));
+  let liability = 0;
+  const receiptState = ensureReceiptState();
+  const withdrawalPolicy = getWithdrawalPolicyConfig(cfg);
+  let finalAtLife = null;
+  let depletionAge = null;
+  let retireAsset = null;
+  let totalIncomeSum = 0;
+  let totalExpenseSum = 0;
+
+  for(let age=cfg.age; age<=120; age++){
+    const annualState = initializeAnnualContributionState(investments);
+    annualState.beginningInvestmentTotal = investments.reduce((s, inv)=>s + (Number(inv.amount) || 0), 0);
+    const yearIndex = age - cfg.age;
+
+    deposits.forEach(d=>{
+      const netRate = d.taxOn ? (Number(d.rate || 0) || 0) * (1 - DEPOSIT_INTEREST_TAX_RATE) : (Number(d.rate || 0) || 0);
+      d.amount *= (1 + netRate);
+    });
+    investments.forEach(inv=>{
+      let r = inv.rate;
+      r = randomizeReturn(r, returnShocks?.[yearIndex]);
+      inv.amount *= (1 + r);
+    });
+
+    let incomeObj;
+    let expenseObj;
+    let socialObj;
+    let taxObj;
+    let annualNeed;
+    if(staticSeries && staticSeries[yearIndex]){
+      const cached = staticSeries[yearIndex];
+      expenseObj = cached.expenseObj;
+      socialObj = cached.socialObj;
+      taxObj = cached.taxObj;
+      annualNeed = cached.annualNeedBase || 0;
+      const retirePay = processReceiptIncomeForYear(cfg, age, investments, receiptState);
+      incomeObj = {
+        parts:{...cached.incomeParts, retirePay, interest:0},
+        total:(cached.baseIncomeTotal || 0) + retirePay
+      };
+    }else{
+      incomeObj = getIncomeForYear(cfg, age, yearIndex, investments, receiptState);
+      expenseObj = getExpenseForYear(cfg, age, yearIndex);
+      const socialTaxObj = estimateSocialAndTaxForYear(cfg, age, yearIndex, incomeObj);
+      socialObj = socialTaxObj.social;
+      taxObj = socialTaxObj.tax;
+      annualNeed = annualCashBufferNeed(expenseObj.parts) + (socialObj.total || 0) + (taxObj.total || 0);
+    }
+
+    const safeAssetObj = processSafeAssetsForYear(cfg, age, safeAssets, deposits);
+    incomeObj.parts.interest = safeAssetObj.interestIncome || 0;
+    const income = incomeObj.total + (safeAssetObj.interestIncome || 0);
+    const expense = expenseObj.total + (socialObj.total || 0) + (taxObj.total || 0);
+    const operating = calculateAnnualOperatingCashflow(income, expenseObj.total, socialObj.total || 0, taxObj.total || 0);
+    let net = operating.net;
+
+    totalIncomeSum += income;
+    totalExpenseSum += expense;
+
+    if(net >= 0){
+      if(liability > 0){
+        const repay = Math.min(net, liability);
+        liability -= repay;
+        net -= repay;
+      }
+      if(net > 0){
+        const depositCount = Math.max(1, deposits.length);
+        const per = net / depositCount;
+        deposits.forEach(d=>{ d.amount += per; });
+      }
+    }else{
+      const shortageNeed = consumeDepositsForNeed(-net, deposits);
+      if(shortageNeed > 0.0001){
+        const annualInvestmentReturn = getInvestmentReturnForYear(annualState, investments);
+        const ruleNeeds = calculateWithdrawalNeeds(cfg, withdrawalPolicy, annualNeed, deposits.reduce((s,d)=>s + (Number(d.amount) || 0), 0), investments.reduce((s,i)=>s + (Number(i.amount) || 0), 0), liability, annualInvestmentReturn);
+        ruleNeeds.mode = withdrawalPolicy.mode;
+        const liabilityRef = {value:liability};
+        applyWithdrawalRule(cfg, age, deposits, investments, liabilityRef, annualNeed, shortageNeed, annualState, ruleNeeds);
+        liability = Math.max(0, Number(liabilityRef.value) || 0);
+      }
+    }
+
+    processScheduledInvestments(cfg, age, yearIndex, deposits, investments, annualState);
+
+    const annualInvestmentReturn = getInvestmentReturnForYear(annualState, investments);
+    const ruleNeeds = calculateWithdrawalNeeds(cfg, withdrawalPolicy, annualNeed, deposits.reduce((s,d)=>s + (Number(d.amount) || 0), 0), investments.reduce((s,i)=>s + (Number(i.amount) || 0), 0), liability, annualInvestmentReturn);
+    ruleNeeds.mode = withdrawalPolicy.mode;
+    if(ruleNeeds.targetBuffer > 0 || ruleNeeds.floorBuffer > 0){
+      const liabilityRef = {value:liability};
+      applyWithdrawalRule(cfg, age, deposits, investments, liabilityRef, annualNeed, 0, annualState, ruleNeeds);
+      liability = liabilityRef.value;
+    }
+
+    const depTotal = deposits.reduce((s,d)=>s+d.amount,0);
+    const invTotal = investments.reduce((s,i)=>s+i.amount,0);
+    const safeTotal = safeAssetObj.totalSafeAssets || 0;
+    const total = depTotal + invTotal + safeTotal - liability;
+
+    if(retireAsset === null && age >= cfg.incomeSelf.retireAge) retireAsset = total;
+    if(total <= 0 && depletionAge === null) depletionAge = age;
+    if(yearIndex === finalLifeIndex) finalAtLife = total;
+  }
+
+  return {
+    finalAtLife: Number.isFinite(finalAtLife) ? finalAtLife : 0,
+    depletionAge,
+    retireAsset: Number.isFinite(retireAsset) ? retireAsset : 0,
+    totalIncomeSum,
+    totalExpenseSum
+  };
+}
+function simulateMonteFinalOnly(cfg, staticSeries, returnShocks, lifeIndex){
+  return simulateMonteFinalOnlyCore(cfg, staticSeries, returnShocks, lifeIndex);
+}
+function buildMonteFinalStatsFromCases(cfgBase, cases, shockTrials){
+  return (cases || []).map(compareCase=>{
     const cfg = deepClone(cfgBase);
     cfg.withdrawalPolicy = {...(cfg.withdrawalPolicy || {}), ...(compareCase.policyOverride || {}), mode:compareCase.mode};
-    const base = simulate(cfg, false);
-    const staticSeries = buildMonteStaticSeries(cfg);
-    const lifeIndex = Math.max(0, Math.min(base.labels.length - 1, Number(cfg.lifeExpect || 0) - Number(cfg.age || 0)));
+    const compareData = sanitizeSimulationInputData(cfg, {includeMonteSettings:true});
+    const base = (getNormalSimCacheByData(compareData) || setNormalSimCacheByData(compareData, cfg, simulate(cfg, false))).sim;
+    const staticSeries = getOrBuildMonteStaticSeries(compareData, cfg);
+    const lifeIndexClamped = Math.max(0, Math.min(base.labels.length - 1, Number(cfg.lifeExpect || 0) - Number(cfg.age || 0)));
     const monteFinals = [];
     let fail = 0;
-    for(let i=0;i<trials;i++){
-      const sim = simulate(cfg, true, {compact:true, staticSeries, returnShocks:shockTrials[i]});
-      const finalAtLife = sim.totalAssets[lifeIndex] ?? sim.totalAssets.at(-1) ?? 0;
+    for(let i=0;i<(shockTrials || []).length;i++){
+      const sim = simulateMonteFinalOnly(cfg, staticSeries, shockTrials[i], lifeIndexClamped);
+      const finalAtLife = Number(sim?.finalAtLife || 0);
       if(finalAtLife <= 0) fail++;
       monteFinals.push(finalAtLife);
     }
@@ -9706,10 +10199,10 @@ function runWithdrawalComparisonCalculation(){
       mode: compareCase.mode,
       label: compareCase.label,
       fullLabel: compareCase.fullLabel || compareCase.label,
-      bankruptcyProb: fail / trials,
+      bankruptcyProb: fail / Math.max(1, monteFinals.length),
       best: sorted.at(-1) || 0,
       p95: percentileFromSorted(sorted, 0.95),
-      fixed: base.totalAssets[lifeIndex] ?? base.totalAssets.at(-1) ?? 0,
+      fixed: base.totalAssets[lifeIndexClamped] ?? base.totalAssets.at(-1) ?? 0,
       median: percentileFromSorted(sorted, 0.50),
       mean: monteFinals.reduce((s,v)=>s+v,0) / Math.max(1, monteFinals.length),
       p05: percentileFromSorted(sorted, 0.05),
@@ -9717,6 +10210,19 @@ function runWithdrawalComparisonCalculation(){
       finals: monteFinals
     };
   });
+}
+function runWithdrawalComparisonCalculation(){
+  const cfgBase = getScenarioFromDOM();
+  const monteSettings = cfgBase?.monteCarlo || getMonteCarloSettingsFromDOM();
+  const trials = clampMonteTrials(monteSettings?.trials || 80);
+  const cases = getWithdrawalComparisonCases(cfgBase);
+  if(!cases.length) return [];
+  const cached = getMonteCompareCacheEntry(cfgBase, cases, monteSettings);
+  if(cached?.results) return cached.results;
+  const shockTrials = buildSharedReturnShocks(cfgBase, trials, cfgBase, monteSettings);
+  const results = buildMonteFinalStatsFromCases(cfgBase, cases, shockTrials);
+  setMonteCompareCacheEntry(cfgBase, cases, monteSettings, results);
+  return results;
 }
 function formatCompareMoney(value){
   const n = Number(value);
